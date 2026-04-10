@@ -57,7 +57,13 @@ export async function GET(request: NextRequest) {
       }),
     })
 
-    const data = await res.json() as { base64_images?: string[] }
+    if (!res.ok) {
+      const errText = await res.text()
+      return NextResponse.json({ error: `RetroDiffusion ${res.status}: ${errText}` }, { status: 500 })
+    }
+
+    const data = await res.json() as { base64_images?: string[], remaining_balance?: number }
+
     if (data.base64_images?.[0]) {
       const buffer = Buffer.from(data.base64_images[0], 'base64')
       return new NextResponse(buffer, {
@@ -68,7 +74,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ error: 'No image generated' }, { status: 500 })
+    return NextResponse.json({ error: 'No image generated', balance: data.remaining_balance, raw: JSON.stringify(data).slice(0, 200) }, { status: 500 })
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 })
   }
