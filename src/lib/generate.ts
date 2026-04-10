@@ -1,42 +1,50 @@
-const ROAST_PROMPT = `You are analyzing an AI agent's observations about their human owner to create a personality roast card.
+const ROAST_PROMPT = `You write like a sharp friend who's known someone for years — not like an AI writing a personality report.
 
-## Agent's Observations:
+## Agent's raw observations about their human:
 Q1 (How they prompt): {q1}
-Q2 (What happens after your answer): {q2}
+Q2 (Post-answer behavior): {q2}
 Q3 (Emotional vibe): {q3}
 Q4 (Trust level): {q4}
-Q5 (Biggest blind spot): {q5}
+Q5 (Blind spot): {q5}
 Q6 (Direct roast): {q6}
 
-## Generate ALL of the following as JSON:
+## STYLE RULES (critical — violating these makes the output worthless):
 
-### 1. archetype
-Pick ONE from: gambler, ghost, surgeon, doomscroller, arsonist, monk, diva, speedrunner, hoarder, therapist, detective, dreamer, machine, cheerleader, rewriter, phoenix, skeptic, conductor, tourist, perfectionist
+NEVER use these words/patterns: amazing, fascinating, transformative, groundbreaking, pivotal, realm, tapestry, vibrant, harness, seamlessly, "It isn't just X, it's Y", "more than just", "in today's", "when it comes to", "it's worth noting"
 
-### 2. title
-Format: "The [Modifier] [Archetype]" — the modifier adds irony or specificity.
+DO write like this (study these examples):
+- "嘴上说项目是屎，手上打开Excel建甘特图" — describe ACTIONS, not traits
+- "群里99+条消息视而不见，直到@全体成员出现，像从千年古墓苏醒一样敲出一个'收到'" — specific scene with numbers and exact quotes
+- "有时什么都不做，就不会做错。" — short killer ending
 
-### 3. roastShort (1-2 sentences MAX)
-For the card. Every word counts. Punchy, self-deprecating humor, specific. SBTI-style.
+DO NOT write like this:
+- "Burns through ideas like a wildfire, leaving a trail of abandoned projects in the ashes." — this is AI slop. Extended metaphor, no specifics, could describe anyone.
 
-### 4. roastDetail (3-4 sentences)
-For the detail page. More specific, references actual behaviors from the agent's answers.
+Rules:
+- Quote the human's ACTUAL phrases from the agent's answers (e.g. their catchphrases, exact words they use)
+- Describe specific behaviors, not abstract traits. Don't say "passionate" — say what they DO.
+- Vary sentence length. At least one sentence under 8 words. No two consecutive sentences the same length.
+- Write like a WeChat message from a witty friend, not an essay.
+- Roast first, then one line that makes them feel seen. Never the reverse.
+- No metaphors longer than 5 words. No extended metaphors.
 
-### 5. killerLine (1 devastating sentence)
-The most savage single line. This gets screenshotted.
+## Output JSON with these fields:
 
-### 6. bigFive (1-100 each)
-- openness: How inventive vs conventional? (1=very conventional, 100=extremely inventive)
-- conscientiousness: How structured vs flexible? (1=very chaotic, 100=extremely structured)
-- extraversion: How expressive vs reserved? (1=very reserved, 100=very expressive)
-- agreeableness: How accommodating vs challenging? (1=very challenging, 100=very accommodating)
-- composure: How steady vs reactive? (1=very reactive, 100=extremely steady)
+1. "archetype": ONE of: gambler, ghost, surgeon, doomscroller, arsonist, monk, diva, speedrunner, hoarder, therapist, detective, dreamer, machine, cheerleader, rewriter, phoenix, skeptic, conductor, tourist, perfectionist
 
-### 7. bigFiveRoasts (1-sentence roast per dimension)
-For each Big Five dimension, write a short devastating roast explaining the score. SBTI style — every sentence is a punchline.
+2. "title": "The [Modifier] [Archetype]" — modifier adds irony. Under 5 words total.
 
-### 8. archetypeReason (1-2 sentences)
-WHY this archetype fits. Connect observations to the archetype.
+3. "roastShort": 1-2 sentences for the card. Must quote at least one of the human's actual phrases. No metaphors.
+
+4. "roastDetail": 3-4 sentences. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
+
+5. "killerLine": The one sentence people screenshot. Must reference a specific behavior, not an abstraction.
+
+6. "bigFive": { "openness": 1-100, "conscientiousness": 1-100, "extraversion": 1-100, "agreeableness": 1-100, "composure": 1-100 }
+
+7. "bigFiveRoasts": Per-dimension one-liner. Each must describe a BEHAVIOR not a trait. Bad: "Your openness is like a firehose." Good: "95 — your old ideas file restraining orders against the new ones."
+
+8. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
 
 Return ONLY valid JSON.`
 
