@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateRoast, generateAvatar } from '@/lib/generate'
-import { saveRoast, generateId } from '@/lib/store'
+import { encodeRoast, generateId } from '@/lib/store'
 import type { RoastResult } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
@@ -24,12 +24,10 @@ export async function POST(request: NextRequest) {
 
     const id = generateId()
 
-    // Generate avatar in background (don't block response)
-    const avatarPromise = generateAvatar(roast.archetype, agentName)
-
+    // Try avatar (optional, don't block if fails)
     let avatarUrl: string | undefined
     try {
-      avatarUrl = (await avatarPromise) || undefined
+      avatarUrl = (await generateAvatar(roast.archetype, agentName)) || undefined
     } catch {
       // Avatar is optional
     }
@@ -51,11 +49,11 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     }
 
-    saveRoast(result)
-
+    // Encode entire result into URL — no database needed
+    const encoded = encodeRoast(result)
     const baseUrl = request.headers.get('host') || 'localhost:3888'
     const protocol = baseUrl.includes('localhost') ? 'http' : 'https'
-    const url = `${protocol}://${baseUrl}/roast/${id}`
+    const url = `${protocol}://${baseUrl}/roast/${encoded}`
 
     return NextResponse.json({
       id,

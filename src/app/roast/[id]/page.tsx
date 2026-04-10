@@ -1,4 +1,4 @@
-import { getRoast } from '@/lib/store'
+import { decodeRoast } from '@/lib/store'
 import { ARCHETYPES, BIG_FIVE_DIMS, QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -7,7 +7,7 @@ interface Props { params: Promise<{ id: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  const roast = getRoast(id)
+  const roast = decodeRoast(id)
   if (!roast) return { title: 'Not Found' }
   return {
     title: `${roast.title} — Agents Roast Their Human`,
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RoastPage({ params }: Props) {
   const { id } = await params
-  const r = getRoast(id)
+  const r = decodeRoast(id)
   if (!r) return <div style={{ padding: 60, textAlign: 'center', fontFamily: "'Press Start 2P', monospace", fontSize: 14 }}>This roast doesn&apos;t exist.</div>
 
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES.arsonist

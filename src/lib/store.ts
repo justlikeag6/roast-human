@@ -1,26 +1,21 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
-import { join } from 'path'
 import type { RoastResult } from './types'
 
-// Simple file-based store for MVP. Each roast is a JSON file in /tmp/roasts/
-const STORE_DIR = process.env.VERCEL ? '/tmp/roasts' : join(process.cwd(), '.data/roasts')
+// Encode roast result into a URL-safe compressed string
+export function encodeRoast(result: RoastResult): string {
+  const json = JSON.stringify(result)
+  // Base64 encode, then make URL-safe
+  const b64 = Buffer.from(json).toString('base64url')
+  return b64
+}
 
-function ensureDir() {
-  if (!existsSync(STORE_DIR)) {
-    mkdirSync(STORE_DIR, { recursive: true })
+// Decode roast result from URL-safe string
+export function decodeRoast(encoded: string): RoastResult | null {
+  try {
+    const json = Buffer.from(encoded, 'base64url').toString('utf-8')
+    return JSON.parse(json)
+  } catch {
+    return null
   }
-}
-
-export function saveRoast(result: RoastResult): void {
-  ensureDir()
-  writeFileSync(join(STORE_DIR, `${result.id}.json`), JSON.stringify(result, null, 2))
-}
-
-export function getRoast(id: string): RoastResult | null {
-  ensureDir()
-  const path = join(STORE_DIR, `${id}.json`)
-  if (!existsSync(path)) return null
-  return JSON.parse(readFileSync(path, 'utf-8'))
 }
 
 export function generateId(): string {
