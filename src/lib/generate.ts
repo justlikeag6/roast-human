@@ -59,32 +59,47 @@ export async function generateRoast(responses: Record<string, string>) {
     prompt = prompt.replace(`{${key}}`, value || '(no response)')
   }
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          maxOutputTokens: 2000,
-        },
-      }),
-    },
-  )
+  // Try models in order: 2.5-flash (best) → 2.0-flash-001 (stable fallback)
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash-001', 'gemini-flash-latest']
+  let lastError = ''
 
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Gemini API error ${res.status}: ${err}`)
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              maxOutputTokens: 2000,
+            },
+          }),
+        },
+      )
+
+      if (!res.ok) {
+        lastError = `${model}: ${res.status}`
+        continue
+      }
+
+      const data = await res.json()
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+      if (!text) {
+        lastError = `${model}: no text in response`
+        continue
+      }
+
+      const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      return JSON.parse(jsonStr)
+    } catch (e) {
+      lastError = `${model}: ${e instanceof Error ? e.message : String(e)}`
+    }
   }
 
-  const data = await res.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-  if (!text) throw new Error('No text in Gemini response')
-
-  const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  return JSON.parse(jsonStr)
+  throw new Error(`All Gemini models failed. Last: ${lastError}`)
 }
 
 export async function generateAvatar(archetype: string, agentName: string): Promise<string | null> {
