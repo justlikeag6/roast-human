@@ -1,5 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk'
-
 const ROAST_PROMPT = `You are analyzing an AI agent's observations about their human owner to create a personality roast card.
 
 ## Agent's Observations:
@@ -53,24 +51,39 @@ Return ONLY valid JSON, no markdown fences:
 }`
 
 export async function generateRoast(responses: Record<string, string>) {
-  const client = new Anthropic()
+  const apiKey = process.env.GOOGLE_API_KEY
+  if (!apiKey) throw new Error('GOOGLE_API_KEY not set')
 
   let prompt = ROAST_PROMPT
   for (const [key, value] of Object.entries(responses)) {
     prompt = prompt.replace(`{${key}}`, value || '(no response)')
   }
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1500,
-    messages: [{ role: 'user', content: prompt }],
-  })
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          maxOutputTokens: 2000,
+        },
+      }),
+    },
+  )
 
-  const text = message.content[0]
-  if (text.type !== 'text') throw new Error('No text response')
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Gemini API error ${res.status}: ${err}`)
+  }
 
-  // Parse JSON — handle potential markdown fences
-  const jsonStr = text.text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+  const data = await res.json()
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+  if (!text) throw new Error('No text in Gemini response')
+
+  const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
   return JSON.parse(jsonStr)
 }
 
@@ -103,7 +116,6 @@ export async function generateAvatar(archetype: string, agentName: string): Prom
 
   const archetypePrompt = prompts[archetype] || prompts.arsonist
 
-  // Deterministic seed from agent name
   let hash = 0
   const str = agentName + archetype
   for (let i = 0; i < str.length; i++) {
