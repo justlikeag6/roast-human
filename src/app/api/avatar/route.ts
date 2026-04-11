@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       headers: { 'Content-Type': 'application/json', 'X-RD-Token': apiKey },
       body: JSON.stringify({
         prompt: `tiny game sprite character, ${archetypePrompt}`,
-        prompt_style: 'rd_fast__simple',
+        prompt_style: 'rd_fast__game_asset',
         width: 64,
         height: 64,
         num_images: 1,
