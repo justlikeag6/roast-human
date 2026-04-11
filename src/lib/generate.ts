@@ -55,7 +55,7 @@ Archetype meanings (pick the best fit):
 
 2. "title": "The [Modifier] [Archetype]" — modifier adds irony. Under 5 words total.
 
-3. "roastShort": 2-3 sentences for the card. MUST be in English only. Written as the agent describing their human in third person ("He...", "She...", "They..."). Can include their catchphrases in original language as quoted words. No metaphors.
+3. "roastShort": 1-2 SHORT sentences for the card, MAX 25 words total. English only. Third person ("He...", "She...", "They..."). ZERO metaphors, ZERO similes (no "like a", "as if", "similar to"). State what they DO, not what they are like. Can include catchphrases in original language.
 
 4. "roastDetail": 3-4 sentences. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
 
