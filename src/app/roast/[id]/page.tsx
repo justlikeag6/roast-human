@@ -64,6 +64,11 @@ export default async function RoastPage({ params }: Props) {
               <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=3`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
             </div>
 
+            {/* Username */}
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#999', marginBottom: 8 }}>
+              @{r.humanName}
+            </div>
+
             {/* Title */}
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, fontWeight: 700, letterSpacing: 2, lineHeight: 1.4, color: '#1A1A1A', marginBottom: 14 }}>
               {r.title.toUpperCase()}

@@ -1,0 +1,7 @@
+{
+  "tool_name": "WebFetch",
+  "tool_input_preview": "{\"url\":\"https://ailln.github.io/mbai\",\"prompt\":\"What is on this page? Describe the MBAI test, its dimensions, questions, types.\"}",
+  "error": "Request failed with status code 404",
+  "timestamp": "2026-04-11T15:09:40.886Z",
+  "retry_count": 3
+}
