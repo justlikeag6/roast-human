@@ -1,5 +1,5 @@
 import { decodeRoast } from '@/lib/store'
-import { ARCHETYPES, MBTI_DIMS, QUESTIONS } from '@/lib/types'
+import { ARCHETYPES, AI_DIMS, QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
@@ -31,69 +31,64 @@ export default async function RoastPage({ params }: Props) {
     return (0.299 * rv + 0.587 * g + 0.114 * b) / 255 > 0.68 ? '#181818' : '#EEEADE'
   }
 
+  // Find the most extreme dimension for the card punchline
+  const extremeDim = r.dims ? (() => {
+    const entries = [
+      { key: 'specVibe', pct: r.dims.specVibe },
+      { key: 'shipLoop', pct: r.dims.shipLoop },
+      { key: 'warmCold', pct: r.dims.warmCold },
+      { key: 'trustDoubt', pct: r.dims.trustDoubt },
+    ]
+    return entries.reduce((max, d) => Math.abs(d.pct - 50) > Math.abs(max.pct - 50) ? d : max)
+  })() : null
+
+  const extremeDimMeta = extremeDim ? AI_DIMS.find(d => d.key === extremeDim.key) : null
+  const extremeRoast = extremeDim ? r.dimRoasts?.[extremeDim.key as keyof typeof r.dimRoasts] : null
+
   return (
     <div style={{ minHeight: '100vh', padding: 20, background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 2, color: '#999', textTransform: 'uppercase', marginTop: 20 }}>your agent&apos;s honest opinion of you</div>
 
-        {/* ═══ MAIN CARD (research-optimized: 4:5 ratio, 5 elements) ═══ */}
+        {/* ═══ MAIN CARD ═══ */}
         <div style={{ width: 400, maxWidth: '100%', background: '#FAF7F0', border: '2px solid #1A1A1A', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A', marginTop: 20 }}>
-          {/* Slim brand header */}
           <div style={{ padding: '5px 12px', background: '#1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color: 'rgba(238,234,222,0.7)', letterSpacing: 1 }}>AGENTS ROAST THEIR HUMAN</span>
             <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color, letterSpacing: 1 }}>arena.dev.fun</span>
           </div>
 
           <div style={{ textAlign: 'center', padding: '28px 24px 24px' }}>
-            {/* Avatar — big */}
+            {/* Avatar */}
             <div style={{ width: 160, height: 160, border: '3px solid #1A1A1A', background: '#f5f5f0', overflow: 'hidden', margin: '0 auto 18px', imageRendering: 'pixelated' as never }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=2`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
+              <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=3`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
             </div>
 
-            {/* Title — the loudest element */}
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, fontWeight: 700, letterSpacing: 2, lineHeight: 1.4, color: '#1A1A1A', marginBottom: 6 }}>
+            {/* Title */}
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, fontWeight: 700, letterSpacing: 2, lineHeight: 1.4, color: '#1A1A1A', marginBottom: 14 }}>
               {r.title.toUpperCase()}
             </div>
 
-            {/* MBTI code — social currency */}
-            {r.mbti && (
-              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, letterSpacing: 3, color, marginBottom: 14 }}>
-                {r.mbti.code}
-              </div>
-            )}
-
-            {/* Roast — 2-3 sentences */}
+            {/* Roast */}
             <div style={{ fontSize: 13, fontWeight: 500, lineHeight: 1.7, color: '#444', padding: '0 4px', marginBottom: 14 }}>
               {r.roastShort}
             </div>
 
-            {/* Single most extreme MBTI bar — the punchline */}
-            {r.mbti && (() => {
-              const dims = [
-                { key: 'ei', pct: r.mbti!.ei, low: 'I', high: 'E' },
-                { key: 'sn', pct: r.mbti!.sn, low: 'S', high: 'N' },
-                { key: 'tf', pct: r.mbti!.tf, low: 'T', high: 'F' },
-                { key: 'jp', pct: r.mbti!.jp, low: 'J', high: 'P' },
-              ]
-              const extreme = dims.reduce((max, d) => Math.abs(d.pct - 50) > Math.abs(max.pct - 50) ? d : max)
-              const roast = r.mbtiRoasts?.[extreme.key as keyof typeof r.mbtiRoasts]
-              return (
-                <div style={{ background: '#EEEADE', border: '2px solid #1A1A1A', padding: '10px 14px', marginBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: extreme.pct < 50 ? color : '#999' }}>{extreme.low}</span>
-                    <div style={{ flex: 1, height: 8, background: 'rgba(24,24,24,0.06)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${extreme.pct}%`, background: color }} />
-                    </div>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color: extreme.pct >= 50 ? color : '#999' }}>{extreme.high}</span>
-                    <span style={{ fontSize: 9, fontWeight: 800 }}>{extreme.pct}%</span>
+            {/* Single most extreme dimension bar — the punchline */}
+            {extremeDim && extremeDimMeta && (
+              <div style={{ background: '#EEEADE', border: '2px solid #1A1A1A', padding: '10px 14px', marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: extremeDim.pct < 50 ? color : '#999' }}>{extremeDimMeta.low}</span>
+                  <div style={{ flex: 1, height: 8, background: 'rgba(24,24,24,0.06)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${extremeDim.pct}%`, background: color }} />
                   </div>
-                  {roast && <div style={{ fontSize: 10, fontWeight: 600, color: '#666', fontStyle: 'italic' }}>{roast}</div>}
+                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: extremeDim.pct >= 50 ? color : '#999' }}>{extremeDimMeta.high}</span>
+                  <span style={{ fontSize: 9, fontWeight: 800 }}>{extremeDim.pct}%</span>
                 </div>
-              )
-            })()}
+                {extremeRoast && <div style={{ fontSize: 10, fontWeight: 600, color: '#666', fontStyle: 'italic' }}>{extremeRoast}</div>}
+              </div>
+            )}
 
-            {/* Attribution */}
             <div style={{ fontSize: 10, fontWeight: 600, color: '#999' }}>
               roasted by {r.agentName}
             </div>
@@ -123,27 +118,28 @@ export default async function RoastPage({ params }: Props) {
           </div>
         </Section>
 
-        {/* MBTI PROFILE */}
-        <Section title={`YOUR MBTI: ${r.mbti?.code || '????'}`}>
+        {/* AI DIMENSIONS */}
+        <Section title="HOW YOUR AGENT SEES YOU">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {MBTI_DIMS.map(d => {
-              const pct = r.mbti?.[d.key as keyof typeof r.mbti] as number ?? 50
-              const letter = pct >= 50 ? d.highCode : d.lowCode
+            {AI_DIMS.map(d => {
+              const pct = r.dims?.[d.key as keyof typeof r.dims] ?? 50
               const label = pct >= 50 ? d.high : d.low
-              const roast = r.mbtiRoasts?.[d.key as keyof typeof r.mbtiRoasts]
+              const desc = pct >= 50 ? d.highDesc : d.lowDesc
+              const roast = r.dimRoasts?.[d.key as keyof typeof r.dimRoasts]
               return (
                 <div key={d.key} style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 14, letterSpacing: 2, color }}>{letter}</span>
+                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1, color }}>{d.label}</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: '#555' }}>{label} · {pct}%</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: pct < 50 ? color : '#999' }}>{d.lowCode}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: pct < 50 ? color : '#999' }}>{d.low}</span>
                     <div style={{ flex: 1, height: 10, background: 'rgba(24,24,24,0.04)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${pct}%`, background: color }} />
                     </div>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: pct >= 50 ? color : '#999' }}>{d.highCode}</span>
+                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: pct >= 50 ? color : '#999' }}>{d.high}</span>
                   </div>
+                  <div style={{ fontSize: 10, color: '#888', marginBottom: 8 }}>{desc}</div>
                   {roast && <div style={{ fontSize: 12, fontWeight: 600, color: '#333', lineHeight: 1.6, fontStyle: 'italic' }}>&ldquo;{roast}&rdquo;</div>}
                 </div>
               )
@@ -151,7 +147,7 @@ export default async function RoastPage({ params }: Props) {
           </div>
         </Section>
 
-        {/* KILLER LINE — standalone moment */}
+        {/* KILLER LINE */}
         {r.killerLine && (
           <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '36px 32px', marginBottom: 40, textAlign: 'center' }}>
             <div style={{ fontSize: 15, fontStyle: 'italic', color: '#eee', lineHeight: 1.8, fontWeight: 600, maxWidth: 600, margin: '0 auto' }}>
@@ -188,14 +184,14 @@ export default async function RoastPage({ params }: Props) {
             </div>
             <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>🧠 LLMs actually know your personality</div>
-              <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333' }}>Columbia research: LLMs infer Big Five personality from chat with r=.44 correlation. Your agent knows you better than you think.</p>
+              <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333' }}>Columbia research: LLMs infer personality from chat with r=.44 correlation. Your agent knows you better than you think.</p>
             </div>
           </div>
         </Section>
 
         {/* ALL ARCHETYPES */}
         <Section title="ALL ARCHETYPES">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 10 }}>
             {Object.entries(ARCHETYPES).map(([key, a]) => {
               const isYou = key === r.archetype
               return (

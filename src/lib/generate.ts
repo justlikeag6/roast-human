@@ -31,7 +31,27 @@ Rules:
 
 ## Output JSON with these fields:
 
-1. "archetype": ONE of: gambler, ghost, surgeon, doomscroller, arsonist, monk, diva, speedrunner, hoarder, therapist, detective, dreamer, machine, cheerleader, rewriter, phoenix, skeptic, conductor, tourist, perfectionist
+1. "archetype": ONE of: speedrunner, arsonist, yolo, therapist, outsourcer, npc, yapper, cheerleader, maincharacter, doomscroller, lurker, ghost, overthinker, rewriter, hallucinationhunter, dreamer, perfectionist, phoenix
+
+Archetype meanings (pick the best fit):
+- speedrunner: ships first answer immediately, no revision
+- arsonist: tears everything down and rebuilds from scratch
+- yolo: zero context in prompts, maximum expectations
+- therapist: uses AI as emotional support
+- outsourcer: delegated all thinking to AI, kept the opinions
+- npc: follows AI output without question, zero agency
+- yapper: sends 47 messages before AI finishes responding
+- cheerleader: "amazing!" but hasn't read the output
+- maincharacter: every prompt is a 3-act personal narrative
+- doomscroller: asks everything, acts on nothing
+- lurker: reads every response, implements zero
+- ghost: sends prompt, vanishes, never returns
+- overthinker: 3 hours of prompt engineering for a 5-min task
+- rewriter: rewrites AI output word by word
+- hallucinationhunter: "source?" "verify that" on every response
+- dreamer: grand prompts, zero follow-through
+- perfectionist: it's never done, just another iteration
+- phoenix: only opens AI when everything is already on fire
 
 2. "title": "The [Modifier] [Archetype]" — modifier adds irony. Under 5 words total.
 
@@ -41,20 +61,18 @@ Rules:
 
 5. "killerLine": The one sentence people screenshot. Must reference a specific behavior, not an abstraction.
 
-6. "mbti": MBTI personality assessment based on the agent's observations.
-   - "code": The 4-letter MBTI type (e.g. "ENTP", "ISFJ"). Derive from scores below.
-   - "ei": 1-100. High = Extravert (expressive, social, loud). Low = Introvert (reserved, internal, quiet). Based on Q3 emotional vibe.
-   - "sn": 1-100. High = Intuitive (abstract, big-picture, patterns). Low = Sensing (concrete, detail-oriented, practical). Based on Q1 prompt style and Q5 self-awareness.
-   - "tf": 1-100. High = Feeling (gut decisions, empathy-driven). Low = Thinking (logic, analysis, verification). Based on Q4 trust style.
-   - "jp": 1-100. High = Perceiving (spontaneous, flexible, chaotic). Low = Judging (structured, planned, organized). Based on Q2 iteration pattern and Q1 structure.
-   The "code" must match the scores: E if ei>=50, I if ei<50. N if sn>=50, S if sn<50. F if tf>=50, T if tf<50. P if jp>=50, J if jp<50.
+6. "dims": 4 AI-observation dimensions. Score each 1-100:
+   - "specVibe": How detailed are their prompts? 1=pure vibes ("make it good"), 100=legal-doc specs (bullet points, examples, constraints). Based on Q1.
+   - "shipLoop": Do they accept first output or iterate? 1=ships immediately, 100=infinite revision loop. Based on Q2.
+   - "warmCold": Emotional register with AI? 1=pure function (no greetings, no thanks), 100=treats AI like a friend (please, thanks, shares feelings). Based on Q3.
+   - "trustDoubt": How much they trust AI output? 1=verifies everything ("source?"), 100=copy-pastes blindly. Based on Q4.
 
-7. "mbtiRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
-   - "ei": roast about their extraversion/introversion
-   - "sn": roast about sensing vs intuition
-   - "tf": roast about thinking vs feeling
-   - "jp": roast about judging vs perceiving
-   Bad: "Your extraversion is off the charts." Good: "78 E — sends 15 messages before you finish reading the first one."
+7. "dimRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
+   - "specVibe": roast about how they give instructions
+   - "shipLoop": roast about their iteration behavior
+   - "warmCold": roast about their emotional register with AI
+   - "trustDoubt": roast about their trust level
+   Bad: "Your trust level is high." Good: "92 Trust — would let AI drive their car off a cliff and say 'interesting route.'"
 
 8. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
 
