@@ -36,72 +36,55 @@ export default async function RoastPage({ params }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 2, color: '#999', textTransform: 'uppercase', marginTop: 20 }}>your agent&apos;s honest opinion of you</div>
 
-        {/* ═══ MAIN CARD ═══ */}
-        <div style={{ width: 460, maxWidth: '100%', background: '#EEEADE', border: '2px solid #1A1A1A', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A', marginTop: 20 }}>
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 11px', background: '#1A1A1A' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 7, height: 7, background: color }} />
-              <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 7, color: '#EEEADE', letterSpacing: 1 }}>AGENTS ROAST THEIR HUMAN</span>
-            </div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(238,234,222,0.8)' }}>Roast Card</span>
+        {/* ═══ MAIN CARD (SBTI-style: clean, big avatar, minimal) ═══ */}
+        <div style={{ width: 420, maxWidth: '100%', background: '#fff', border: '2px solid #1A1A1A', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A', marginTop: 20 }}>
+          {/* Header bar */}
+          <div style={{ padding: '6px 14px', background: '#1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 7, color: '#EEEADE', letterSpacing: 1 }}>AGENTS ROAST THEIR HUMAN</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(238,234,222,0.6)' }}>Roast Card</span>
           </div>
 
-          {/* Hero */}
-          <div style={{ textAlign: 'center', padding: '24px 20px 20px', borderBottom: '2px solid #1A1A1A' }}>
-            <div style={{ width: 96, height: 96, border: '3px solid #1A1A1A', background: '#fff', overflow: 'hidden', margin: '0 auto 14px', imageRendering: 'pixelated' as never }}>
+          {/* Big avatar + type name — the screenshot zone */}
+          <div style={{ textAlign: 'center', padding: '32px 24px 24px', background: '#fff' }}>
+            {/* Large avatar */}
+            <div style={{ width: 160, height: 160, border: '3px solid #1A1A1A', background: '#f5f5f0', overflow: 'hidden', margin: '0 auto 20px', imageRendering: 'pixelated' as never }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
             </div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#666', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
-              roasted by: <span style={{ color: '#000' }}>{r.agentName}</span>
-            </div>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 15, fontWeight: 700, letterSpacing: 1, lineHeight: 1.4, color, marginBottom: 8 }}>
+
+            {/* Type name — big and bold */}
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, fontWeight: 700, letterSpacing: 2, lineHeight: 1.4, color: '#1A1A1A', marginBottom: 8 }}>
               {r.title.toUpperCase()}
             </div>
-            <div style={{ display: 'inline-block', fontSize: 9, fontWeight: 700, letterSpacing: 0.5, padding: '3px 12px', border: '2px solid #1A1A1A', background: color, color: contrast(color) }}>
+
+            {/* Archetype badge */}
+            <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, padding: '4px 14px', border: '2px solid #1A1A1A', background: color, color: contrast(color), marginBottom: 16 }}>
               {arch.emoji} {r.archetype}
+            </div>
+
+            {/* MBTI one-liner */}
+            {r.mbti && (
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#666', marginBottom: 8 }}>
+                Your agent thinks you&apos;re <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 14, color, letterSpacing: 2 }}>{r.mbti.code}</span>
+              </div>
+            )}
+
+            {/* Roast — the one-liner */}
+            <div style={{ fontSize: 13, fontWeight: 500, lineHeight: 1.7, color: '#444', marginTop: 12, padding: '0 8px' }}>
+              {r.roastShort}
             </div>
           </div>
 
-          {/* Roast */}
-          <div style={{ padding: '16px 20px', borderBottom: '2px solid #1A1A1A' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.75, color: '#333' }}>{r.roastShort}</div>
-          </div>
-
-          {/* MBTI */}
-          <div style={{ padding: '16px 20px', borderBottom: '2px solid #1A1A1A' }}>
-            {r.mbti && (
-              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 22, textAlign: 'center', letterSpacing: 4, color, marginBottom: 12 }}>
-                {r.mbti.code}
-              </div>
-            )}
-            {MBTI_DIMS.map(d => {
-              const pct = r.mbti?.[d.key as keyof typeof r.mbti] as number ?? 50
-              const letter = pct >= 50 ? d.highCode : d.lowCode
-              return (
-                <div key={d.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, fontWeight: 700, letterSpacing: 1, minWidth: 36, color: pct < 50 ? color : '#999' }}>{d.lowCode}</span>
-                  <div style={{ flex: 1, height: 10, background: 'rgba(24,24,24,0.05)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${pct}%`, background: color }} />
-                  </div>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, fontWeight: 700, letterSpacing: 1, minWidth: 36, textAlign: 'right' as const, color: pct >= 50 ? color : '#999' }}>{d.highCode}</span>
-                  <span style={{ fontSize: 9, fontWeight: 800, minWidth: 24, textAlign: 'right' as const }}>{pct}%</span>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Killer line */}
+          {/* Killer line — dark footer */}
           <div style={{ padding: '14px 20px', background: '#181818' }}>
             <div style={{ fontSize: 11, fontStyle: 'italic', color: '#ddd', lineHeight: 1.75, fontWeight: 600 }}>&ldquo;{r.killerLine}&rdquo;</div>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, marginTop: 8, textTransform: 'uppercase', letterSpacing: 1.5, color }}>&mdash; {r.agentName}</div>
           </div>
 
-          {/* Footer */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 11px', background: '#1A1A1A' }}>
-            <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(238,234,222,0.7)', letterSpacing: 0.5 }}>How does YOUR agent see you?</span>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, color }}>roast.dev.fun</span>
+          {/* Bottom bar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 14px', background: '#1A1A1A' }}>
+            <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(238,234,222,0.6)', letterSpacing: 0.5 }}>How does YOUR agent see you?</span>
+            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, color }}>arena.dev.fun</span>
           </div>
         </div>
 
