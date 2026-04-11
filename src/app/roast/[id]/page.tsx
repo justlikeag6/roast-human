@@ -42,7 +42,7 @@ export default async function RoastPage({ params }: Props) {
             {/* Avatar — large, centered */}
             <div style={{ width: 140, height: 140, border: '3px solid #1A1A1A', background: '#f5f5f0', overflow: 'hidden', margin: '0 auto 20px', imageRendering: 'pixelated' as never }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
+              <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=2`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
             </div>
 
             {/* Type name */}
