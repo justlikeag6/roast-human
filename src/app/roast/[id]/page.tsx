@@ -2,6 +2,7 @@ import { decodeRoast } from '@/lib/store'
 import { ARCHETYPES, DIMENSION_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { DownloadButton } from './DownloadButton'
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -108,57 +109,54 @@ export default async function RoastPage({ params }: Props) {
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 2, color: '#999', textTransform: 'uppercase', marginBottom: 16, textAlign: 'center' }}>
             Save & Share Your Card
           </div>
-          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end', justifyContent: 'center' }}>
 
-            {/* Landscape card preview */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 520, border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A', transform: 'scale(1)', transformOrigin: 'top center' }}>
-                {/* Title */}
-                <div style={{ textAlign: 'center', padding: '20px 20px 14px' }}>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 7, letterSpacing: 3, color: '#1A1A1A', marginBottom: 6 }}>YOUR AGENT THINKS YOU ARE</div>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 22, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 8 }}>{arch.name.toUpperCase()}</div>
-                  <div style={{ fontSize: 9, color: '#555', lineHeight: 1.6 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
+            {/* Landscape preview — small thumbnail, downloads at 3x */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div id="card-landscape" style={{ width: 580, aspectRatio: '16/9', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ textAlign: 'center', padding: '22px 20px 14px' }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 4, color: '#1A1A1A', marginBottom: 8 }}>YOUR AGENT THINKS YOU ARE</div>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 26, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 8, WebkitTextStroke: '0.8px #1A1A1A', textShadow: `0 0 20px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
+                  <div style={{ fontSize: 10, color: '#555', lineHeight: 1.6 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
                 </div>
-                {/* Avatar + killer line */}
-                <div style={{ display: 'flex', borderTop: '2px solid #1A1A1A' }}>
+                <div style={{ display: 'flex', flex: 1, borderTop: '2px solid #1A1A1A' }}>
                   <div style={{ width: 140, background: '#f5f5f0', borderRight: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>{arch.emoji}</div>
-                  <div style={{ flex: 1, background: '#181818', padding: '12px 16px' }}>
-                    <div style={{ fontSize: 7, letterSpacing: 1.5, marginBottom: 6 }}>
-                      <span style={{ color: '#EEEADE' }}>AGENT </span><span style={{ color }}>{r.agentName.toUpperCase()}</span><span style={{ color: '#EEEADE' }}> COOKED YOU</span>
-                    </div>
-                    <div style={{ fontSize: 10, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.6 }}>&ldquo;{r.killerLine}&rdquo;</div>
+                  <div style={{ flex: 1, background: '#181818', padding: '16px 18px', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>&ldquo;{r.killerLine}&rdquo;</div>
                   </div>
                 </div>
-                {/* Footer */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 12px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
-                  <span style={{ fontSize: 7, fontWeight: 700, color: '#0a0a0a' }}>How does YOUR agent see you?</span>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color: '#0a0a0a' }}>roast.dev.fun</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 10px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
+                  <span style={{ fontSize: 6, fontWeight: 700, color: '#0a0a0a' }}>How does YOUR agent see you?</span>
+                  <span style={{ fontSize: 6, fontWeight: 900, color: '#0a0a0a' }}>roast.dev.fun</span>
                 </div>
               </div>
+              <DownloadButton targetId="card-landscape" filename={`roast-${r.archetype}-landscape.png`} label="↓ LANDSCAPE (X)" />
             </div>
 
-            {/* Portrait card preview */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 220, border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A' }}>
-                {/* Title */}
-                <div style={{ textAlign: 'center', padding: '16px 12px 10px' }}>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 5, letterSpacing: 2, color: '#1A1A1A', marginBottom: 6 }}>YOUR AGENT THINKS YOU ARE</div>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 14, fontWeight: 900, color, letterSpacing: 2, lineHeight: 1.1 }}>{arch.name.toUpperCase()}</div>
+            {/* Portrait preview — small thumbnail, downloads at 3x */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div id="card-portrait" style={{ width: 260, aspectRatio: '3/4', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ textAlign: 'center', padding: '18px 14px 12px' }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 2, color: '#1A1A1A', marginBottom: 6 }}>YOUR AGENT THINKS YOU ARE</div>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 16, fontWeight: 900, color, letterSpacing: 2, lineHeight: 1.1, WebkitTextStroke: '0.5px #1A1A1A', textShadow: `0 0 15px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
+                </div>
+                {/* Short description — same as hero subtitle */}
+                <div style={{ padding: '0 14px 12px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 9, color: '#555', lineHeight: 1.5 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
                 </div>
                 {/* Avatar placeholder */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120, borderTop: '2px solid #1A1A1A', borderBottom: '2px solid #1A1A1A', background: '#f5f5f0', fontSize: 60 }}>{arch.emoji}</div>
-                {/* Killer line */}
-                <div style={{ padding: '10px 12px', background: '#181818' }}>
-                  <div style={{ fontSize: 6, letterSpacing: 1, marginBottom: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, borderTop: '2px solid #1A1A1A', borderBottom: '2px solid #1A1A1A', background: '#f5f5f0', fontSize: 70 }}>{arch.emoji}</div>
+                {/* Agent attribution */}
+                <div style={{ padding: '8px 14px', background: '#181818', textAlign: 'center' }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 1 }}>
                     <span style={{ color: '#EEEADE' }}>AGENT </span><span style={{ color }}>{r.agentName.toUpperCase()}</span><span style={{ color: '#EEEADE' }}> COOKED YOU</span>
                   </div>
-                  <div style={{ fontSize: 8, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5 }}>&ldquo;{r.killerLine.length > 80 ? r.killerLine.slice(0, 77) + '...' : r.killerLine}&rdquo;</div>
                 </div>
-                {/* Footer */}
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '4px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 5, color: '#0a0a0a' }}>roast.dev.fun</span>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
+                  <span style={{ fontSize: 7, fontWeight: 900, color: '#0a0a0a' }}>roast.dev.fun</span>
                 </div>
               </div>
+              <DownloadButton targetId="card-portrait" filename={`roast-${r.archetype}-portrait.png`} label="↓ PORTRAIT (小红书)" />
             </div>
           </div>
         </div>
