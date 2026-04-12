@@ -10,9 +10,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'No RetroDiffusion API key' }, { status: 500 })
   }
 
-  // Fixed character style — all archetypes use the same base prompt
-  // Only the seed varies per archetype+name to create subtle differences
-  const archetypePrompt = 'a small cute character with armor surrounded by floating stone fragments and debris'
+  const prompts: Record<string, string> = {
+    degen: 'holding dice, wild grin',
+    notresponding: 'fading away, waving goodbye',
+    npc: 'standing still, question mark above head',
+    delaylama: 'meditating peacefully, clock melting',
+    kanyewaste: 'wearing crown, dramatic pose',
+    aidhd: 'surrounded by lightning bolts, spinning',
+    tabber: 'buried in pile of boxes and papers',
+    scamaltman: 'smiling with hidden hands behind back',
+    sherlock: 'holding magnifying glass, suspicious squint',
+    elonbust: 'pointing at stars, standing on nothing',
+    zuckerbot: 'robot face, no expression, gears visible',
+    copium: 'on fire but smiling, thumbs up',
+    caveman: 'poking a computer with a stick',
+    nokia: 'cracked but standing, glowing eyes',
+  }
+  const archetypePrompt = prompts[archetype] || prompts.degen
 
   // Deterministic seed
   let hash = 0
@@ -27,7 +41,7 @@ export async function GET(request: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-RD-Token': apiKey },
       body: JSON.stringify({
-        prompt: `${archetypePrompt}, grayscale, monochrome`,
+        prompt: `tiny game sprite character, ${archetypePrompt}, grayscale, monochrome`,
         prompt_style: 'rd_fast__simple',
         width: 64,
         height: 64,

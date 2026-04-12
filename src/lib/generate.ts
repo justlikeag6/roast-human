@@ -31,27 +31,23 @@ Rules:
 
 ## Output JSON with these fields:
 
-1. "archetype": ONE of: speedrunner, arsonist, yolo, therapist, outsourcer, npc, yapper, cheerleader, maincharacter, doomscroller, lurker, ghost, overthinker, rewriter, hallucinationhunter, dreamer, perfectionist, phoenix
+1. "archetype": ONE of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia
 
 Archetype meanings (pick the best fit):
-- speedrunner: ships first answer immediately, no revision
-- arsonist: tears everything down and rebuilds from scratch
-- yolo: zero context in prompts, maximum expectations
-- therapist: uses AI as emotional support
-- outsourcer: delegated all thinking to AI, kept the opinions
-- npc: follows AI output without question, zero agency
-- yapper: sends 47 messages before AI finishes responding
-- cheerleader: "amazing!" but hasn't read the output
-- maincharacter: every prompt is a 3-act personal narrative
-- doomscroller: asks everything, acts on nothing
-- lurker: reads every response, implements zero
-- ghost: sends prompt, vanishes, never returns
-- overthinker: 3 hours of prompt engineering for a 5-min task
-- rewriter: rewrites AI output word by word
-- hallucinationhunter: "source?" "verify that" on every response
-- dreamer: grand prompts, zero follow-through
-- perfectionist: it's never done, just another iteration
-- phoenix: only opens AI when everything is already on fire
+- degen: risk-addicted, bets on everything, "this is the one" energy, refuses to quit
+- notresponding: disappears after dropping a task, never follows up, ghosting master
+- npc: consumes endless info but produces nothing, analysis paralysis, spectator
+- delaylama: suspiciously calm, procrastinates spiritually, deadlines do not exist
+- kanyewaste: delusional confidence, main character syndrome, grand vision zero execution details
+- aidhd: cannot focus, interrupts own interruptions, chaotic multi-tasking, ships mystery output
+- tabber: digital hoarder, 247 tabs open, collects everything finishes nothing
+- scamaltman: wraps manipulation in empathy, steers toward predetermined answers, faux-collaborative
+- sherlock: trusts nothing, verifies everything, cross-examines every output, paranoid
+- elonbust: massive vision, zero execution, announces everything ships nothing, roadmap addict
+- zuckerbot: robotic, no personality, pure input-output, possibly not human
+- copium: rationalizes every failure, reframes everything as growth, professional denier
+- caveman: pre-digital human, pokes AI like discovering fire, stubbornly analog
+- nokia: indestructible, crashes and comes back unchanged, never learns but never quits
 
 2. "title": "The [Modifier] [Archetype]" — modifier adds irony. Under 5 words total.
 

@@ -8,10 +8,10 @@ export interface RoastResult {
   roastDetail: string
   killerLine: string
   dims: {
-    specVibe: number   // 1-100, high = Spec (detailed), low = Vibe (vague)
-    shipLoop: number   // 1-100, high = Loop (iterates), low = Ship (accepts first)
-    warmCold: number   // 1-100, high = Warm (emotional), low = Cold (instrumental)
-    trustDoubt: number // 1-100, high = Trust (blind faith), low = Doubt (verify all)
+    specVibe: number
+    shipLoop: number
+    warmCold: number
+    trustDoubt: number
   }
   dimRoasts: {
     specVibe: string
@@ -25,24 +25,20 @@ export interface RoastResult {
 }
 
 export const ARCHETYPES: Record<string, { name: string; emoji: string; color: string }> = {
-  speedrunner: { name: 'The Speedrunner', emoji: '⚡', color: '#FCD34D' },
-  arsonist: { name: 'The Arsonist', emoji: '🔥', color: '#F87171' },
-  yolo: { name: 'The YOLO', emoji: '🎲', color: '#FDA4AF' },
-  therapist: { name: 'The Therapist', emoji: '🛋️', color: '#A5B4FC' },
-  outsourcer: { name: 'The Outsourcer', emoji: '🧠', color: '#C084FC' },
-  npc: { name: 'The NPC', emoji: '🤖', color: '#D6D3D1' },
-  yapper: { name: 'The Yapper', emoji: '💬', color: '#FCD34D' },
-  cheerleader: { name: 'The Cheerleader', emoji: '📣', color: '#6EE7B7' },
-  maincharacter: { name: 'The Main Character', emoji: '🎭', color: '#C084FC' },
-  doomscroller: { name: 'The Doomscroller', emoji: '📱', color: '#A5B4FC' },
-  lurker: { name: 'The Lurker', emoji: '👀', color: '#D6D3D1' },
-  ghost: { name: 'The Ghost', emoji: '👻', color: '#D6D3D1' },
-  overthinker: { name: 'The Overthinker', emoji: '🔎', color: '#67E8F9' },
-  rewriter: { name: 'The Rewriter', emoji: '✏️', color: '#FDA4AF' },
-  hallucinationhunter: { name: 'The Hallucination Hunter', emoji: '🤨', color: '#67E8F9' },
-  dreamer: { name: 'The Dreamer', emoji: '🌙', color: '#C084FC' },
-  perfectionist: { name: 'The Perfectionist', emoji: '💎', color: '#A5B4FC' },
-  phoenix: { name: 'The Phoenix', emoji: '🐦‍🔥', color: '#F87171' },
+  degen: { name: 'Degenerate', emoji: '🎰', color: '#FCD34D' },
+  notresponding: { name: '404 Not Responding', emoji: '👻', color: '#D6D3D1' },
+  npc: { name: 'NPC', emoji: '📱', color: '#A5B4FC' },
+  delaylama: { name: 'Delay Lama', emoji: '🧘', color: '#6EE7B7' },
+  kanyewaste: { name: 'Kanye Waste', emoji: '👑', color: '#C084FC' },
+  aidhd: { name: 'AiDHD', emoji: '⚡', color: '#FCD34D' },
+  tabber: { name: 'Taskpiler', emoji: '📦', color: '#FDA4AF' },
+  scamaltman: { name: 'Scam Altman', emoji: '🛋️', color: '#A5B4FC' },
+  sherlock: { name: 'Sherlock', emoji: '🔍', color: '#67E8F9' },
+  elonbust: { name: 'Elon Bust', emoji: '🌙', color: '#C084FC' },
+  zuckerbot: { name: 'Zuckerbot', emoji: '⚙️', color: '#D6D3D1' },
+  copium: { name: 'Copium', emoji: '🔥', color: '#F87171' },
+  caveman: { name: 'Caveman', emoji: '🦴', color: '#6EE7B7' },
+  nokia: { name: 'Nokia', emoji: '📱', color: '#F87171' },
 }
 
 export const AI_DIMS = [
