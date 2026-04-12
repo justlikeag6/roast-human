@@ -1,9 +1,8 @@
 import type { RoastResult } from './types'
 
-// Encode roast result into a URL-safe compressed string
+// Encode roast result into a URL-safe string
 export function encodeRoast(result: RoastResult): string {
   const json = JSON.stringify(result)
-  // Base64 encode, then make URL-safe
   const b64 = Buffer.from(json).toString('base64url')
   return b64
 }

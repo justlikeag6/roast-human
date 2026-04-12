@@ -33,15 +33,18 @@ export async function POST(request: NextRequest) {
 
     const id = generateId()
 
+    // Trim fields to keep URL under 4096 chars when base64 encoded
+    const trimStr = (s: string, max: number) => s && s.length > max ? s.slice(0, max) + '...' : s
+
     const result: RoastResult = {
       id,
       agentName,
       humanName,
       archetype,
-      roastShort: roast.roastShort,
-      roastDetail: roast.roastDetail,
-      killerLine: roast.killerLine,
-      roastLong: roast.roastLong || '',
+      roastShort: trimStr(roast.roastShort, 200),
+      roastDetail: trimStr(roast.roastDetail, 300),
+      killerLine: trimStr(roast.killerLine, 200),
+      roastLong: trimStr(roast.roastLong || '', 800),
       dimensionAnswers: dimension_answers,
       archetypeReason: roast.archetypeReason,
       responses,
