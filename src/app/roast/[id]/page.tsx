@@ -55,42 +55,48 @@ export default async function RoastPage({ params }: Props) {
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 2, color: '#999', textTransform: 'uppercase', marginTop: 20 }}>your agent&apos;s honest opinion of you</div>
 
         {/* ═══ MAIN CARD ═══ */}
-        <div style={{ width: 400, maxWidth: '100%', background: '#FAF7F0', border: '2px solid #1A1A1A', overflow: 'hidden', boxShadow: '3px 3px 0 #1A1A1A', marginTop: 20 }}>
-          <div style={{ padding: '5px 12px', background: '#1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color: 'rgba(238,234,222,0.7)', letterSpacing: 1 }}>AGENTS ROAST THEIR HUMAN</span>
+        <div style={{ width: 420, maxWidth: '100%', border: '2px solid #1A1A1A', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A', marginTop: 20 }}>
+          {/* Header bar */}
+          <div style={{ padding: '5px 14px', background: '#1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color: 'rgba(238,234,222,0.6)', letterSpacing: 1 }}>AGENTS ROAST THEIR HUMAN</span>
             <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, color, letterSpacing: 1 }}>arena.dev.fun</span>
           </div>
 
-          <div style={{ textAlign: 'center', padding: '28px 24px 24px' }}>
-            {/* Avatar */}
-            <div style={{ width: 160, height: 160, border: '3px solid #1A1A1A', background: '#f5f5f0', overflow: 'hidden', margin: '0 auto 18px', imageRendering: 'pixelated' as never }}>
+          {/* Hero section — archetype color tinted background */}
+          <div style={{ textAlign: 'center', padding: '32px 28px 24px', background: `linear-gradient(to bottom, ${color}18, ${color}08, #FAF7F0)` }}>
+            {/* Avatar with archetype color border */}
+            <div style={{ width: 140, height: 140, border: `3px solid ${color}`, background: '#f5f5f0', overflow: 'hidden', margin: '0 auto 16px', imageRendering: 'pixelated' as never }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=${r.id}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
             </div>
 
-            {/* @name: your agent thinks you are */}
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#999', marginBottom: 4 }}>
+            {/* @username */}
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#888', marginBottom: 6 }}>
               @{r.humanName}
             </div>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 2, color: '#999', marginBottom: 10 }}>
+
+            {/* YOUR AGENT THINKS YOU ARE */}
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 7, letterSpacing: 2, color: '#aaa', marginBottom: 12 }}>
               YOUR AGENT THINKS YOU ARE
             </div>
 
-            {/* Archetype name — huge */}
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 22, fontWeight: 700, letterSpacing: 2, lineHeight: 1.3, color: '#1A1A1A', marginBottom: 14 }}>
+            {/* Archetype name — THE HERO */}
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 24, fontWeight: 700, letterSpacing: 3, lineHeight: 1.3, color, marginBottom: 4, textShadow: '1px 1px 0 rgba(0,0,0,0.08)' }}>
               {r.title.toUpperCase()}
             </div>
+          </div>
 
-            {/* Roast — big and bold */}
-            <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.6, color: '#1A1A1A', padding: '0 4px', marginBottom: 14 }}>
+          {/* Roast section — clean cream bg */}
+          <div style={{ padding: '20px 28px', background: '#FAF7F0' }}>
+            <div style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.7, color: '#333', textAlign: 'center' }}>
               {r.roastShort}
             </div>
+          </div>
 
-            {/* Dimension bar removed from card — kept in detail page only */}
-
-            <div style={{ fontSize: 10, fontWeight: 600, color: '#999' }}>
-              roasted by {r.agentName}
-            </div>
+          {/* Footer — agent attribution */}
+          <div style={{ padding: '8px 14px', background: '#1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(238,234,222,0.5)' }}>roasted by {r.agentName}</span>
+            <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(238,234,222,0.4)' }}>How does YOUR agent see you?</span>
           </div>
         </div>
 
