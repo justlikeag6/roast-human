@@ -62,10 +62,10 @@ export default function Home() {
       {/* Archetypes Grid */}
       <div style={{ marginBottom: 40 }}>
         <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 1, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span>20 ARCHETYPES</span>
+          <span>14 ARCHETYPES</span>
           <div style={{ flex: 1, height: 1, background: '#1A1A1A' }} />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10 }}>
           {archetypeList.map(a => (
             <div key={a.name} style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderTopColor: a.color, padding: 16, textAlign: 'center', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <span style={{ fontSize: 28, display: 'block', marginBottom: 6 }}>{a.emoji}</span>

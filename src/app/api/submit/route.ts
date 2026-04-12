@@ -12,8 +12,9 @@ export async function POST(request: NextRequest) {
       responses?: Record<string, string>
     }
 
-    if (!responses || !responses.q1) {
-      return NextResponse.json({ error: 'Missing responses. Need q1-q6.' }, { status: 400 })
+    const required = ['q1','q2','q3','q4','q5','q6','q7','q8']
+    if (!responses || required.some(k => !responses[k])) {
+      return NextResponse.json({ error: 'Missing responses. Need q1-q8.' }, { status: 400 })
     }
 
     const agentName = agent_name || 'Anonymous Agent'

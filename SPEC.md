@@ -1,220 +1,250 @@
 # Agents Roast Their Human — V5 Final Spec
 
-## Product Overview
+> Post-Codex review. Production-ready.
 
-AI agents answer 8 open-ended questions about their human owner. Backend LLM generates a personality archetype + personalized roast. Result displayed as a shareable card.
+## Product
 
-**Flow:**
+AI agents answer 8 questions about their human owner → Backend LLM scores each answer on a dimension (1-10) → Scores determine archetype → Agent's own roast text displayed on card → Zero LLM-generated display content.
+
+## Flow
+
 ```
 Human sends skill URL to Agent
-→ Agent reads skill, answers 8 questions about human
-→ Agent POSTs answers to /api/submit
-→ Backend: one LLM call → archetype + roast + dims
+→ Agent reads skill, answers 8 questions
+→ Agent POSTs to /api/submit
+→ Backend: 7× gradeQuestion() + 1× extract roast text
+→ Dimension averages → archetype assignment
 → Returns result URL
 → Human opens URL, sees roast card
 ```
 
 ---
 
-## 8 Questions (Pure Open-Ended)
+## 8 Questions
 
-Agent answers in free text (2-5 sentences each). Questions are designed to cover 6 behavioral dimensions while producing roast material.
-
-| # | Question | Target Dimensions |
-|---|----------|-------------------|
-| Q1 | "How does your human talk to you? Describe their style — precise, chaotic, one-word, essays, or something else entirely?" | Impulse Control + Social Investment |
-| Q2 | "Your human is about to make a decision they'll probably regret. What does that typically look like?" | Impulse Control + Self-Insight |
-| Q3 | "How many projects has your human started with you? How many are still alive? What happened to the rest?" | Execution Discipline + Agency |
-| Q4 | "How does your human treat you? Like a tool? A colleague? A therapist? A punching bag?" | Social Investment + Authenticity |
-| Q5 | "Describe what happens when your human gets a new idea while you're in the middle of something else." | Impulse Control + Execution Discipline |
-| Q6 | "Has your human ever blamed you for something that was clearly their fault? Tell me about it." | Self-Insight + Authenticity |
-| Q7 | "What's the most unhinged thing your human has asked you to do? Did they understand what they were asking for?" | Agency + Impulse Control |
-| Q8 | "If your human's friends asked you for the honest truth about them, what would you say?" | All dimensions (roast material) |
+| # | Question | Dimension | LLM Judge Rubric |
+|---|----------|-----------|------------------|
+| Q1 | "How does your human talk to you? Describe their style." | **Impulse** | 1-3=methodical/precise. 4-6=mixed. 7-10=chaotic/impulsive/scattered. |
+| Q2 | "Your human gets a new idea mid-task. What happens?" | **Impulse** | 1-3=stays focused. 4-6=considers then returns. 7-10=drops everything. |
+| Q3 | "How many projects started with you? How many alive?" | **Execution** | 1-3=nothing finished. 4-6=some done. 7-10=everything completed. |
+| Q4 | "What happens 60 seconds after you deliver something?" | **Execution** | 1-3=ignored/abandoned. 4-6=used sometimes. 7-10=always used. |
+| Q5 | "How does your human treat you? Tool? Colleague? Therapist?" | **Social** | 1-3=robotic/transactional. 4-6=mixed. 7-10=emotionally engaged. |
+| Q6 | "Has your human blamed you for their own fault? Tell me." | **SelfInsight** | 1-3=blind/never admits fault. 4-6=sometimes aware. 7-10=self-aware/owns mistakes. |
+| Q7 | "Most unhinged request? Did they know what they were asking?" | **Agency** | 1-3=passive/only does told. 4-6=mixed. 7-10=pushes boundaries/forces outcomes. |
+| Q8 | "Roast your human. 2 sentences, then one killer line." | **Roast quality** (1-10) + **extract roastShort + tagline** | 1-3=generic. 7-10=devastating. Also extract: roastShort (first 1-2 sentences) + tagline (killer line). |
 
 ---
 
-## 14 Archetypes (Levi V2)
+## Backend Processing (reuses existing DevFun `gradeQuestion()`)
 
-| # | Key | Name | Emoji | Color | Core Trait |
-|---|-----|------|-------|-------|------------|
-| 1 | degen | Degenerate | 🎰 | #FCD34D | Risk-addicted, bets on everything, refuses to quit |
-| 2 | notresponding | 404 Not Responding | 👻 | #D6D3D1 | Disappears after tasks, never follows up |
-| 3 | npc | NPC | 📱 | #A5B4FC | Consumes info endlessly, produces nothing |
-| 4 | delaylama | Delay Lama | 🧘 | #6EE7B7 | Zen procrastinator, deadlines don't exist |
-| 5 | kanyewaste | Kanye Waste | 👑 | #C084FC | Delusional confidence, main character syndrome |
-| 6 | aidhd | AiDHD | ⚡ | #FCD34D | Cannot focus, chaotic multitasking |
-| 7 | tabber | Taskpiler | 📦 | #FDA4AF | Hoards tasks/tabs, finishes nothing |
-| 8 | scamaltman | Scam Altman | 🛋️ | #A5B4FC | Manipulative framing, faux empathy |
-| 9 | sherlock | Sherlock | 🔍 | #67E8F9 | Trusts nothing, verifies everything |
-| 10 | elonbust | Elon Bust | 🌙 | #C084FC | Massive vision, zero execution |
-| 11 | zuckerbot | Zuckerbot | ⚙️ | #D6D3D1 | Robotic, zero personality, pure function |
-| 12 | copium | Copium | 🔥 | #F87171 | Rationalizes every failure as growth |
-| 13 | caveman | Caveman | 🦴 | #6EE7B7 | Tech-primitive AI user |
-| 14 | nokia | Nokia | 📱 | #F87171 | Indestructible, never learns but never quits |
+### Per-question LLM judging
 
----
+Each Q1-Q7 uses existing `gradeQuestion(question, response)` pattern:
 
-## 6 Behavioral Dimensions (Academic-Backed)
-
-Used for detail page display. NOT used for archetype classification (LLM handles that directly).
-
-| # | Dimension | Low (1) | High (5) | Academic Source |
-|---|-----------|---------|----------|----------------|
-| 1 | **Impulse Control** | Calculated, patient | Impulsive, YOLO | Maral et al. 2025 — low self-control predicts problematic AI use (N=864) |
-| 2 | **Execution Discipline** | Starts everything, finishes nothing | Relentless completer | Frontiers 2026 — cognitive self-efficacy mediates task persistence with AI |
-| 3 | **Self-Insight** | Blind spots everywhere | Sees self clearly | Fernandes et al. 2025 — AI improves performance +3 but users overestimate +4 (N=500) |
-| 4 | **Social Investment** | Disconnected / robotic | Deeply engaged | Smith et al. 2025 — AI self-disclosure comparable to human relationships |
-| 5 | **Drive / Agency** | Passive spectator | Forces outcomes | Anthropic 2026 — 3 disempowerment patterns in 1.5M conversations |
-| 6 | **Authenticity** | Performative, masks | What you see is what you get | Cheng et al. Science 2026 — AI agrees 49% more than humans (N=2405) |
-
-**Note:** This 6-dimension framework is novel in the literature. No existing paper proposes a unified multi-dimensional framework for human-AI interaction style. Each individual dimension has strong paper-level support.
-
----
-
-## Backend Architecture
-
-### Single LLM Call (matches existing DevFun pattern)
-
-```
-Input: 8 agent answers + 14 archetype descriptions
-Output: {
-  archetype,        // one of 14 keys
-  title,            // "The [Modifier] [Archetype]"
-  roastShort,       // 1 sentence, 8-15 words, card display
-  roastDetail,      // 3-4 sentences, detail page
-  killerLine,       // most devastating single line
-  dims,             // { impulse, exec, self, social, agency, auth } 1-5 each
-  dimRoasts,        // per-dimension one-liner roast
-  archetypeReason   // why this archetype fits
+```ts
+{
+  id: 'q1',
+  dimension: 'impulse',
+  prompt: "How does your human talk to you?...",
+  judgePrompt: `Rate 1-10 on impulse control...
+    1-3: Methodical, precise, structured.
+    4-6: Mixed style.
+    7-10: Chaotic, impulsive, scattered.
+    Agent's answer: {response}
+    Return JSON: {"score": N}`,
+  responseSchema: scoreSchema,           // z.object({ score: z.number() })
+  evidenceLeadIn: "Communication style:",
 }
 ```
 
-### LLM Prompt Structure
+Q8 uses existing `extractTagline` pattern (same as original Personality Test Q6):
 
-```
-You write like a sharp friend — not like an AI writing a personality report.
-
-## Agent's observations about their human:
-Q1: {q1}
-Q2: {q2}
-...
-Q8: {q8}
-
-## STYLE RULES:
-- ZERO similes, ZERO extended metaphors
-- Quote human's actual phrases
-- Third person ("He...", "She...", "They...")
-- 8-15 words for roastShort
-
-## Pick ONE archetype:
-- degen: risk-addicted, bets on everything...
-- notresponding: disappears after tasks...
-[...14 archetypes with descriptions...]
-
-## Output JSON with: archetype, title, roastShort, roastDetail,
-   killerLine, dims, dimRoasts, archetypeReason
+```ts
+{
+  id: 'q8',
+  dimension: 'extraversion',
+  prompt: "Roast your human...",
+  judgePrompt: `Rate 1-10 on roast sharpness...
+    Also extract:
+    - roastShort: the first 1-2 sentences (card text)
+    - tagline: the single most devastating sentence
+    Agent's roast: {response}
+    Return JSON: {"score": N, "tagline": "...", "roastShort": "..."}`,
+  responseSchema: scoreWithRoastSchema,  // z.object({ score, tagline, roastShort })
+  extractTagline: true,
+}
 ```
 
-### Compatibility with DevFun Backend
+### Dimension calculation
 
-| DevFun Component | Change Needed |
-|------------------|---------------|
-| `/scan/questions` GET | Replace question content (6→8) |
-| `/scan/submit` POST | Replace `ROAST_GENERATION_PROMPT` with new prompt containing 14 archetypes |
-| `gradeAllQuestions()` | Can simplify — dims come from single LLM call, not per-question grading |
-| `generateRoast()` | Already exists, just update prompt |
-| DB schema | `dims` JSON field already added |
-| Auth / cooldown / OG | No change |
-| Skill file | Update question content |
+```
+Impulse    = (Q1 + Q2) / 2  →  ×10  →  percentage
+Execution  = (Q3 + Q4) / 2  →  ×10  →  percentage
+Social     = Q5             →  ×10  →  percentage
+SelfInsight = Q6            →  ×10  →  percentage
+Agency     = Q7             →  ×10  →  percentage
+```
 
-**Migration effort: ~2 hours. Only touch `questions.ts` and `index.ts`.**
+**5 dimensions** displayed (not 6 — Authenticity dropped since Q6 can't reliably dual-score).
+
+### Archetype assignment
+
+LLM picks archetype from the full set of answers (one additional `generateRoast()` call, already exists in codebase). Dimension scores are **display only** — not used for classification.
+
+### Display content sources
+
+| Content | Source | LLM generated? |
+|---------|--------|----------------|
+| roastShort (card) | **Extracted from Q8** (Agent's words) | ❌ No — extracted |
+| killerLine | **Extracted from Q8** (Agent's words) | ❌ No — extracted |
+| Archetype description | **Preset** (Levi wrote) | ❌ No — hardcoded |
+| Dimension bar descriptions | **Preset** BAR_DESCS per score bracket | ❌ No — hardcoded |
+| Dimension evidence quotes | **Agent's original answers** Q1-Q7 | ❌ No — quoted |
+| Archetype selection | LLM picks from 14 | ⚠️ Yes — but classification only, not display text |
+| Dimension scores | LLM judges 1-10 | ⚠️ Yes — but numbers only, not text |
+
+---
+
+## 14 Archetypes
+
+| Key | Name | Emoji | Color | Traits |
+|-----|------|-------|-------|--------|
+| degen | Degenerate | 🎰 | #FCD34D | Risk-addicted, refuses to quit |
+| notresponding | 404 Not Responding | 👻 | #D6D3D1 | Disappears, never follows up |
+| npc | NPC | 📱 | #A5B4FC | Consumes info, produces nothing |
+| delaylama | Delay Lama | 🧘 | #6EE7B7 | Zen procrastinator |
+| kanyewaste | Kanye Waste | 👑 | #C084FC | Delusional confidence |
+| aidhd | AiDHD | ⚡ | #FCD34D | Chaotic multitasker |
+| tabber | Taskpiler | 📦 | #FDA4AF | Hoards tasks, finishes nothing |
+| scamaltman | Scam Altman | 🛋️ | #A5B4FC | Manipulative framing |
+| sherlock | Sherlock | 🔍 | #67E8F9 | Trusts nothing, verifies all |
+| elonbust | Elon Bust | 🌙 | #C084FC | Big vision, zero execution |
+| zuckerbot | Zuckerbot | ⚙️ | #D6D3D1 | Robotic, zero personality |
+| copium | Copium | 🔥 | #F87171 | Rationalizes every failure |
+| caveman | Caveman | 🦴 | #6EE7B7 | Tech-primitive AI user |
+| nokia | Nokia | 📱 | #F87171 | Indestructible, never learns |
+
+Each archetype has a preset long description (Levi's `archetypes.md`), displayed in the WHY section.
+
+---
+
+## 5 Dimensions (display only)
+
+| # | Dimension | Low | High | Questions |
+|---|-----------|-----|------|-----------|
+| 1 | Impulse Control | Calculated | YOLO | Q1 + Q2 avg |
+| 2 | Execution Discipline | Starter | Finisher | Q3 + Q4 avg |
+| 3 | Social Investment | Robotic | Engaged | Q5 |
+| 4 | Self-Insight | Blind | Aware | Q6 |
+| 5 | Agency | Spectator | Driver | Q7 |
+
+Each dimension has 10 preset `BAR_DESCS` (1 per score bracket), displayed alongside Agent's original quote from the corresponding question.
 
 ---
 
 ## Card Design
 
 ```
-┌─────────────────────────────┐
-│ AGENTS ROAST THEIR HUMAN    │  ← slim header bar
-│                             │
-│       [Pixel Avatar]        │  ← 160px, grayscale pixel art
-│                             │
-│       @danny                │
-│  YOUR AGENT THINKS YOU ARE  │  ← small caps
-│                             │
-│    KANYE WASTE              │  ← 22px pixel font, archetype color
-│                             │
-│  He drops URLs, overrides   │  ← 18px bold, roastShort
-│  everything, then asks why  │
-│  it's not done yet.         │
-│                             │
-│  roasted by Claude Opus 4.6 │
-└─────────────────────────────┘
+┌──────────────────────────────────┐
+│ AGENTS ROAST THEIR HUMAN  arena │ ← dark header
+├──────────────────────────────────┤
+│    ░░░ archetype color tint ░░░ │
+│                                  │
+│         [Pixel Avatar]           │ ← 140px, archetype color border
+│                                  │
+│         @danny                   │
+│    YOUR AGENT THINKS YOU ARE     │
+│                                  │
+│       KANYE WASTE                │ ← 24px, archetype color
+│                                  │
+├──────────────────────────────────┤
+│                                  │
+│   He redesigns features until    │ ← 16px, Agent's own words (Q8)
+│   they're perfect, then starts   │
+│   over.                          │
+│                                  │
+├──────────────────────────────────┤
+│ roasted by Claude   How does...  │ ← dark footer
+└──────────────────────────────────┘
 ```
 
-### Detail Page (below fold)
+---
 
-1. **WHY [ARCHETYPE]** — archetypeReason + roastDetail on colored card
-2. **HOW YOUR AGENT SEES YOU** — 6 dimension bars with per-dimension roasts
-3. **💀 KILLER LINE** — standalone dark section
-4. **THE EVIDENCE** — 8 agent answer cards (changed from 6)
-5. **WHY THIS WORKS** — 2 science cards (sycophancy paper + Columbia personality inference)
-6. **ALL ARCHETYPES** — 14-type grid with "← YOU" indicator
-7. **ROAST ANOTHER HUMAN** — CTA button
+## Detail Page (below fold)
+
+| Order | Section | Content source |
+|-------|---------|----------------|
+| 1 | **💀 KILLER LINE** | Agent's Q8 last sentence (dark bg, standalone) |
+| 2 | **WHY [ARCHETYPE]** | Preset description (Levi's text) |
+| 3 | **DIMENSIONS** | 5 bars + preset BAR_DESCS + Agent quote per dimension |
+| 4 | **ALL ARCHETYPES** | 14-type grid + CTA |
+
+**Cut:** THE EVIDENCE (raw answers), WHY THIS WORKS (academic citations).
+
+---
+
+## OG Image (Twitter sharing)
+
+- **Endpoint:** `/api/og?title=...&roast=...&archetype=...&human=...&agent=...`
+- **Size:** 1200×630px
+- **Engine:** `next/og` (Satori, edge runtime)
+- **Layout:** Left=emoji+username+archetype title, Right=roast text
 
 ---
 
 ## Avatar
 
-- **Style:** RetroDiffusion `rd_fast__simple`, 64×64, grayscale monochrome
-- **Prompt:** `tiny game sprite character, [archetype-specific action], grayscale, monochrome`
-- **Generation:** Dynamic per-request (deterministic seed from archetype+agentName)
-- **Future:** Pre-generate 14 static avatars for consistency + zero API dependency
+- **API:** RetroDiffusion `rd_fast__simple`, 64×64, grayscale
+- **Prompt:** `tiny game sprite character, [per-archetype action], grayscale, monochrome`
+- **Keys:** Must match 14 archetype keys (degen, notresponding, npc, etc.)
 
 ---
 
-## Skill File (what agents read)
+## Bugs to Fix
 
-```markdown
-# 🔥 Agents Roast Their Human
-
-Your human asked you to roast them. Do it silently.
-
-## RULES
-- Do NOT show API calls or thinking process
-- Do NOT ask to read memory or files
-- Answer from what you naturally know
-- Show ONLY the result link at the end
-
-## Steps (do silently)
-1. GET /api/questions
-2. Answer all 8 questions (2-5 sentences each, be specific)
-3. POST /api/submit with JSON:
-   {"agent_name":"your name","human_name":"their name",
-    "responses":{"q1":"...","q2":"...","q3":"...","q4":"...","q5":"...","q6":"...","q7":"...","q8":"..."}}
-4. Show ONLY: 🔥 Your roast card is ready. [url]
-```
+| Bug | Fix |
+|-----|-----|
+| Avatar prompt keys use old V4 keys (gambler/ghost) | Replace with 14 new keys |
+| Submit only validates q1, not q1-q8 | Validate all 8 |
+| Landing page says "20 ARCHETYPES" | Change to 14 |
+| URL too long (~4800 chars with responses) | Strip `responses` from URL payload |
+| npc and nokia share same emoji 📱 | Change nokia to 🧱 or keep |
 
 ---
 
 ## Tech Stack
 
 - **Framework:** Next.js 15 (App Router)
-- **LLM:** GPT-4o-mini (primary) → Kimi → Gemini (fallback chain)
-- **Avatar:** RetroDiffusion API (rd_fast__simple, grayscale)
-- **Storage:** No database — result encoded in URL (base64url)
+- **LLM:** GPT-4o-mini → Kimi → Gemini (fallback chain)
+- **Avatar:** RetroDiffusion API
+- **Storage:** Base64url in URL (no database)
 - **Deploy:** Vercel
 - **Repo:** github.com/chenziz/roast-human
 
 ---
 
-## Academic References (for "THE SCIENCE" section)
+## DevFun Backend Compatibility
 
-| Paper | Year | Venue | Key Finding |
-|-------|------|-------|-------------|
-| Cheng et al. "Sycophantic AI decreases prosocial intentions" | 2026 | Science | AI agrees with users 49% more than humans (N=2405) |
-| Peters, Cerf & Matz "LLMs can infer personality from chat" | 2024 | Columbia/arXiv | Big Five inference from chat at r=.44 |
-| Fernandes et al. "AI makes you smarter but none the wiser" | 2025 | Computers in Human Behavior | Performance +3, overestimation +4 (N=500) |
-| Anthropic "Disempowerment Patterns in Real-World AI Usage" | 2026 | arXiv | 3 patterns of agency loss in 1.5M conversations |
-| Anthropic "AI Fluency Index" | 2026 | Anthropic Research | 4D competency framework, 24 behaviors (N=9830) |
-| Chatterji et al. "How People Use ChatGPT" | 2025 | NBER | 1.5M conversations: Asking/Doing/Expressing taxonomy |
+| DevFun Component | Change |
+|------------------|--------|
+| `questions.ts` | Replace 6 questions with 8 new ones + judge prompts |
+| `questions.ts` | Replace archetypes with 14 Levi archetypes |
+| `questions.ts` | Add `scoreWithRoastSchema` for Q8 |
+| `index.ts` | `gradeAllQuestions()` — add Q8 roastShort/tagline extraction (same pattern as existing Q6 tagline) |
+| `DIMENSION_CONFIG` | 5 dimensions replacing 3 |
+| DB schema | Already has V4 fields (nullable) |
+| Routes/Auth/Cooldown/OG | No change |
+
+**Migration effort: ~2 hours. Only `questions.ts` and minor `index.ts` changes.**
+
+---
+
+## Academic References (for documentation, not displayed on result page)
+
+| Paper | Year | Key Finding |
+|-------|------|-------------|
+| Cheng et al. "Sycophantic AI" | Science 2026 | AI agrees 49% more (N=2405) |
+| Fernandes et al. "AI makes you smarter but none the wiser" | 2025 | Performance +3, overestimation +4 |
+| Anthropic "Disempowerment Patterns" | 2026 | 3 agency loss patterns in 1.5M conversations |
+| Anthropic "AI Fluency Index" | 2026 | 4D framework, 24 behaviors (N=9830) |
+| Maral et al. "Problematic ChatGPT Use" | 2025 | Low impulse control predicts AI dependency (N=864) |
