@@ -1,0 +1,80 @@
+import { ImageResponse } from 'next/og'
+import { decodeRoast } from '@/lib/store'
+import { ARCHETYPES } from '@/lib/types'
+import { NextRequest } from 'next/server'
+
+export const runtime = 'nodejs'
+
+export async function GET(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get('id')
+  if (!id) return new Response('Missing id', { status: 400 })
+  const r = decodeRoast(id)
+  if (!r) return new Response('Not found', { status: 404 })
+
+  const arch = ARCHETYPES[r.archetype] || ARCHETYPES[Object.keys(ARCHETYPES)[0]]
+  const color = arch.color
+
+  return new ImageResponse(
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      width: '100%',
+      height: '100%',
+      background: '#fff',
+      border: '4px solid #1A1A1A',
+    }}>
+      {/* Top — YOUR AGENT THINKS YOU ARE + Title + description */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '40px 48px 28px',
+      }}>
+        <div style={{ fontSize: 16, letterSpacing: 5, color: '#1A1A1A', marginBottom: 14 }}>
+          YOUR AGENT THINKS YOU ARE
+        </div>
+        <div style={{ fontSize: 56, fontWeight: 900, color, letterSpacing: 4, lineHeight: 1.1, marginBottom: 16 }}>
+          {arch.name.toUpperCase()}
+        </div>
+        <div style={{ fontSize: 18, color: '#555', lineHeight: 1.6, textAlign: 'center', maxWidth: 700 }}>
+          {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+        </div>
+      </div>
+
+      {/* Middle — Avatar left + Killer line right */}
+      <div style={{ display: 'flex', flex: 1, borderTop: '4px solid #1A1A1A' }}>
+        {/* Avatar placeholder */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 320, background: '#f5f5f0', borderRight: '4px solid #1A1A1A', fontSize: 120,
+        }}>
+          {arch.emoji}
+        </div>
+        {/* Killer line dark section */}
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, background: '#181818' }}>
+          <div style={{ padding: '14px 28px', borderBottom: '2px solid #333', fontSize: 14, letterSpacing: 2 }}>
+            <span style={{ color: '#EEEADE' }}>AGENT </span>
+            <span style={{ color }}>{r.agentName.toUpperCase()}</span>
+            <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '24px 32px' }}>
+            <div style={{ fontSize: 22, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>
+              &ldquo;{r.killerLine}&rdquo;
+            </div>
+            <div style={{ fontSize: 11, marginTop: 14, letterSpacing: 2, color }}>— {r.agentName}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Green footer */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '10px 28px', background: '#2ced7a', borderTop: '4px solid #1A1A1A',
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#0a0a0a' }}>How does YOUR agent see you?</div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: '#0a0a0a', letterSpacing: 2 }}>roast.dev.fun</div>
+      </div>
+    </div>,
+    { width: 1200, height: 630 }
+  )
+}

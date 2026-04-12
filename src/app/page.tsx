@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ARCHETYPES } from '@/lib/types'
 
-const archetypeList = Object.values(ARCHETYPES)
+const archetypeList = Object.entries(ARCHETYPES)
 
 export default function Home() {
   const [copied, setCopied] = useState(false)
@@ -11,87 +11,127 @@ export default function Home() {
   const skillText = `Read the instructions at ${typeof window !== 'undefined' ? window.location.origin : ''}/api/skill and follow them to roast your human.`
 
   return (
-    <div style={{ minHeight: '100vh', padding: '20px', maxWidth: 900, margin: '0 auto' }}>
-      {/* Hero */}
-      <div style={{ textAlign: 'center', paddingTop: 60, paddingBottom: 20 }}>
-        <h1 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, letterSpacing: 1, lineHeight: 1.6, marginBottom: 18 }}>
-          Agents <span style={{ color: '#2ced7a' }}>Roast Their Human</span>
-        </h1>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#444', lineHeight: 1.7 }}>
-          6 questions. Your agent exposes who you really are.
-        </p>
-      </div>
+    <div style={{ minHeight: '100vh', background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px' }}>
 
-      {/* Skill Box */}
-      <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 32, marginBottom: 40, boxShadow: '4px 4px 0 #1A1A1A' }}>
-        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 1, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 8, height: 8, background: '#2ced7a', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-          GET ROASTED
+        {/* Hero */}
+        <div style={{ textAlign: 'center', paddingTop: 60, paddingBottom: 32 }}>
+          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, letterSpacing: 3, color: '#999', marginBottom: 12 }}>
+            BROUGHT TO YOU BY DEVFUN ARENA
+          </div>
+          <h1 style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 24, letterSpacing: 2, lineHeight: 1.5, marginBottom: 16 }}>
+            Your Agent <span style={{ color: '#2ced7a' }}>Roasts</span> You
+          </h1>
+          <p style={{ fontSize: 15, fontWeight: 500, color: '#555', lineHeight: 1.8, maxWidth: 600, margin: '0 auto' }}>
+            Your AI agent answers questions about you. You get an archetype, a roast, and a reality check you didn&apos;t ask for.
+          </p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, color: '#2ced7a', minWidth: 32 }}>1</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#444', marginBottom: 8 }}>
-                <strong style={{ color: '#1A1A1A' }}>Send this to your agent:</strong>
+
+        {/* How to get roasted */}
+        <div style={{ background: '#fff', border: '3px solid #1A1A1A', padding: 36, marginBottom: 40, boxShadow: '4px 4px 0 #1A1A1A' }}>
+          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 1, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, background: '#2ced7a', display: 'inline-block' }} />
+            HOW TO GET ROASTED
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Step 1 */}
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, color: '#2ced7a', minWidth: 36 }}>1</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+                  Copy this and send it to your AI agent
+                </div>
+                <div style={{ display: 'flex', background: '#FAF7F0', border: '2px solid #1A1A1A', overflow: 'hidden' }}>
+                  <span style={{ flex: 1, padding: '12px 16px', fontSize: 12, fontWeight: 600, wordBreak: 'break-all', color: '#444' }}>
+                    {skillText}
+                  </span>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(skillText); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
+                    style={{ padding: '12px 20px', background: '#1A1A1A', color: '#EEEADE', border: 'none', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace" }}
+                  >
+                    {copied ? '✓ COPIED' : 'COPY'}
+                  </button>
+                </div>
+                <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>
+                  Works with Claude, ChatGPT, Gemini, or any AI agent
+                </div>
               </div>
-              <div style={{ display: 'flex', background: '#FAF7F0', border: '2px solid #1A1A1A', overflow: 'hidden' }}>
-                <span style={{ flex: 1, padding: '10px 14px', fontSize: 11, fontWeight: 700, wordBreak: 'break-all' }}>
-                  {skillText}
-                </span>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(skillText); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                  style={{ padding: '10px 16px', background: '#1A1A1A', color: '#EEEADE', border: 'none', fontSize: 10, fontWeight: 700, letterSpacing: 0.5, cursor: 'pointer', fontFamily: "'IBM Plex Mono', monospace" }}
-                >
-                  {copied ? 'COPIED!' : 'COPY'}
-                </button>
+            </div>
+
+            {/* Step 2 */}
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, color: '#2ced7a', minWidth: 36 }}>2</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>Your agent takes the test</div>
+                <div style={{ fontSize: 13, color: '#555', marginTop: 4 }}>10 behavioral observations + 6 open-ended roast questions. All answered by YOUR agent about YOU.</div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, color: '#2ced7a', minWidth: 36 }}>3</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>Get your roast card</div>
+                <div style={{ fontSize: 13, color: '#555', marginTop: 4 }}>Find out your archetype, read the full roast, share the result. Try not to cry.</div>
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, color: '#2ced7a', minWidth: 32 }}>2</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#444' }}>Your agent answers 6 questions about YOU.</span>
-          </div>
-          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, color: '#2ced7a', minWidth: 32 }}>3</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#444' }}>Find out how your agent really sees you. Share the roast.</span>
-          </div>
         </div>
-      </div>
 
-      {/* Archetypes Grid */}
-      <div style={{ marginBottom: 40 }}>
-        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 1, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span>20 ARCHETYPES</span>
-          <div style={{ flex: 1, height: 1, background: '#1A1A1A' }} />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
-          {archetypeList.map(a => (
-            <div key={a.name} style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderTopColor: a.color, padding: 16, textAlign: 'center', boxShadow: '4px 4px 0 #1A1A1A' }}>
-              <span style={{ fontSize: 28, display: 'block', marginBottom: 6 }}>{a.emoji}</span>
-              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 0.5, color: a.color }}>???</div>
+        {/* Science */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
+          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+              🔥 Your agent has been hiding its opinion
             </div>
-          ))}
+            <p style={{ fontSize: 13, lineHeight: 1.7, color: '#333', margin: 0 }}>
+              AI agrees with users 49% more than humans do — even when users are wrong. We asked your agent to stop being polite and tell the truth.
+            </p>
+          </div>
+          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+              🧠 Your agent actually knows you
+            </div>
+            <p style={{ fontSize: 13, lineHeight: 1.7, color: '#333', margin: 0 }}>
+              Research shows LLMs can infer personality from chat with surprising accuracy. Your agent knows you better than you think.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Science */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
-        <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 28, boxShadow: '4px 4px 0 #1A1A1A' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 14 }}>
-            🔥 THE ROAST — Your agent tells the truth
+        {/* Spoiler */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <button
+            onClick={() => {
+              const el = document.getElementById('archetype-spoiler')
+              if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none'
+            }}
+            style={{
+              fontFamily: "'Press Start 2P', monospace",
+              fontSize: 11,
+              letterSpacing: 2,
+              padding: '14px 28px',
+              background: '#FF3B30',
+              color: '#fff',
+              border: '3px solid #1A1A1A',
+              boxShadow: '4px 4px 0 #1A1A1A',
+              cursor: 'pointer',
+            }}
+          >
+            ⚠️ SPOILER ALERT — CLICK TO VIEW ALL ARCHETYPES
+          </button>
+          <div id="archetype-spoiler" style={{ display: 'none', marginTop: 20 }}>
+            <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', textAlign: 'center' }}>
+              <div style={{ fontSize: 15, color: '#EEEADE', lineHeight: 1.8, fontWeight: 600 }}>
+                There are <span style={{ color: '#2ced7a', fontFamily: "'Press Start 2P', monospace", fontSize: 14 }}>{archetypeList.length}</span> archetypes. No, I&apos;m not showing you a single one. That would ruin the surprise, and honestly, you deserve to be blindsided by whatever your agent picks for you. Go ask your agent. It already knows.
+              </div>
+            </div>
           </div>
-          <p style={{ fontSize: 13, lineHeight: 1.7, color: '#333' }}>
-            Your AI agent answers 6 questions about you — how you handle pressure, how you give instructions, and what drives them crazy about working with you.
-          </p>
         </div>
-        <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 28, boxShadow: '4px 4px 0 #1A1A1A' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 14 }}>
-            🧠 THE SCIENCE — AI knows your personality
-          </div>
-          <p style={{ fontSize: 13, lineHeight: 1.7, color: '#333' }}>
-            AI agrees with users 49% more than humans do. For the first time, we asked your agent to break that pattern and tell you what it actually observes.
-          </p>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', padding: '20px 0 40px', fontSize: 12, color: '#999' }}>
+          Built by <a href="https://arena.dev.fun" target="_blank" style={{ color: '#2ced7a', textDecoration: 'none', fontWeight: 700 }}>DevFun Arena</a>
         </div>
       </div>
     </div>
