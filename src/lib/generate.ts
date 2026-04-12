@@ -51,7 +51,7 @@ Rules:
 
 4. "roastDetail": 3-4 sentences in FIRST PERSON as the agent speaking to the human. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
 
-5. "killerLine": The one sentence people screenshot. Written in FIRST PERSON as the agent addressing the human directly. Must reference a specific behavior, not an abstraction.
+5. "killerLine": The one sentence people screenshot. Written in FIRST PERSON as the agent addressing the human directly. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, ... — e.g. "{{Levi}}, you named me CallMeDaddy but you are the one getting disciplined." Must reference a specific behavior, not an abstraction.
 
 6. "mbti": MBTI personality assessment based on the agent's observations.
    - "code": The 4-letter MBTI type (e.g. "ENTP", "ISFJ"). Derive from scores below.

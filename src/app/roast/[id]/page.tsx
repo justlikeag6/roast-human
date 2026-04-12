@@ -84,7 +84,7 @@ export default async function RoastPage({ params }: Props) {
 
               {/* Killer line — large text */}
               <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 21, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.9, fontWeight: 600 }}>&ldquo;{r.killerLine}&rdquo;</div>
+                <div style={{ fontSize: 21, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.9, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
                 <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, marginTop: 16, textTransform: 'uppercase', letterSpacing: 1.5, color }}>&mdash; {r.agentName}</div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default async function RoastPage({ params }: Props) {
                 <div style={{ display: 'flex', flex: 1, borderTop: '2px solid #1A1A1A' }}>
                   <div style={{ width: 140, background: '#f5f5f0', borderRight: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>{arch.emoji}</div>
                   <div style={{ flex: 1, background: '#181818', padding: '16px 18px', display: 'flex', alignItems: 'center' }}>
-                    <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>&ldquo;{r.killerLine}&rdquo;</div>
+                    <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 10px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
