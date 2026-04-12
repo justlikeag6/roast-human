@@ -86,20 +86,7 @@ export default async function RoastPage({ params }: Props) {
               {r.roastShort}
             </div>
 
-            {/* Single most extreme dimension bar — the punchline */}
-            {extremeDim && extremeDimMeta && (
-              <div style={{ background: '#EEEADE', border: '2px solid #1A1A1A', padding: '10px 14px', marginBottom: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: extremeDim.pct < 50 ? color : '#999' }}>{extremeDimMeta.low}</span>
-                  <div style={{ flex: 1, height: 8, background: 'rgba(24,24,24,0.06)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${extremeDim.pct}%`, background: color }} />
-                  </div>
-                  <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: extremeDim.pct >= 50 ? color : '#999' }}>{extremeDimMeta.high}</span>
-                  <span style={{ fontSize: 9, fontWeight: 800 }}>{extremeDim.pct}%</span>
-                </div>
-                {extremeRoast && <div style={{ fontSize: 10, fontWeight: 600, color: '#666', fontStyle: 'italic' }}>{extremeRoast}</div>}
-              </div>
-            )}
+            {/* Dimension bar removed from card — kept in detail page only */}
 
             <div style={{ fontSize: 10, fontWeight: 600, color: '#999' }}>
               roasted by {r.agentName}
