@@ -140,23 +140,17 @@ export default async function RoastPage({ params }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {AI_DIMS.map(d => {
               const pct = r.dims?.[d.key as keyof typeof r.dims] ?? 50
-              const label = pct >= 50 ? d.high : d.low
-              const desc = pct >= 50 ? d.highDesc : d.lowDesc
               const roast = r.dimRoasts?.[d.key as keyof typeof r.dimRoasts]
               return (
                 <div key={d.key} style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1, color }}>{d.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#555' }}>{label} · {pct}%</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1, color, marginBottom: 12 }}>{d.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                     <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: pct < 50 ? color : '#999' }}>{d.low}</span>
                     <div style={{ flex: 1, height: 10, background: 'rgba(24,24,24,0.04)', border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ height: '100%', position: 'absolute', top: 0, left: 0, width: `${pct}%`, background: color }} />
                     </div>
                     <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, color: pct >= 50 ? color : '#999' }}>{d.high}</span>
                   </div>
-                  <div style={{ fontSize: 10, color: '#888', marginBottom: 8 }}>{desc}</div>
                   {roast && <div style={{ fontSize: 12, fontWeight: 600, color: '#333', lineHeight: 1.6, fontStyle: 'italic' }}>&ldquo;{roast}&rdquo;</div>}
                 </div>
               )
