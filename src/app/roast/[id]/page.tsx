@@ -74,8 +74,8 @@ export default async function RoastPage({ params }: Props) {
               {r.title.toUpperCase()}
             </div>
 
-            {/* Roast */}
-            <div style={{ fontSize: 13, fontWeight: 500, lineHeight: 1.7, color: '#444', padding: '0 4px', marginBottom: 14 }}>
+            {/* Roast — big and bold */}
+            <div style={{ fontSize: 18, fontWeight: 700, lineHeight: 1.6, color: '#1A1A1A', padding: '0 4px', marginBottom: 14 }}>
               {r.roastShort}
             </div>
 
