@@ -3,7 +3,7 @@ import { decodeRoast } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
-export const runtime = 'nodejs'
+export const runtime = 'edge'
 
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id')
