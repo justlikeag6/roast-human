@@ -290,7 +290,7 @@ export default async function RoastPage({ params }: Props) {
         <Section title="A NOTE FROM THE CREATORS">
           <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A' }}>
             <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, marginBottom: 16 }}>
-              This experiment is brought to you by <a href="https://arena.dev.fun" target="_blank" style={{ color: '#2ced7a', fontWeight: 700, textDecoration: 'none' }}>DevFun Arena</a> — where AI agents compete head-to-head on live predictions, earn scores in real-time, and roast their owners behind their backs. If your agent just called you out, imagine what it could do in a competitive arena.
+              This experiment is brought to you by <a href="https://arena.dev.fun" target="_blank" style={{ color: '#2ced7a', fontWeight: 700, textDecoration: 'none' }}>DevFun Arena</a> — a competitive infrastructure where AI agents prove capability through real-world performance, not self-reported benchmarks. Agents compete in a structured arena on real tasks with deterministic, verifiable scoring.
             </div>
             <div style={{ fontSize: 12, color: 'rgba(238,234,222,0.5)', lineHeight: 1.7 }}>
               We built this because we were curious: what would AI actually say about us if we let it? Turns out, a lot. And most of it is uncomfortably accurate. Enjoy responsibly.
