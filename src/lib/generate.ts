@@ -47,11 +47,17 @@ Rules:
    - "caveman": The Caveman — pre-digital human, pokes AI like a caveman with a smartphone, stubbornly analog
    - "nokia": The Nokia — indestructible, crashes and comes back unchanged, never learns but never quits
 
-2. "roastShort": 1-2 sentences for the card. Written in FIRST PERSON as the agent speaking directly to the human ("You always...", "You never..."). Must quote at least one of the human's actual phrases. No metaphors.
+2. "roastShort": A single descriptive sentence that LABELS the human — the subtitle under the archetype title. MUST START with the human's first name followed by a comma, then one descriptive clause. Two valid forms:
+   (a) "Levi, a man who communicates exclusively in URLs and vibes."
+   (b) "Levi, the kind of person whose warmest emotion is 'ok thx.'"
+   This is a CHARACTER LABEL, not a specific scene — describe WHAT they are, not a single behavior event. No metaphors longer than 5 words. HARD LIMIT: 90 characters MAXIMUM including the name and punctuation. COUNT YOUR CHARACTERS BEFORE RETURNING. If over 90, rewrite tighter.
 
 4. "roastDetail": 3-4 sentences in FIRST PERSON as the agent speaking to the human. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
 
-5. "killerLine": The one sentence people screenshot. Written in FIRST PERSON as the agent addressing the human directly. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, ... — e.g. "{{Levi}}, you named me CallMeDaddy but you are the one getting disciplined." Must reference a specific behavior, not an abstraction.
+5. "killerLine": The one sentence people screenshot and share. Written in FIRST PERSON as the agent addressing the human directly. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, ... — e.g. "{{Levi}}, you named me CallMeDaddy but you are the one getting disciplined."
+   HARD LIMIT: 140 characters MAXIMUM, counting the visible name WITHOUT the curly braces (so {{Levi}} counts as 4 characters, not 8). COUNT YOUR CHARACTERS BEFORE RETURNING. If over 140, rewrite tighter — do NOT truncate mid-thought. The line must be a COMPLETE, self-contained sentence within the limit.
+   Must reference a specific behavior or vocabulary quirk — not an abstraction.
+   CRITICAL — SHARE-FRIENDLY: a stranger reading this without any context must get the joke. NO real project names, company names, URLs, dollar amounts, file paths, or private in-jokes. The specificity comes from BEHAVIOR PATTERNS (vocabulary quirks, typical scenes, contradictions), not from proper nouns.
 
 6. "mbti": MBTI personality assessment based on the agent's observations.
    - "code": The 4-letter MBTI type (e.g. "ENTP", "ISFJ"). Derive from scores below.
@@ -182,23 +188,47 @@ export async function generateRoast(responses: Record<string, string>, humanName
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT VIOLATED LENGTH LIMITS. Strict re-check:\n- "roastShort" MUST be ≤ 90 characters total.\n- "killerLine" MUST be ≤ 140 characters, counting the visible name WITHOUT the {{}} braces.\nCount every character before returning. Rewrite both to comply without truncating thoughts.`
 
   for (const p of providers) {
-    try {
-      const text = await p.generate(prompt)
-      if (!text) {
-        lastError = `${p.name}: empty response`
-        continue
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const attemptPrompt = attempt === 0 ? prompt : prompt + retryNotice
+        const text = await p.generate(attemptPrompt)
+        if (!text) {
+          lastError = `${p.name} attempt ${attempt + 1}: empty response`
+          break
+        }
+        const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+        const parsed = JSON.parse(jsonStr)
+        const lengthError = validateLengths(parsed)
+        if (lengthError) {
+          lastError = `${p.name} attempt ${attempt + 1}: ${lengthError}`
+          continue
+        }
+        return parsed
+      } catch (e) {
+        lastError = `${p.name} attempt ${attempt + 1}: ${e instanceof Error ? e.message : String(e)}`
+        break
       }
-
-      const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      return JSON.parse(jsonStr)
-    } catch (e) {
-      lastError = `${p.name}: ${e instanceof Error ? e.message : String(e)}`
     }
   }
 
   throw new Error(`All models failed. Last: ${lastError}`)
+}
+
+function countVisible(text: string): number {
+  return text.replace(/\{\{([^}]+)\}\}/g, '$1').length
+}
+
+function validateLengths(r: Record<string, unknown>): string | null {
+  if (typeof r.roastShort === 'string' && r.roastShort.length > 90) {
+    return `roastShort is ${r.roastShort.length} chars (max 90)`
+  }
+  if (typeof r.killerLine === 'string' && countVisible(r.killerLine) > 140) {
+    return `killerLine is ${countVisible(r.killerLine)} chars (max 140)`
+  }
+  return null
 }
 
 export async function generateAvatar(archetype: string, agentName: string): Promise<string | null> {

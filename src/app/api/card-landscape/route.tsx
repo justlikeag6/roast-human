@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
           {arch.name.toUpperCase()}
         </div>
         <div style={{ fontSize: 18, color: '#555', lineHeight: 1.6, textAlign: 'center', maxWidth: 700 }}>
-          {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+          {renderRoastShort(r.roastShort, r.humanName)}
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '24px 32px' }}>
             <div style={{ fontSize: 22, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>
-              &ldquo;{r.killerLine}&rdquo;
+              &ldquo;{stripNamePlaceholder(r.killerLine)}&rdquo;
             </div>
             <div style={{ fontSize: 11, marginTop: 14, letterSpacing: 2, color }}>— {r.agentName}</div>
           </div>

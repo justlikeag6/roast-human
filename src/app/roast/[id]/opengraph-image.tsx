@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 
 export const runtime = 'edge'
@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           textAlign: 'center',
           lineHeight: 1.6,
         }}>
-          {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+          {renderRoastShort(r.roastShort, r.humanName)}
         </div>
       </div>
 
@@ -85,7 +85,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           lineHeight: 1.6,
           fontWeight: 600,
         }}>
-          &ldquo;{r.killerLine}&rdquo;
+          &ldquo;{stripNamePlaceholder(r.killerLine)}&rdquo;
         </div>
         <div style={{
           fontSize: 14,

@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
           <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
         </div>
         <div style={{ fontSize: 16, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.6, fontWeight: 600 }}>
-          &ldquo;{r.killerLine.length > 120 ? r.killerLine.slice(0, 117) + '...' : r.killerLine}&rdquo;
+          &ldquo;{stripNamePlaceholder(r.killerLine)}&rdquo;
         </div>
       </div>
 

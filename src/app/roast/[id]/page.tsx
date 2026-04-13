@@ -1,4 +1,4 @@
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort } from '@/lib/store'
 import { ARCHETYPES, DIMENSION_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -59,7 +59,7 @@ export default async function RoastPage({ params }: Props) {
               {arch.name.toUpperCase()}
             </div>
             <div style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.8, color: '#555', maxWidth: 640, margin: '0 auto' }}>
-              {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+              {renderRoastShort(r.roastShort, r.humanName)}
             </div>
           </div>
 
@@ -84,7 +84,7 @@ export default async function RoastPage({ params }: Props) {
 
               {/* Killer line — large text */}
               <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 21, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.9, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
+                <div style={{ fontSize: 21, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.6, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
                 <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, marginTop: 16, textTransform: 'uppercase', letterSpacing: 1.5, color }}>&mdash; {r.agentName}</div>
               </div>
             </div>
@@ -117,7 +117,7 @@ export default async function RoastPage({ params }: Props) {
                 <div style={{ textAlign: 'center', padding: '22px 20px 14px' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 4, color: '#1A1A1A', marginBottom: 8 }}>YOUR AGENT THINKS YOU ARE</div>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 26, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 8, WebkitTextStroke: '0.8px #1A1A1A', textShadow: `0 0 20px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
-                  <div style={{ fontSize: 10, color: '#555', lineHeight: 1.6 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
+                  <div style={{ fontSize: 10, color: '#555', lineHeight: 1.6 }}>{renderRoastShort(r.roastShort, r.humanName)}</div>
                 </div>
                 <div style={{ display: 'flex', flex: 1, borderTop: '2px solid #1A1A1A' }}>
                   <div style={{ width: 140, background: '#f5f5f0', borderRight: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>{arch.emoji}</div>
@@ -142,7 +142,7 @@ export default async function RoastPage({ params }: Props) {
                 </div>
                 {/* Short description — same as hero subtitle */}
                 <div style={{ padding: '0 14px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, color: '#555', lineHeight: 1.5 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
+                  <div style={{ fontSize: 9, color: '#555', lineHeight: 1.5 }}>{renderRoastShort(r.roastShort, r.humanName)}</div>
                 </div>
                 {/* Avatar placeholder */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, borderTop: '2px solid #1A1A1A', borderBottom: '2px solid #1A1A1A', background: '#f5f5f0', fontSize: 70 }}>{arch.emoji}</div>

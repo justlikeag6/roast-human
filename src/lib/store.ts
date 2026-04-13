@@ -20,3 +20,18 @@ export function decodeRoast(encoded: string): RoastResult | null {
 export function generateId(): string {
   return Math.random().toString(36).slice(2, 14)
 }
+
+// Strip {{name}} markers to plain text for renderers that can't style substrings
+// (e.g. Satori / next/og). Web page uses <RoastText> to color them instead.
+export function stripNamePlaceholder(text: string): string {
+  return text.replace(/\{\{([^}]+)\}\}/g, '$1')
+}
+
+// Back-compat: roastShort now bakes in the name prefix, but legacy stored roasts
+// don't. Prepend humanName when missing so old URLs still render correctly.
+export function renderRoastShort(roastShort: string, humanName: string): string {
+  if (!roastShort) return ''
+  if (!humanName) return roastShort
+  if (roastShort.startsWith(humanName)) return roastShort
+  return `${humanName}, ${roastShort.charAt(0).toLowerCase()}${roastShort.slice(1)}`
+}
