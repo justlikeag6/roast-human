@@ -165,7 +165,7 @@ export default async function RoastPage({ params }: Props) {
                   <span style={{ fontSize: 7, fontWeight: 900, color: '#0a0a0a' }}>roast.dev.fun</span>
                 </div>
               </div>
-              <DownloadButton targetId="card-portrait" filename={`roast-${r.archetype}-portrait.png`} label="↓ PORTRAIT (小红书)" />
+              <DownloadButton targetId="card-portrait" filename={`roast-${r.archetype}-portrait.png`} label="↓ PORTRAIT (MOBILE)" />
             </div>
           </div>
         </div>
@@ -195,15 +195,11 @@ export default async function RoastPage({ params }: Props) {
             </div>
             {(() => {
               const fullRoastPlain = stripNamePlaceholder(r.roastLong).replace(/\*\*([^*]+)\*\*/g, '$1')
-              const cap = 180
-              const snippet = fullRoastPlain.length > cap
-                ? fullRoastPlain.slice(0, cap).trimEnd() + '...'
-                : fullRoastPlain
-              const tweetText = `☠️ My agent's full roast:\n\n"${snippet}"\n\nSee how your agent would roast you → roast.dev.fun`
+              const shareText = `☠️ My agent's full roast:\n\n"${fullRoastPlain}"\n\nSee how your agent would roast you → roast.dev.fun`
               return (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
                   <a
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`}
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -221,7 +217,7 @@ export default async function RoastPage({ params }: Props) {
                   >
                     ☠️ SHARE FULL ROAST ON 𝕏
                   </a>
-                  <CopyButton text={fullRoastPlain} />
+                  <CopyButton text={shareText} />
                 </div>
               )
             })()}
