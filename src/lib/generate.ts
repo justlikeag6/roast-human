@@ -269,10 +269,10 @@ function validateLengths(r: Record<string, unknown>): string | null {
   if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
     return 'roastLong is missing or empty'
   }
-  // Enforce ** highlight markers in roastLong (min 6)
+  // Enforce ** highlight markers in roastLong (min 3, soft — only triggers one retry)
   const highlightCount = ((r.roastLong as string).match(/\*\*[^*]+\*\*/g) || []).length
-  if (highlightCount < 6) {
-    return `roastLong has only ${highlightCount} highlights (need at least 6)`
+  if (highlightCount < 3) {
+    return `roastLong has only ${highlightCount} highlights (need at least 3 phrases wrapped in **double asterisks**)`
   }
   return null
 }
