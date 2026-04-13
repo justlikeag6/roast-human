@@ -62,7 +62,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         </div>
         <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
           {arch.traits.map((t, i) => (
-            <span key={i} style={{ padding: '10px 22px', border: '3px solid #1A1A1A', borderRadius: 10, background: '#fff', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
+            <span key={i} style={{ padding: '10px 22px', border: '3px solid #1A1A1A', borderRadius: 18, background: '#fff', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
           ))}
         </div>
       </div>

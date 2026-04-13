@@ -52,7 +52,7 @@ export default async function ReportPage({ params }: Props) {
               A PERSONALITY ASSESSMENT
             </div>
             <div>
-              <div style={{ width: 280, height: 280, margin: '0 auto 32px', border: '3px solid #1A1A1A', borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '6px 6px 0 #1A1A1A' }}>
+              <div style={{ width: 280, height: 280, margin: '0 auto 32px', border: '3px solid #1A1A1A', borderRadius: 18, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '6px 6px 0 #1A1A1A' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={`/archetypes/${r.archetype}.png`} alt={arch.name} style={{ width: 220, height: 220, objectFit: 'contain', imageRendering: 'pixelated' as never }} />
               </div>
@@ -64,7 +64,7 @@ export default async function ReportPage({ params }: Props) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 44 }}>
                 {arch.traits.map((t, i) => (
-                  <span key={i} style={{ padding: '8px 16px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
+                  <span key={i} style={{ padding: '8px 16px', border: '2px solid #1A1A1A', borderRadius: 12, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
                 ))}
               </div>
               <div style={{ fontSize: 16, color: '#1A1A1A', lineHeight: 1.7, fontWeight: 600, maxWidth: 500, margin: '0 auto' }}>
@@ -92,7 +92,7 @@ export default async function ReportPage({ params }: Props) {
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {arch.traits.map((t, i) => (
-                <span key={i} style={{ padding: '7px 14px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
+                <span key={i} style={{ padding: '7px 14px', border: '2px solid #1A1A1A', borderRadius: 12, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
               ))}
             </div>
           </div>
@@ -102,7 +102,7 @@ export default async function ReportPage({ params }: Props) {
           </div>
           <div style={{ borderTop: '2px solid #1A1A1A', paddingTop: 24 }}>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 2, color: '#666', marginBottom: 12 }}>THE VERDICT</div>
-            <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 18, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 18, color: '#EEEADE', lineHeight: 1.6, fontWeight: 600, fontStyle: 'italic' }}>
                 &ldquo;{killerLine}&rdquo;
               </div>
@@ -117,7 +117,7 @@ export default async function ReportPage({ params }: Props) {
         <div className="page">
           <ReportHeader pageNum="02" title="THE FULL ROAST" color={accent} />
           {r.roastLong ? (
-            <div style={{ background: '#FAF7F0', border: '3px solid #1A1A1A', borderRadius: 10, padding: '32px 36px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#FAF7F0', border: '3px solid #1A1A1A', borderRadius: 18, padding: '32px 36px', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 15, color: '#1A1A1A', lineHeight: 1.95, fontWeight: 500 }}>
                 <ReportRoastText text={r.roastLong} nameColor={accent} />
               </div>
@@ -146,7 +146,7 @@ export default async function ReportPage({ params }: Props) {
               const answer = r.responses?.[q.id]
               if (!answer) return null
               return (
-                <div key={q.id} style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '18px 22px', border: '2px solid #1A1A1A', borderRadius: 8, background: '#EEEADE', pageBreakInside: 'avoid' }}>
+                <div key={q.id} style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '18px 22px', border: '2px solid #1A1A1A', borderRadius: 14, background: '#EEEADE', pageBreakInside: 'avoid' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: accent, minWidth: 30, paddingTop: 2, WebkitTextStroke: '0.5px #1A1A1A', paintOrder: 'stroke fill' as never }}>
                     {String(i + 1).padStart(2, '0')}
                   </div>
@@ -171,7 +171,7 @@ export default async function ReportPage({ params }: Props) {
             Drop this into <code style={{ color: '#1A1A1A', fontWeight: 700 }}>CLAUDE.md</code> / <code style={{ color: '#1A1A1A', fontWeight: 700 }}>.cursorrules</code> / ChatGPT custom instructions, and your next agent will actually work the way you do.
           </div>
           {r.agentManual ? (
-            <div style={{ background: '#fff', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#fff', border: '3px solid #1A1A1A', borderRadius: 18, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <ReportManualMarkdown text={r.agentManual} accent={accent} />
             </div>
           ) : (
@@ -184,17 +184,17 @@ export default async function ReportPage({ params }: Props) {
           <ReportHeader pageNum="05" title="APPENDIX" color={accent} />
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 2, color: '#666', marginBottom: 14 }}>WHY THIS WORKS</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 36 }}>
-            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 18, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12, color: '#1A1A1A' }}>🔥 Your AI has been hiding its real opinion</div>
               <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333', margin: 0 }}>AI agrees with users 49% more than humans do — even when users are wrong. For the first time, we asked your agent to break that pattern.</p>
             </div>
-            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 18, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12, color: '#1A1A1A' }}>🧠 LLMs actually know your personality</div>
               <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333', margin: 0 }}>Columbia research: LLMs infer Big Five personality from chat with r=.44 correlation. Your agent knows you better than you think.</p>
             </div>
           </div>
 
-          <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 28 }}>
+          <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 18, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 28 }}>
             <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, marginBottom: 16 }}>
               This experiment is brought to you by <span style={{ color: '#2ced7a', fontWeight: 700 }}>DevFun Arena</span> — a competitive infrastructure where AI agents prove capability through real-world performance, not self-reported benchmarks.
             </div>

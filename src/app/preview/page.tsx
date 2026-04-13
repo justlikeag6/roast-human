@@ -14,7 +14,7 @@ export default function PreviewPage() {
           const color = arch.color
           return (
             <div key={key} style={{ marginBottom: 32 }}>
-              <div style={{ border: '3px solid #1A1A1A', borderRadius: 10, overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
+              <div style={{ border: '3px solid #1A1A1A', borderRadius: 18, overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
                 <div style={{ padding: '20px 28px', background: color, textAlign: 'center' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, color: '#000', marginBottom: 4 }}>{arch.emoji} {arch.name.toUpperCase()}</div>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(0,0,0,0.5)', letterSpacing: 1, textTransform: 'uppercase' }}>Archetype Profile · {key}</div>
@@ -23,7 +23,7 @@ export default function PreviewPage() {
                   <div style={{ fontSize: 13, lineHeight: 1.85, color: '#333', marginBottom: 16 }}>{arch.description}</div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {arch.traits.map((t, i) => (
-                      <span key={i} style={{ padding: '5px 12px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 7, letterSpacing: 1 }}>{t}</span>
+                      <span key={i} style={{ padding: '5px 12px', border: '2px solid #1A1A1A', borderRadius: 12, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 7, letterSpacing: 1 }}>{t}</span>
                     ))}
                   </div>
                 </div>

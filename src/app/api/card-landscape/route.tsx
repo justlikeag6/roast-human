@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       width: '100%',
       height: '100%',
       background: '#fff',
-      border: '4px solid #1A1A1A', borderRadius: 12,
+      border: '4px solid #1A1A1A', borderRadius: 22,
     }}>
       {/* Top — YOUR AGENT THINKS YOU ARE + Title + description */}
       <div style={{
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
           {arch.traits.map((t, i) => (
-            <span key={i} style={{ padding: '8px 16px', border: '2.5px solid #1A1A1A', borderRadius: 7, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
+            <span key={i} style={{ padding: '8px 16px', border: '2.5px solid #1A1A1A', borderRadius: 12, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
           ))}
         </div>
       </div>

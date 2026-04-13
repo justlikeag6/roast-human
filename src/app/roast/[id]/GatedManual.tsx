@@ -103,7 +103,7 @@ export function GatedManual({ roastId, shareText, children }: Props) {
               background: '#2ced7a',
               color: '#0a0a0a',
               border: '3px solid #1A1A1A',
-              borderRadius: 10,
+              borderRadius: 18,
               boxShadow: '4px 4px 0 #1A1A1A',
               cursor: 'pointer',
             }}

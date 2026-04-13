@@ -24,7 +24,7 @@ export function DownloadButton({ targetId, filename, label }: { targetId: string
         padding: '10px 20px',
         background: '#1A1A1A',
         color: '#EEEADE',
-        border: '2px solid #1A1A1A', borderRadius: 6,
+        border: '2px solid #1A1A1A', borderRadius: 12,
         boxShadow: '3px 3px 0 #1A1A1A',
         cursor: 'pointer',
       }}

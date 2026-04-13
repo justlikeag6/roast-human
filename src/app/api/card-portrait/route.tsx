@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       width: '100%',
       height: '100%',
       background: '#fff',
-      border: '4px solid #1A1A1A', borderRadius: 12,
+      border: '4px solid #1A1A1A', borderRadius: 22,
     }}>
       {/* Title section */}
       <div style={{
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           {arch.name.toUpperCase()}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <span style={{ padding: '7px 16px', border: '2.5px solid #1A1A1A', borderRadius: 7, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{pickTrait(arch.traits, r.id)}</span>
+          <span style={{ padding: '7px 16px', border: '2.5px solid #1A1A1A', borderRadius: 12, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{pickTrait(arch.traits, r.id)}</span>
         </div>
       </div>
 
