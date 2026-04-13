@@ -4,12 +4,8 @@ export interface RoastResult {
   humanName: string
   archetype: string
   roastShort: string
-  roastDetail: string
   roastLong: string
   dimensionAnswers: Record<string, string> // d1-d10 → 'a'|'b'|'c'|'d'|'x'
-  archetypeReason: string
-  responses: Record<string, string> // q1-q6 open-ended
-  createdAt: string
 }
 
 export const ARCHETYPES: Record<string, { name: string; emoji: string; color: string; description: string; traits: string[] }> = {

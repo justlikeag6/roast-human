@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const id = generateId()
 
-    // Trim fields to keep URL under 4096 chars when base64 encoded
+    // Trim text fields to keep the URL compact (base64 expands ~33%).
     const trimStr = (s: string, max: number) => s && s.length > max ? s.slice(0, max) + '...' : s
 
     const result: RoastResult = {
@@ -42,12 +42,8 @@ export async function POST(request: NextRequest) {
       humanName,
       archetype,
       roastShort: trimStr(roast.roastShort, 220),
-      roastDetail: trimStr(roast.roastDetail, 300),
       roastLong: trimStr(roast.roastLong || '', 1500),
       dimensionAnswers: dimension_answers,
-      archetypeReason: roast.archetypeReason,
-      responses,
-      createdAt: new Date().toISOString(),
     }
 
     const encoded = encodeRoast(result)
