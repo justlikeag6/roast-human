@@ -6,6 +6,9 @@ export interface RoastResult {
   roastShort: string
   roastLong: string
   dimensionAnswers: Record<string, string> // d1-d10 → 'a'|'b'|'c'|'d'|'x'
+  // Markdown bullet list a future agent can paste into its system prompt.
+  // May be missing on legacy roasts created before this feature shipped.
+  agentManual?: string
 }
 
 export const ARCHETYPES: Record<string, { name: string; emoji: string; color: string; description: string; traits: string[] }> = {

@@ -35,7 +35,7 @@ export function CopyButton({ text, label = 'COPY ROAST' }: { text: string; label
         padding: '10px 18px',
         background: copied ? '#2ced7a' : '#EEEADE',
         color: '#1A1A1A',
-        border: '2px solid #1A1A1A',
+        border: '2px solid #1A1A1A', borderRadius: 6,
         boxShadow: '3px 3px 0 #1A1A1A',
         cursor: 'pointer',
       }}

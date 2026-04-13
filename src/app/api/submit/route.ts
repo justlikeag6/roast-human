@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
       roastShort: trimStr(roast.roastShort, 220),
       roastLong: trimStr(roast.roastLong || '', 1500),
       dimensionAnswers: dimension_answers,
+      agentManual: trimStr(roast.agentManual || '', 1200),
     }
 
     await saveRoast(result)

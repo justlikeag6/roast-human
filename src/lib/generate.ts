@@ -67,6 +67,16 @@ Rules:
    - NO metaphors longer than 5 words. NO AI slop. Every word earns its place.
    - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad. The reader should feel like they're watching someone finally break.
 
+4. "agentManual": THE UTILITY LAYER. A markdown bullet list of 5-8 third-person rules a future AI agent should follow when working with this human. The user can copy-paste this directly into CLAUDE.md / .cursorrules / ChatGPT custom instructions to make their agent work better with them tomorrow.
+   Rules:
+   - Output as a single string of markdown bullets, each line starting with "- ".
+   - Each bullet is 1-2 sentences, written as instruction to a future agent ABOUT this human. Use third-person ("They pick up mid-thought after breaks. Always summarize last context before asking what's next.") — NOT first person to the human, NOT second person.
+   - Derive each rule from the agent's actual answers (q1-q6 + dimension answers). Don't invent traits the data doesn't show.
+   - The first bullet should address their #1 communication quirk. The rest in descending order of impact.
+   - This is the COPY-PASTE deliverable. The user is going to put this into their agent's system prompt. Make it precise, actionable, no fluff.
+   - NO emoji, NO meta-commentary like "based on the test", NO hedging.
+   - NO real names, company names, project names — keep it portable.
+
 Return ONLY valid JSON.`
 
 interface LLMProvider {
@@ -209,6 +219,9 @@ function validateLengths(r: Record<string, unknown>): string | null {
   }
   if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
     return 'roastLong is missing or empty'
+  }
+  if (typeof r.agentManual !== 'string' || r.agentManual.trim().length === 0) {
+    return 'agentManual is missing or empty'
   }
   return null
 }

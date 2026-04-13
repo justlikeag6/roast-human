@@ -30,7 +30,7 @@ export default function Home() {
         </div>
 
         {/* How to get roasted */}
-        <div style={{ background: '#fff', border: '3px solid #1A1A1A', padding: 36, marginBottom: 40, boxShadow: '4px 4px 0 #1A1A1A' }}>
+        <div style={{ background: '#fff', border: '3px solid #1A1A1A', borderRadius: 10, padding: 36, marginBottom: 40, boxShadow: '4px 4px 0 #1A1A1A' }}>
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 1, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, background: '#2ced7a', display: 'inline-block' }} />
             HOW TO GET ROASTED
@@ -86,7 +86,7 @@ export default function Home() {
 
         {/* Science */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 40 }}>
-          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
+          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
             <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
               🔥 Your agent has been hiding its opinion
             </div>
@@ -94,7 +94,7 @@ export default function Home() {
               AI agrees with users 49% more than humans do — even when users are wrong. We asked your agent to stop being polite and tell the truth.
             </p>
           </div>
-          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
+          <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 24, boxShadow: '4px 4px 0 #1A1A1A' }}>
             <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
               🧠 Your agent actually knows you
             </div>
@@ -105,7 +105,7 @@ export default function Home() {
         </div>
 
         {/* Disclaimer */}
-        <div style={{ marginBottom: 32, padding: '18px 22px', border: '2px solid #1A1A1A', background: '#EEEADE', boxShadow: '3px 3px 0 #1A1A1A' }}>
+        <div style={{ marginBottom: 32, padding: '18px 22px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#EEEADE', boxShadow: '3px 3px 0 #1A1A1A' }}>
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 6, height: 6, background: '#1A1A1A', display: 'inline-block' }} />
             DISCLAIMER
@@ -129,7 +129,7 @@ export default function Home() {
               padding: '14px 28px',
               background: '#FF3B30',
               color: '#fff',
-              border: '3px solid #1A1A1A',
+              border: '3px solid #1A1A1A', borderRadius: 10,
               boxShadow: '4px 4px 0 #1A1A1A',
               cursor: 'pointer',
             }}
@@ -137,7 +137,7 @@ export default function Home() {
             ⚠️ SPOILER ALERT — CLICK TO VIEW ALL ARCHETYPES
           </button>
           <div id="archetype-spoiler" style={{ display: 'none', marginTop: 20 }}>
-            <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', textAlign: 'center' }}>
+            <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', textAlign: 'center' }}>
               <div style={{ fontSize: 15, color: '#EEEADE', lineHeight: 1.8, fontWeight: 600 }}>
                 There are <span style={{ color: '#2ced7a', fontFamily: "'Press Start 2P', monospace", fontSize: 14 }}>{archetypeList.length}</span> archetypes. No, I&apos;m not showing you a single one. That would ruin the surprise, and honestly, you deserve to be blindsided by whatever your agent picks for you. Go ask your agent. It already knows.
               </div>

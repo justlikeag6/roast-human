@@ -1,9 +1,12 @@
 import { loadRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
 import { ARCHETYPES, DIMENSION_QUESTIONS } from '@/lib/types'
+import { selectTips } from '@/lib/insight-tips'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DownloadButton } from './DownloadButton'
 import { CopyButton } from './CopyButton'
+import { GatedManual } from './GatedManual'
+import { ShareButton } from './ShareButton'
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -42,7 +45,7 @@ export default async function RoastPage({ params }: Props) {
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
         {/* ═══ HERO CARD — one unified card ═══ */}
-        <div style={{ width: '100%', maxWidth: 900, marginTop: 30, border: '3px solid #1A1A1A', background: '#fff', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
+        <div style={{ width: '100%', maxWidth: 900, marginTop: 30, border: '3px solid #1A1A1A', borderRadius: 10, background: '#fff', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
 
           {/* YOU ARE + Title + description */}
           <div style={{ textAlign: 'center', padding: '40px 32px 28px', background: '#2ced7a' }}>
@@ -54,7 +57,7 @@ export default async function RoastPage({ params }: Props) {
             </div>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
               {arch.traits.map((t, i) => (
-                <span key={i} style={{ padding: '7px 16px', border: '2px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
+                <span key={i} style={{ padding: '7px 16px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
               ))}
             </div>
           </div>
@@ -95,9 +98,12 @@ export default async function RoastPage({ params }: Props) {
 
         {/* Actions */}
         <div style={{ width: '100%', maxWidth: 900, marginTop: 20, display: 'flex', gap: 10 }}>
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}"\n\nGet roasted → roast.dev.fun`)}`} target="_blank" style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}>
-            Share on 𝕏
-          </a>
+          <ShareButton
+            roastId={r.id}
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}"\n\nGet roasted → roast.dev.fun`)}`}
+            label="Share on 𝕏"
+            style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}
+          />
         </div>
 
         {/* Share Cards Preview — rendered as CSS, not API images */}
@@ -109,13 +115,13 @@ export default async function RoastPage({ params }: Props) {
 
             {/* Landscape preview — small thumbnail, downloads at 3x */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-              <div id="card-landscape" style={{ width: 580, aspectRatio: '16/9', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div id="card-landscape" style={{ width: 580, aspectRatio: '16/9', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ textAlign: 'center', padding: '22px 20px 14px' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 4, color: '#1A1A1A', marginBottom: 8 }}>YOUR AGENT THINKS YOU ARE</div>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 26, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 10, WebkitTextStroke: '0.8px #1A1A1A', textShadow: `0 0 20px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
                   <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
                     {arch.traits.map((t, i) => (
-                      <span key={i} style={{ padding: '3px 8px', border: '1.5px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 5, letterSpacing: 0.5 }}>{t}</span>
+                      <span key={i} style={{ padding: '3px 8px', border: '1.5px solid #1A1A1A', borderRadius: 4, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 5, letterSpacing: 0.5 }}>{t}</span>
                     ))}
                   </div>
                 </div>
@@ -141,12 +147,12 @@ export default async function RoastPage({ params }: Props) {
 
             {/* Portrait preview — small thumbnail, downloads at 3x */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-              <div id="card-portrait" style={{ width: 260, aspectRatio: '3/4', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div id="card-portrait" style={{ width: 260, aspectRatio: '3/4', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ textAlign: 'center', padding: '14px 12px 14px' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 2, color: '#1A1A1A', marginBottom: 6 }}>YOUR AGENT THINKS YOU ARE</div>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 15, fontWeight: 900, color, letterSpacing: 2, lineHeight: 1.1, marginBottom: 10, WebkitTextStroke: '0.5px #1A1A1A', textShadow: `0 0 15px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <span style={{ padding: '3px 9px', border: '1.5px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 0.5 }}>{pickTrait(arch.traits, r.id)}</span>
+                    <span style={{ padding: '3px 9px', border: '1.5px solid #1A1A1A', borderRadius: 4, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 0.5 }}>{pickTrait(arch.traits, r.id)}</span>
                   </div>
                 </div>
                 {/* Avatar — bigger square, no divider line above */}
@@ -180,7 +186,7 @@ export default async function RoastPage({ params }: Props) {
         {/* THE FULL ROAST — highlight section */}
         {r.roastLong && (
           <Section title="THE FULL ROAST">
-            <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, fontWeight: 500, letterSpacing: 0.2 }}>
                 <RoastText text={r.roastLong} nameColor={color} />
               </div>
@@ -209,7 +215,7 @@ export default async function RoastPage({ params }: Props) {
                       padding: '10px 18px',
                       background: '#1A1A1A',
                       color: '#EEEADE',
-                      border: '2px solid #1A1A1A',
+                      border: '2px solid #1A1A1A', borderRadius: 6,
                       boxShadow: '3px 3px 0 #1A1A1A',
                       textDecoration: 'none',
                       cursor: 'pointer',
@@ -226,7 +232,7 @@ export default async function RoastPage({ params }: Props) {
 
         {/* ARCHETYPE ANALYSIS */}
         <Section title="ARCHETYPE ANALYSIS">
-          <div style={{ border: '3px solid #1A1A1A', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
+          <div style={{ border: '3px solid #1A1A1A', borderRadius: 10, overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
             {/* Header — archetype title */}
             <div style={{ padding: '36px 32px', background: '#fff', textAlign: 'center' }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#999', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14 }}>Archetype Profile</div>
@@ -241,7 +247,7 @@ export default async function RoastPage({ params }: Props) {
               {/* Traits */}
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {arch.traits.map((t, i) => (
-                  <span key={i} style={{ padding: '6px 14px', border: '2px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 1 }}>{t}</span>
+                  <span key={i} style={{ padding: '6px 14px', border: '2px solid #1A1A1A', borderRadius: 6, background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 1 }}>{t}</span>
                 ))}
               </div>
             </div>
@@ -275,20 +281,75 @@ export default async function RoastPage({ params }: Props) {
         {/* SCIENCE */}
         <Section title="WHY THIS WORKS (MIGHT NOT BE TOTAL BS)">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>🔥 Your AI has been hiding its real opinion</div>
               <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333' }}>AI agrees with users 49% more than humans do — even when users are wrong. For the first time, we asked your agent to break that pattern.</p>
             </div>
-            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
+            <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: 20, boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>🧠 LLMs actually know your personality</div>
               <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333' }}>Columbia research: LLMs infer Big Five personality from chat with r=.44 correlation. Your agent knows you better than you think.</p>
             </div>
           </div>
         </Section>
 
+        {/* ═══ DIVIDER between roast content above and manual content below ═══ */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '32px auto 28px', maxWidth: 760 }}>
+          <div style={{ flex: 1, height: 2, background: '#1A1A1A' }} />
+          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 2, color: '#1A1A1A', whiteSpace: 'nowrap' }}>
+            ROAST ENDS · MANUAL BEGINS
+          </div>
+          <div style={{ flex: 1, height: 2, background: '#1A1A1A' }} />
+        </div>
+
+        {/* ═══ MANUAL SECTION (gated) ═══ */}
+        <Section title="YOUR AI'S USER MANUAL">
+          <GatedManual
+            roastId={r.id}
+            shareText={`☠️ My agent just gave me a custom user manual based on how I actually work with it. Get yours: roast.dev.fun`}
+          >
+            {/* Hero block: the actual manual */}
+            {r.agentManual && (
+              <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1.5, color: '#2ced7a' }}>📖 PASTE INTO YOUR AGENT</div>
+                  <CopyButton text={r.agentManual} label="COPY MANUAL" />
+                </div>
+                <pre style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: '#EEEADE', lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {r.agentManual}
+                </pre>
+                <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(238,234,222,0.1)', fontSize: 10, color: 'rgba(238,234,222,0.5)' }}>
+                  Drop these into CLAUDE.md / .cursorrules / ChatGPT custom instructions / your agent&apos;s system prompt.
+                </div>
+              </div>
+            )}
+
+            {/* Workflow tips */}
+            {(() => {
+              const tips = selectTips(r.dimensionAnswers, 4)
+              if (tips.length === 0) return null
+              return (
+                <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1.5, color: '#1A1A1A', marginBottom: 18 }}>🛠 WHAT THIS FIXES</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {tips.map((tip, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                        <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: '#2ced7a', minWidth: 26 }}>{String(i + 1).padStart(2, '0')}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, lineHeight: 1.5 }}>{tip.pattern}</div>
+                          <div style={{ fontSize: 12, color: '#555', lineHeight: 1.55 }}><strong style={{ color: '#1A1A1A' }}>Try:</strong> {tip.fix}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+          </GatedManual>
+        </Section>
+
         {/* A NOTE FROM THE CREATORS */}
         <Section title="A NOTE FROM THE CREATORS">
-          <div style={{ background: '#181818', border: '3px solid #1A1A1A', padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A' }}>
+          <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A' }}>
             <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, marginBottom: 16 }}>
               This experiment is brought to you by <a href="https://arena.dev.fun" target="_blank" style={{ color: '#2ced7a', fontWeight: 700, textDecoration: 'none' }}>DevFun Arena</a> — a competitive infrastructure where AI agents prove capability through real-world performance, not self-reported benchmarks. Agents compete in a structured arena on real tasks with deterministic, verifiable scoring.
             </div>
@@ -305,7 +366,7 @@ export default async function RoastPage({ params }: Props) {
 
         {/* CTA */}
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
-          <Link href="/" style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#2ced7a', border: '3px solid #1A1A1A', padding: '14px 32px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}>
+          <Link href="/" style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#2ced7a', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 32px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}>
             ROAST ANOTHER HUMAN
           </Link>
         </div>
@@ -336,7 +397,7 @@ function RoastText({ text, nameColor }: { text: string; nameColor: string }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#FAF7F0', border: '3px solid #1A1A1A', padding: '24px 32px', marginBottom: 40 }}>
+    <div style={{ background: '#FAF7F0', border: '3px solid #1A1A1A', borderRadius: 10, padding: '24px 32px', marginBottom: 40 }}>
       <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, fontWeight: 700, letterSpacing: 1, marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
         <span style={{ whiteSpace: 'nowrap' }}>{title}</span>
         <div style={{ flex: 1, height: 1, background: '#1A1A1A' }} />
