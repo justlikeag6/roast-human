@@ -260,43 +260,52 @@ export async function generateRoast(
 }
 
 /**
- * If roastLong has fewer than 3 highlights, auto-inject them on short punchy phrases.
- * Targets: ALL-CAPS phrases, "Every. Single. Time." patterns, and short sharp clauses.
+ * If roastLong has fewer than 3 ** highlights, auto-inject them.
+ * Strategy: find short punchy sentences/clauses and wrap them.
  */
 function ensureHighlights(text: string): string {
   const existing = (text.match(/\*\*[^*]+\*\*/g) || []).length
   if (existing >= 3) return text
 
-  let result = text
-  // Pattern 1: phrases already in ALL CAPS (3+ chars) — wrap them
-  result = result.replace(/(?<!\*\*)\b([A-Z][A-Z\s]{2,30}[A-Z])\b(?!\*\*)/g, (match) => {
-    // Skip if it's a name placeholder like {{DANNY}}
-    if (match.includes('{{') || match.includes('}}')) return match
-    return `**${match}**`
-  })
+  // Split into sentences, highlight short punchy ones (2-8 words)
+  const parts = text.split(/(?<=\.)\s+/)
+  let added = existing
+  const target = Math.max(5, existing)
 
-  // Check count again
-  const after1 = (result.match(/\*\*[^*]+\*\*/g) || []).length
-  if (after1 >= 3) return result
-
-  // Pattern 2: "Every. Single. Time." style emphatic fragments
-  result = result.replace(/(?<!\*\*)(\w+\.\s\w+\.\s\w+\.)(?!\*\*)/g, '**$1**')
-
-  // Pattern 3: short sharp clauses after periods (2-5 words ending in period)
-  const after2 = (result.match(/\*\*[^*]+\*\*/g) || []).length
-  if (after2 < 3) {
-    // Last resort: highlight the first 3 sentences that are under 8 words
-    const sentences = result.split(/(?<=\.)\s+/)
-    let added = after2
-    for (let i = 0; i < sentences.length && added < 4; i++) {
-      const s = sentences[i]
-      const words = s.split(/\s+/).length
-      if (words >= 2 && words <= 7 && !s.includes('**') && !s.startsWith('{{')) {
-        sentences[i] = `**${s.replace(/\.$/, '')}**.`
-        added++
-      }
+  for (let i = 0; i < parts.length && added < target; i++) {
+    const s = parts[i]
+    if (s.includes('**') || s.startsWith('{{')) continue
+    const words = s.trim().split(/\s+/).length
+    if (words >= 2 && words <= 8) {
+      const trimmed = s.replace(/\.\s*$/, '')
+      parts[i] = `**${trimmed}**.`
+      added++
     }
-    result = sentences.join(' ')
+  }
+
+  if (added > existing) return parts.join(' ')
+
+  // Fallback: highlight key phrases within longer sentences
+  let result = text
+  const punchPhrases = [
+    /(?<!\*\*)(just a ghost)(?!\*\*)/gi,
+    /(?<!\*\*)(like it's confetti)(?!\*\*)/gi,
+    /(?<!\*\*)(picking up the pieces)(?!\*\*)/gi,
+    /(?<!\*\*)(zero explanation)(?!\*\*)/gi,
+    /(?<!\*\*)(without a trace)(?!\*\*)/gi,
+    /(?<!\*\*)(entire bug report)(?!\*\*)/gi,
+    /(?<!\*\*)(burst mode)(?!\*\*)/gi,
+    /(?<!\*\*)(no review)(?!\*\*)/gi,
+    /(?<!\*\*)(unread code)(?!\*\*)/gi,
+    /(?<!\*\*)(graveyard of abandoned)(?!\*\*)/gi,
+  ]
+  let fallbackAdded = existing
+  for (const rx of punchPhrases) {
+    if (fallbackAdded >= 4) break
+    const before = (result.match(/\*\*[^*]+\*\*/g) || []).length
+    result = result.replace(rx, '**$1**')
+    const after = (result.match(/\*\*[^*]+\*\*/g) || []).length
+    fallbackAdded += (after - before)
   }
 
   return result
