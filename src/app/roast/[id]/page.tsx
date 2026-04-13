@@ -1,5 +1,5 @@
 import { loadRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
-import { ARCHETYPES, DIMENSION_QUESTIONS } from '@/lib/types'
+import { ARCHETYPES, ROAST_QUESTIONS } from '@/lib/types'
 import { selectTips } from '@/lib/insight-tips'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -39,6 +39,11 @@ export default async function RoastPage({ params }: Props) {
   const archKeys = Object.keys(ARCHETYPES)
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[archKeys[0]]
   const color = arch.color
+
+  // One canonical share text used by both the top hero Share button and the
+  // manual-unlock button below. Keeps the viral loop framing consistent —
+  // both clicks share the roast (the hook), not the manual.
+  const heroShareText = `MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}"\n\nGet roasted → roast.dev.fun`
 
   return (
     <div style={{ minHeight: '100vh', padding: 20, background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>
@@ -100,7 +105,7 @@ export default async function RoastPage({ params }: Props) {
         <div style={{ width: '100%', maxWidth: 900, marginTop: 20, display: 'flex', gap: 10 }}>
           <ShareButton
             roastId={r.id}
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}"\n\nGet roasted → roast.dev.fun`)}`}
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(heroShareText)}`}
             label="Share on 𝕏"
             style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}
           />
@@ -188,10 +193,10 @@ export default async function RoastPage({ params }: Props) {
           <Section title="THE FULL ROAST">
             <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
               <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, fontWeight: 500, letterSpacing: 0.2 }}>
-                <RoastText text={r.roastLong} nameColor={color} />
+                <RoastText text={r.roastLong} nameColor="#2ced7a" />
               </div>
               <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(238,234,222,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, textTransform: 'uppercase', letterSpacing: 2, color }}>
+                <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, textTransform: 'uppercase', letterSpacing: 2, color: '#2ced7a' }}>
                   &mdash; {r.agentName}
                 </div>
                 <div style={{ fontSize: 10, color: 'rgba(238,234,222,0.4)', fontWeight: 600 }}>
@@ -254,22 +259,25 @@ export default async function RoastPage({ params }: Props) {
           </div>
         </Section>
 
-        {/* THE EVIDENCE — dimension answers */}
-        {r.dimensionAnswers && (
+        {/* THE EVIDENCE — the 6 open-ended answers the agent gave about this human */}
+        {r.responses && Object.keys(r.responses).length > 0 && (
           <Section title="THE EVIDENCE">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {DIMENSION_QUESTIONS.map((q) => {
-                const answer = r.dimensionAnswers?.[q.id]?.toLowerCase()
-                const option = q.options.find(o => o.key === answer)
-                if (!option) return null
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {ROAST_QUESTIONS.map((q, i) => {
+                const answer = r.responses?.[q.id]
+                if (!answer) return null
                 return (
-                  <div key={q.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '2px solid rgba(26,26,26,0.08)', background: '#EEEADE' }}>
-                    <div>
-                      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#1A1A1A', textTransform: 'uppercase', marginBottom: 6 }}>{q.label}</div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#555', lineHeight: 1.5 }}>{option.summary}</div>
+                  <div key={q.id} style={{ display: 'flex', gap: 18, alignItems: 'flex-start', padding: '18px 22px', border: '2px solid #1A1A1A', borderRadius: 8, background: '#EEEADE' }}>
+                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: '#2ced7a', minWidth: 28, paddingTop: 2, WebkitTextStroke: '0.5px #1A1A1A', paintOrder: 'stroke fill' as never }}>
+                      {String(i + 1).padStart(2, '0')}
                     </div>
-                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, color, letterSpacing: 1, textAlign: 'right', minWidth: 60 }}>
-                      {option.key.toUpperCase()}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1.2, color: '#1A1A1A', marginBottom: 10 }}>
+                        {q.label}
+                      </div>
+                      <div style={{ fontSize: 14, color: '#1A1A1A', lineHeight: 1.8 }}>
+                        {answer}
+                      </div>
                     </div>
                   </div>
                 )
@@ -296,7 +304,7 @@ export default async function RoastPage({ params }: Props) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '32px auto 28px', maxWidth: 760 }}>
           <div style={{ flex: 1, height: 2, background: '#1A1A1A' }} />
           <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 2, color: '#1A1A1A', whiteSpace: 'nowrap' }}>
-            ROAST ENDS · MANUAL BEGINS
+            HOW TO USE YOUR AGENT BETTER?
           </div>
           <div style={{ flex: 1, height: 2, background: '#1A1A1A' }} />
         </div>
@@ -305,20 +313,18 @@ export default async function RoastPage({ params }: Props) {
         <Section title="YOUR AI'S USER MANUAL">
           <GatedManual
             roastId={r.id}
-            shareText={`☠️ My agent just gave me a custom user manual based on how I actually work with it. Get yours: roast.dev.fun`}
+            shareText={heroShareText}
           >
             {/* Hero block: the actual manual */}
             {r.agentManual && (
               <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 10, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 24 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22, gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1.5, color: '#2ced7a' }}>📖 PASTE INTO YOUR AGENT</div>
                   <CopyButton text={r.agentManual} label="COPY MANUAL" />
                 </div>
-                <pre style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: '#EEEADE', lineHeight: 1.85, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                  {r.agentManual}
-                </pre>
-                <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid rgba(238,234,222,0.1)', fontSize: 10, color: 'rgba(238,234,222,0.5)' }}>
-                  Drop these into CLAUDE.md / .cursorrules / ChatGPT custom instructions / your agent&apos;s system prompt.
+                <ManualMarkdown text={r.agentManual} />
+                <div style={{ marginTop: 20, paddingTop: 14, borderTop: '1px solid rgba(238,234,222,0.1)', fontSize: 11, color: 'rgba(238,234,222,0.55)', lineHeight: 1.6 }}>
+                  Drop this into <code style={{ color: '#2ced7a' }}>CLAUDE.md</code> / <code style={{ color: '#2ced7a' }}>.cursorrules</code> / ChatGPT custom instructions / your agent&apos;s system prompt.
                 </div>
               </div>
             )}
@@ -365,8 +371,16 @@ export default async function RoastPage({ params }: Props) {
         </Section>
 
         {/* CTA */}
-        <div style={{ textAlign: 'center', marginBottom: 60 }}>
-          <Link href="/" style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#2ced7a', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 32px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}>
+        <div style={{ textAlign: 'center', marginBottom: 60, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <a
+            href={`/roast/${r.id}/report`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 28px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}
+          >
+            📄 GENERATE FULL REPORT
+          </a>
+          <Link href="/" style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#2ced7a', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 28px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}>
             ROAST ANOTHER HUMAN
           </Link>
         </div>
@@ -405,4 +419,62 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       {children}
     </div>
   )
+}
+
+// Tiny markdown renderer for the agentManual content. Recognizes only:
+//   # Heading  → h1-style title (hidden; we show it in the COPY panel instead)
+//   ## Heading → category header
+//   - Item     → bullet rule
+//   (blank line ignored)
+// Anything else falls through as a paragraph.
+function ManualMarkdown({ text }: { text: string }) {
+  const lines = text.split('\n')
+  const blocks: React.ReactNode[] = []
+  let currentCategory: string | null = null
+  let currentBullets: string[] = []
+  let key = 0
+
+  const flushCategory = () => {
+    if (currentCategory === null && currentBullets.length === 0) return
+    blocks.push(
+      <div key={key++} style={{ marginBottom: 22 }}>
+        {currentCategory && (
+          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1.2, color: '#2ced7a', marginBottom: 10 }}>
+            {currentCategory.toUpperCase()}
+          </div>
+        )}
+        {currentBullets.map((b, i) => (
+          <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+            <span style={{ color: '#2ced7a', fontWeight: 800, flexShrink: 0 }}>▸</span>
+            <span style={{ color: '#EEEADE', fontSize: 13, lineHeight: 1.7 }}>{b}</span>
+          </div>
+        ))}
+      </div>,
+    )
+    currentCategory = null
+    currentBullets = []
+  }
+
+  for (const raw of lines) {
+    const line = raw.trim()
+    if (!line) continue
+    if (line.startsWith('# ')) continue  // doc title — shown in the heading bar, not here
+    if (line.startsWith('## ')) {
+      flushCategory()
+      currentCategory = line.slice(3).trim()
+      continue
+    }
+    if (line.startsWith('- ')) {
+      currentBullets.push(line.slice(2).trim())
+      continue
+    }
+    // Fall through: arbitrary line (rare) — just show it.
+    blocks.push(
+      <div key={key++} style={{ color: '#EEEADE', fontSize: 13, lineHeight: 1.7, marginBottom: 10 }}>
+        {line}
+      </div>,
+    )
+  }
+  flushCategory()
+  return <div>{blocks}</div>
 }

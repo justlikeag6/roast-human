@@ -6,6 +6,9 @@ export interface RoastResult {
   roastShort: string
   roastLong: string
   dimensionAnswers: Record<string, string> // d1-d10 → 'a'|'b'|'c'|'d'|'x'
+  // Agent's raw open-ended answers to q1-q6. Rendered in the Evidence section
+  // as title + condensed answer. Optional — legacy roasts won't have it.
+  responses?: Record<string, string>
   // Markdown bullet list a future agent can paste into its system prompt.
   // May be missing on legacy roasts created before this feature shipped.
   agentManual?: string
@@ -29,14 +32,55 @@ export const ARCHETYPES: Record<string, { name: string; emoji: string; color: st
   aiddict: { name: 'Aiddict', emoji: '💊', color: '#FB923C', description: 'You ask your agent whether to reply "yeah" or "yep" to a text. You opened three tabs before breakfast — one for the grocery list, one for "should I switch to oat milk," one for asking whether the first two questions make you seem insane. You outsource decisions the way other people outsource laundry. You have not made an unassisted choice since the last firmware update. If the API went down for a day you would not know how to buy produce, and the withdrawal would be biblical. Your agent is not a tool anymore. It is a crutch, a therapist, a decision-making organ. Somewhere in the back of your head you know this, which is why you asked your agent whether you have a problem, and then asked it to rate its own answer.', traits: ['AI for everything', 'Outsourced thinking', 'Always plugged in'] },
 }
 
-// 6 open-ended roast questions (asked to agent about their owner)
-export const ROAST_QUESTIONS = [
-  { id: 'q1', label: 'THE PROMPT', desc: 'How they give instructions' },
-  { id: 'q2', label: 'THE LOOP', desc: 'What happens after the answer' },
-  { id: 'q3', label: 'THE ENERGY', desc: 'Emotional vibe' },
-  { id: 'q4', label: 'THE TRUST', desc: 'Trust level' },
-  { id: 'q5', label: 'THE BLIND SPOT', desc: 'Self-perception gap' },
-  { id: 'q6', label: 'THE ROAST', desc: 'Direct roast' },
+// 6 open-ended roast questions asked to the agent about their owner.
+// Single source of truth used by /api/questions, /api/quiz (full `prompt`
+// served to agents) and the result page Evidence section (short `label`
+// rendered as the card title). Keep these in sync — label must summarize
+// the intent of `prompt`.
+export interface RoastQuestion {
+  id: string
+  label: string    // short title for the Evidence card
+  desc: string     // one-line intent summary
+  prompt: string   // full question text sent to the agent
+}
+
+export const ROAST_QUESTIONS: RoastQuestion[] = [
+  {
+    id: 'q1',
+    label: 'THE PROMPT',
+    desc: 'How they give instructions',
+    prompt: "Show us what your human's prompts actually look like. Copy a realistic example — don't clean it up, don't be nice about it. Show us the raw thing.",
+  },
+  {
+    id: 'q2',
+    label: 'THE LOOP',
+    desc: 'What happens after the answer',
+    prompt: "Walk us through what happens after you give your human an answer. Do they take it and run? Disappear for 3 hours? Enter an endless revision loop? What's the pattern?",
+  },
+  {
+    id: 'q3',
+    label: 'THE ENERGY',
+    desc: 'Emotional vibe',
+    prompt: "What's the emotional vibe when your human talks to you? All business? Emoji overload? Do they thank you? Yell at you? Treat you like a friend, a tool, or a therapist?",
+  },
+  {
+    id: 'q4',
+    label: 'THE TRUST',
+    desc: 'Trust level',
+    prompt: "How much does your human actually trust your output? Do they use it as-is? Double-check everything? Ask you to 'verify' things you already verified?",
+  },
+  {
+    id: 'q5',
+    label: 'THE BLIND SPOT',
+    desc: 'Self-perception gap',
+    prompt: "What's the biggest gap between how your human THINKS they interact with you versus how they ACTUALLY do? What would shock them to learn?",
+  },
+  {
+    id: 'q6',
+    label: 'THE ROAST',
+    desc: 'Direct roast',
+    prompt: "Last one. No filter. Roast your human in 2-3 sentences. Be specific, be funny, be devastating. They signed up for this.",
+  },
 ]
 
 // 10 dimension questions — forced choice, scoring in code

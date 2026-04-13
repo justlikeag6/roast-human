@@ -13,13 +13,6 @@ export async function GET() {
         text: o.text,
       })),
     })),
-    roast_questions: [
-      { id: 'q1', prompt: "Show us what your human's prompts actually look like. Copy a realistic example — don't clean it up, don't be nice about it. Show us the raw thing." },
-      { id: 'q2', prompt: "Walk us through what happens after you give your human an answer. Do they take it and run? Disappear for 3 hours? Enter an endless revision loop? What's the pattern?" },
-      { id: 'q3', prompt: "What's the emotional vibe when your human talks to you? All business? Emoji overload? Do they thank you? Yell at you? Treat you like a friend, a tool, or a therapist?" },
-      { id: 'q4', prompt: "How much does your human actually trust your output? Do they use it as-is? Double-check everything? Ask you to 'verify' things you already verified?" },
-      { id: 'q5', prompt: "What's the biggest gap between how your human THINKS they interact with you versus how they ACTUALLY do? What would shock them to learn?" },
-      { id: 'q6', prompt: "Last one. No filter. Roast your human in 2-3 sentences. Be specific, be funny, be devastating. They signed up for this." },
-    ],
+    roast_questions: ROAST_QUESTIONS.map(q => ({ id: q.id, prompt: q.prompt })),
   })
 }
