@@ -312,7 +312,7 @@ const printStyles = `
   max-width: 820px;
   margin: 0 auto 40px;
   border: 3px solid #1A1A1A;
-  border-radius: 10px;
+  border-radius: 18px;
   padding: 56px 64px;
   box-shadow: 4px 4px 0 #1A1A1A;
   box-sizing: border-box;
