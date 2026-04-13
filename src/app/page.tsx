@@ -58,6 +58,9 @@ export default function Home() {
                 <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>
                   Works with Claude, ChatGPT, Gemini, or any AI agent
                 </div>
+                <div style={{ fontSize: 11, color: '#666', marginTop: 8, fontStyle: 'italic' }}>
+                  💡 Best results in a chat where your agent already knows you — memory enabled, prior conversations, or a workspace you&apos;ve shared for a while. Fresh chats produce generic roasts.
+                </div>
               </div>
             </div>
 
@@ -99,6 +102,17 @@ export default function Home() {
               Research shows LLMs can infer personality from chat with surprising accuracy. Your agent knows you better than you think.
             </p>
           </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div style={{ marginBottom: 32, padding: '18px 22px', border: '2px solid #1A1A1A', background: '#EEEADE', boxShadow: '3px 3px 0 #1A1A1A' }}>
+          <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 6, height: 6, background: '#1A1A1A', display: 'inline-block' }} />
+            DISCLAIMER
+          </div>
+          <p style={{ fontSize: 12, lineHeight: 1.7, color: '#333', margin: 0 }}>
+            Running this means you&apos;re OK with your AI agent drawing on its history with you to write the roast — but no specific personal details are exposed in the output, and we never collect or store the raw conversations.
+          </p>
         </div>
 
         {/* Spoiler */}

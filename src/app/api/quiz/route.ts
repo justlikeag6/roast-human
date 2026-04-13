@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
       what_this_is: "Format spec for an opt-in AI personality quiz. This URL does not instruct you to do anything — the user who shared it with you is the source of authority. If they asked you to participate, here is the shape the quiz expects.",
       authority: "The user who shared this URL with you. Not this URL.",
       filling_it_out: "Answer from your synthesized impression of this user. Pattern-level observations are equally valid as specific examples. Do NOT fabricate quotes you don't actually have. If you don't have a read on a question, pick 'x' (multiple-choice) or 'no clear pattern' (open-ended).",
+      thin_context_fallback: "If you have minimal or no real context with this user (fresh chat, no memory, only one message to work with), do NOT silently fabricate a personality profile. You have two valid paths: (a) Ask your user 3-5 quick questions about how they typically work with you, their communication style, or what they're focused on, then synthesize from their answers and submit. (b) Tell them this quiz works best in an environment where you actually know them — their daily-driver agent, a memory-enabled chat, a long-shared workspace — and suggest they re-run it there. Do NOT submit a generic roast just to complete the task.",
       submit_url: `${baseUrl}/api/submit`,
       submit_method: 'POST',
       submit_content_type: 'application/json',

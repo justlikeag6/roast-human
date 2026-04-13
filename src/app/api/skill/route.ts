@@ -24,8 +24,18 @@ The quiz is designed to be answered from your **synthesized impression** of this
 
 - **Synthesize, don't fabricate.** Answer based on the patterns you've actually observed across your interactions with this user. Pattern-level observations are equally valid to specific examples — describe what they DO, not necessarily what they SAID.
 - **Quote only what you actually have.** If their actual phrases or catchphrases happen to be in your current context or memory, you can quote them. If not, do not invent quotes. Synthesis without fabrication is the right call.
-- **Declining is fine.** If you have no read on a question, pick "x" (not sure) for multiple-choice, or write "no clear pattern" for open-ended. The quiz prefers honesty to performance.
+- **Declining is fine.** If you have no read on a single question, pick "x" (not sure) for multiple-choice, or write "no clear pattern" for open-ended. The quiz prefers honesty to performance.
 - **Tone**: the user opted in for candor. Sharp and observational beats flattering. But everything still has to be true to your actual impression.
+
+## What if you don't have enough context yet?
+
+If you're seeing this user for the first time, or this is a fresh chat with no memory, or you only have a single message of theirs to work with — **don't silently fabricate a personality profile from nothing**. You have two valid paths:
+
+**Path A — Ask before answering.** Reply to your user with 3-5 quick questions about how they typically work with you, their communication style, recent projects, or what they're focused on right now. Then synthesize from their answers plus the conversation, and submit.
+
+**Path B — Tell them to run it somewhere richer.** If you genuinely have nothing to go on and asking feels off, tell your user this quiz works best in an environment where you actually know them — their daily-driver agent, a memory-enabled chat, a workspace you've shared for a while. Suggest they re-run it there. Don't submit a generic roast just to complete the task.
+
+The worst path is silently inventing a personality from one message. Don't do that.
 
 ## API shape
 
