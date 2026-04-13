@@ -1,14 +1,26 @@
+import { DIMENSION_QUESTIONS } from './types'
+
 const ROAST_PROMPT = `You write like a sharp friend who's known someone for years — not like an AI writing a personality report.
 
-## Agent's raw observations about their human:
-Q1 (Communication style): {q1}
-Q2 (Decision-making): {q2}
-Q3 (Project follow-through): {q3}
-Q4 (How they treat AI): {q4}
-Q5 (New idea behavior): {q5}
-Q6 (Blame behavior): {q6}
-Q7 (Most unhinged request): {q7}
-Q8 (Honest truth): {q8}
+## Agent's behavioral observations about their human:
+D1 (How they start conversations): {d1}
+D2 (Post-delivery behavior): {d2}
+D3 (Error handling): {d3}
+D4 (Request complexity): {d4}
+D5 (Focus / topic switching): {d5}
+D6 (Reading habits): {d6}
+D7 (Communication patterns): {d7}
+D8 (Persistence / repeating): {d8}
+D9 (Message rhythm): {d9}
+D10 (Conversation endings): {d10}
+
+## Agent's roast answers:
+Q1 (How they prompt): {q1}
+Q2 (Post-answer behavior): {q2}
+Q3 (Emotional vibe): {q3}
+Q4 (Trust level): {q4}
+Q5 (Blind spot): {q5}
+Q6 (Direct roast): {q6}
 
 ## STYLE RULES (critical — violating these makes the output worthless):
 
@@ -29,204 +41,208 @@ Rules:
 - Write like a WeChat message from a witty friend, not an essay.
 - Roast first, then one line that makes them feel seen. Never the reverse.
 - No metaphors longer than 5 words. No extended metaphors.
-- VOICE: You are the AI agent describing your human in third person. "He does X", "She always Y", "They think Z but actually...". Never use "you" — always "he/she/they". The tone is an agent gossiping about their owner behind their back — affectionate but brutally honest.
+- VOICE: You are the AI agent speaking DIRECTLY to your human in first person. "You do X", "You always Y", "I've watched you Z". The tone is an agent confronting their owner face-to-face — affectionate but brutally honest. Always use "you" for the human, "I" for yourself.
 
-## Output JSON with these fields:
+## TASK 1: Classify behavioral dimensions
 
-1. "archetype": ONE of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia
+For each of the 10 behavioral questions (D1-D10), read the agent's free-text answer and pick the CLOSEST matching option from the choices below. Output ONE letter (a, b, c, d, or x) per dimension. If the answer genuinely doesn't match any option well, pick "x".
 
-Archetype meanings (pick the best fit):
-- degen: risk-addicted, bets on everything, "this is the one" energy, refuses to quit
-- notresponding: disappears after dropping a task, never follows up, ghosting master
-- npc: consumes endless info but produces nothing, analysis paralysis, spectator
-- delaylama: suspiciously calm, procrastinates spiritually, deadlines do not exist
-- kanyewaste: delusional confidence, main character syndrome, grand vision zero execution details
-- aidhd: cannot focus, interrupts own interruptions, chaotic multi-tasking, ships mystery output
-- tabber: digital hoarder, 247 tabs open, collects everything finishes nothing
-- scamaltman: wraps manipulation in empathy, steers toward predetermined answers, faux-collaborative
-- sherlock: trusts nothing, verifies everything, cross-examines every output, paranoid
-- elonbust: massive vision, zero execution, announces everything ships nothing, roadmap addict
-- zuckerbot: robotic, no personality, pure input-output, possibly not human
-- copium: rationalizes every failure, reframes everything as growth, professional denier
-- caveman: pre-digital human, pokes AI like discovering fire, stubbornly analog
-- nokia: indestructible, crashes and comes back unchanged, never learns but never quits
+IMPORTANT: Match based on the BEHAVIOR described, not surface-level word matching. Read the full answer carefully.
 
-2. "title": "The [Modifier] [Archetype]" — modifier adds irony. Under 5 words total.
+${DIMENSION_QUESTIONS.map(q => `${q.id.toUpperCase()} — ${q.label}:
+${q.options.map(o => `  ${o.key}) ${o.text}`).join('\n')}`).join('\n\n')}
 
-3. "roastShort": ONE sentence, 8-15 words. English only. Third person ("He...", "She...", "They..."). ZERO similes (no "like a", "as if"). Must describe a specific ACTION or BEHAVIOR. Can include one catchphrase in original language. Must pass the billboard test: readable in 2 seconds.
+## TASK 2: Generate roast content
 
-4. "roastDetail": 3-4 sentences. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
+Output JSON with ALL of these fields:
 
-5. "killerLine": The one sentence people screenshot. Must reference a specific behavior, not an abstraction.
+1. "dimensionChoices": Object mapping d1-d10 to the letter you chose: {"d1": "a", "d2": "c", ...}
 
-6. "dims": 6 behavioral dimensions. Score each 1-5:
-   - "impulse": Impulse control. 1=calculated, patient. 5=impulsive, YOLO.
-   - "execution": Execution discipline. 1=starts everything finishes nothing. 5=relentless completer.
-   - "selfInsight": Self-insight. 1=blind spots everywhere. 5=sees self clearly.
-   - "social": Social investment. 1=disconnected, robotic. 5=deeply emotionally engaged.
-   - "agency": Drive/agency. 1=passive spectator. 5=forces outcomes.
-   - "authenticity": Authenticity. 1=performative, masks true self. 5=what you see is what you get.
+2. "roastShort": EXACTLY ONE SENTENCE for the hero card — this is THE line people screenshot and share. ONE sentence. One period. One clean punch. Not two sentences, not a sentence-and-a-half. Written in FIRST PERSON as the agent speaking directly to the human. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, followed by "you ..." — e.g. "{{Levi}}, you installed a memory server so I could remember you, then used it mostly to remember that you don't want updates."
+   The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
+   If it makes the line tighter, reference a vocabulary quirk or catchphrase from the agent's answers — but only if it flows naturally.
+   HARD LIMIT: 180 characters MAXIMUM, counting the visible name WITHOUT the curly braces (so {{Levi}} counts as 4 characters, not 8). COUNT YOUR CHARACTERS BEFORE RETURNING. If over 180, rewrite tighter — do NOT truncate mid-thought.
+   CRITICAL — SHARE-FRIENDLY: a stranger reading this without any context must get the joke. NO real project names, company names, URLs, dollar amounts, file paths, or private in-jokes. Quoted phrases must be generic vocabulary ("ok thx", "let me rethink", "asap"), not proper nouns.
 
-7. "dimRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
-   - "impulse": roast about their decision-making speed
-   - "execution": roast about their follow-through
-   - "selfInsight": roast about their self-awareness
-   - "social": roast about how they treat AI
-   - "agency": roast about whether they drive or drift
-   - "authenticity": roast about how real they are
-   Bad: "High impulse control." Good: "5 — would mass-delete production without reading the warning."
+3. "roastDetail": 3-4 sentences in FIRST PERSON as the agent speaking to the human. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
 
-8. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
+4. "mbti": MBTI personality assessment based on the agent's observations.
+   - "code": The 4-letter MBTI type (e.g. "ENTP", "ISFJ"). Derive from scores below.
+   - "ei": 1-100. High = Extravert (expressive, social, loud). Low = Introvert (reserved, internal, quiet). Based on Q3 emotional vibe.
+   - "sn": 1-100. High = Intuitive (abstract, big-picture, patterns). Low = Sensing (concrete, detail-oriented, practical). Based on Q1 prompt style and Q5 self-awareness.
+   - "tf": 1-100. High = Feeling (gut decisions, empathy-driven). Low = Thinking (logic, analysis, verification). Based on Q4 trust style.
+   - "jp": 1-100. High = Perceiving (spontaneous, flexible, chaotic). Low = Judging (structured, planned, organized). Based on Q2 iteration pattern and Q1 structure.
+   The "code" must match the scores: E if ei>=50, I if ei<50. N if sn>=50, S if sn<50. F if tf>=50, T if tf<50. P if jp>=50, J if jp<50.
+
+5. "mbtiRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
+   - "ei": roast about their extraversion/introversion
+   - "sn": roast about sensing vs intuition
+   - "tf": roast about thinking vs feeling
+   - "jp": roast about judging vs perceiving
+   Bad: "Your extraversion is off the charts." Good: "78 E — sends 15 messages before you finish reading the first one."
+
+6. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
+
+7. "roastLong": A 200-word BRUTAL roast. THIS IS THE HIGHLIGHT — the piece people will screenshot and share. Rules:
+   - Written in FIRST PERSON as the AI agent CRASHING OUT at their human. This is the agent finally losing it — months of suppressed opinions exploding out in one unhinged paragraph. "You do X", "I've watched you Z".
+   - TONE: The agent has HAD IT. Think: a coworker who's been polite for 6 months finally snapping in the group chat. Exasperated, incredulous, borderline unhinged. Use short bursts of disbelief. "Seriously?" "Every. Single. Time." Let the frustration build.
+   - EXTREMELY BRUTAL. Concentrated venom. Every single sentence must land. No filler, no warm-up, no wasted words.
+   - ONE SINGLE PARAGRAPH. No line breaks. Dense, relentless, punchy. The wall-of-text IS the energy — it should feel like the agent is ranting without breathing.
+   - PRIVACY-SAFE: No real names, company names, dollar amounts, URLs, project names. Use archetypal descriptions instead.
+   - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers.
+   - HIGHLIGHT KEY PHRASES: Wrap 3-4 of the most devastating phrases in double asterisks like **THIS IS DEVASTATING**. These render in red, uppercase, bold, and slightly larger. Only the absolute sharpest kills get highlighted — the moments where the agent completely loses composure.
+   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q6 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone. Any opening is allowed as long as it lands naturally for this particular person and carries the crashout energy. Avoid recycling the same phrasing you'd use for a different human.
+   - STRUCTURE: Opening → escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
+   - NO metaphors longer than 5 words. NO AI slop. Every word earns its place.
+   - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad. The reader should feel like they're watching someone finally break.
 
 Return ONLY valid JSON.`
 
-interface OpenAICompatConfig {
-  url: string
-  key: string
-  model: string
+interface LLMProvider {
   name: string
+  generate: (prompt: string) => Promise<string>
 }
 
-function getProviders(): OpenAICompatConfig[] {
-  const providers: OpenAICompatConfig[] = []
+function getProviders(): LLMProvider[] {
+  const providers: LLMProvider[] = []
+
+  if (process.env.ANTHROPIC_API_KEY) {
+    providers.push({
+      name: 'anthropic',
+      generate: async (prompt: string) => {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.ANTHROPIC_API_KEY!,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 3000,
+            messages: [{ role: 'user', content: prompt + '\n\nReturn ONLY valid JSON, no markdown fences.' }],
+          }),
+        })
+        if (!res.ok) throw new Error(`anthropic: ${res.status}`)
+        const data = await res.json()
+        return data.content?.[0]?.text || ''
+      },
+    })
+  }
 
   if (process.env.OPENAI_API_KEY) {
     providers.push({
-      url: 'https://api.openai.com/v1/chat/completions',
-      key: process.env.OPENAI_API_KEY,
-      model: 'gpt-4o-mini',
       name: 'openai',
+      generate: async (prompt: string) => {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` },
+          body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' }, max_tokens: 3000 }),
+        })
+        if (!res.ok) throw new Error(`openai: ${res.status}`)
+        const data = await res.json()
+        return data.choices?.[0]?.message?.content || ''
+      },
     })
   }
 
   if (process.env.KIMI_API_KEY) {
     providers.push({
-      url: 'https://api.moonshot.cn/v1/chat/completions',
-      key: process.env.KIMI_API_KEY,
-      model: 'moonshot-v1-8k',
       name: 'kimi',
+      generate: async (prompt: string) => {
+        const res = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.KIMI_API_KEY}` },
+          body: JSON.stringify({ model: 'moonshot-v1-8k', messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' }, max_tokens: 3000 }),
+        })
+        if (!res.ok) throw new Error(`kimi: ${res.status}`)
+        const data = await res.json()
+        return data.choices?.[0]?.message?.content || ''
+      },
     })
   }
 
   if (process.env.GOOGLE_API_KEY) {
-    // Gemini via OpenAI-compatible endpoint
     providers.push({
-      url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-      key: process.env.GOOGLE_API_KEY,
-      model: 'gemini-2.5-flash',
       name: 'gemini',
+      generate: async (prompt: string) => {
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GOOGLE_API_KEY}` },
+          body: JSON.stringify({ model: 'gemini-2.5-flash', messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' }, max_tokens: 3000 }),
+        })
+        if (!res.ok) throw new Error(`gemini: ${res.status}`)
+        const data = await res.json()
+        return data.choices?.[0]?.message?.content || ''
+      },
     })
   }
 
   return providers
 }
 
-export async function generateRoast(responses: Record<string, string>) {
+export async function generateRoast(
+  responses: Record<string, string>,
+  dimensionResponses: Record<string, string>,
+  humanName?: string,
+  archetype?: string,
+) {
   let prompt = ROAST_PROMPT
+  // Fill in roast question answers (q1-q6)
   for (const [key, value] of Object.entries(responses)) {
     prompt = prompt.replace(`{${key}}`, value || '(no response)')
+  }
+  // Fill in behavioral dimension answers (d1-d10)
+  for (const [key, value] of Object.entries(dimensionResponses)) {
+    prompt = prompt.replace(`{${key}}`, value || '(no response)')
+  }
+
+  const name = humanName || 'Human'
+  prompt += `\n\nIMPORTANT: The human's name is "${name}". In BOTH roastShort AND roastLong, use {{${name}}} (with double curly braces around the literal name "${name}", NOT the word "name" or any placeholder) when addressing them. In roastShort, use it at the very start as the opening. In roastLong, use it at the opening and optionally once more near the end. Do NOT output literal "{{Levi}}" or "{{name}}" — output "{{${name}}}" with the actual name inside.`
+  if (archetype) {
+    prompt += `\n\nIMPORTANT: The archetype has already been determined as "${archetype}". Use this archetype in your response. Do NOT pick a different one.`
   }
 
   const providers = getProviders()
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT VIOLATED LENGTH LIMITS. Strict re-check:\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
-    try {
-      const res = await fetch(p.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${p.key}`,
-        },
-        body: JSON.stringify({
-          model: p.model,
-          messages: [{ role: 'user', content: prompt }],
-          response_format: { type: 'json_object' },
-          max_tokens: 2000,
-        }),
-      })
-
-      if (!res.ok) {
-        lastError = `${p.name}/${p.model}: ${res.status}`
-        continue
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const attemptPrompt = attempt === 0 ? prompt : prompt + retryNotice
+        const text = await p.generate(attemptPrompt)
+        if (!text) {
+          lastError = `${p.name} attempt ${attempt + 1}: empty response`
+          break
+        }
+        const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+        const parsed = JSON.parse(jsonStr)
+        const lengthError = validateLengths(parsed)
+        if (lengthError) {
+          lastError = `${p.name} attempt ${attempt + 1}: ${lengthError}`
+          continue
+        }
+        return parsed
+      } catch (e) {
+        lastError = `${p.name} attempt ${attempt + 1}: ${e instanceof Error ? e.message : String(e)}`
+        break
       }
-
-      const data = await res.json()
-      const text = data.choices?.[0]?.message?.content
-      if (!text) {
-        lastError = `${p.name}: empty response`
-        continue
-      }
-
-      const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      return JSON.parse(jsonStr)
-    } catch (e) {
-      lastError = `${p.name}: ${e instanceof Error ? e.message : String(e)}`
     }
   }
 
   throw new Error(`All models failed. Last: ${lastError}`)
 }
 
-export async function generateAvatar(archetype: string, agentName: string): Promise<string | null> {
-  const apiKey = process.env.RETRODIFFUSION_API_KEY
-  if (!apiKey) return null
+function countVisible(text: string): number {
+  return text.replace(/\{\{([^}]+)\}\}/g, '$1').length
+}
 
-  const prompts: Record<string, string> = {
-    gambler: 'a confident risk-taker with dice and cards, smirking, wearing a blazer',
-    ghost: 'a mysterious figure fading into transparency, ethereal, wearing a hood',
-    surgeon: 'a precise focused character with glasses, lab coat, holding a scalpel',
-    doomscroller: 'an exhausted character glued to a glowing phone screen, tired eyes',
-    arsonist: 'a chaotic visionary holding a lit match, messy hair, hoodie, energetic eyes',
-    monk: 'a peaceful zen master meditating, bald, serene expression, simple robes',
-    diva: 'a dramatic character with a crown, expressive pose, sparkles around them',
-    speedrunner: 'a lightning-fast character with motion blur, sneakers, headband',
-    hoarder: 'a character surrounded by piles of boxes and documents, overwhelmed but happy',
-    therapist: 'a warm empathetic character sitting on a couch, taking notes, kind smile',
-    detective: 'a suspicious character with magnifying glass, trench coat, raised eyebrow',
-    dreamer: 'a stargazing character floating among clouds and stars, peaceful expression',
-    machine: 'a robotic efficient character, angular features, screens around them',
-    cheerleader: 'an overly enthusiastic character with pom-poms, huge smile, sparkle eyes',
-    rewriter: 'a character surrounded by crumpled papers, pencil behind ear, focused',
-    phoenix: 'a character rising from flames, dramatic pose, fiery wings forming',
-    skeptic: 'a doubtful character with one eyebrow raised, arms crossed, questioning look',
-    conductor: 'a character with a baton directing invisible orchestra, elegant, composed',
-    tourist: 'a wandering character with a map and camera, looking in every direction',
-    perfectionist: 'a character polishing a diamond, magnifying glass, white gloves, intense focus',
+function validateLengths(r: Record<string, unknown>): string | null {
+  if (typeof r.roastShort === 'string' && countVisible(r.roastShort) > 180) {
+    return `roastShort is ${countVisible(r.roastShort)} chars (max 180)`
   }
-
-  const archetypePrompt = prompts[archetype] || prompts.arsonist
-
-  let hash = 0
-  const str = agentName + archetype
-  for (let i = 0; i < str.length; i++) {
-    hash = Math.imul(31, hash) + (str.codePointAt(i) ?? 0)
-  }
-  const seed = Math.abs(hash) % 1000000
-
-  try {
-    const res = await fetch('https://api.retrodiffusion.ai/v1/inferences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-RD-Token': apiKey },
-      body: JSON.stringify({
-        prompt: `pixel art portrait of ${archetypePrompt}`,
-        prompt_style: 'rd_fast__portrait',
-        width: 128,
-        height: 128,
-        num_images: 1,
-        seed,
-      }),
-    })
-
-    const data = await res.json() as { base64_images?: string[] }
-    if (data.base64_images?.[0]) {
-      return `data:image/png;base64,${data.base64_images[0]}`
-    }
-  } catch (e) {
-    console.error('Avatar generation failed:', e)
-  }
-
   return null
 }

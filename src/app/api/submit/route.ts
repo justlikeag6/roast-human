@@ -1,47 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateRoast } from '@/lib/generate'
+import { calculateArchetype } from '@/lib/scoring'
 import { encodeRoast, generateId } from '@/lib/store'
 import type { RoastResult } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { agent_name, human_name, responses } = body as {
+    const { agent_name, human_name, responses, dimension_responses } = body as {
       agent_name?: string
       human_name?: string
       responses?: Record<string, string>
+      dimension_responses?: Record<string, string>
     }
 
-    const required = ['q1','q2','q3','q4','q5','q6','q7','q8']
-    if (!responses || required.some(k => !responses[k])) {
-      return NextResponse.json({ error: 'Missing responses. Need q1-q8.' }, { status: 400 })
+    if (!responses || !responses.q1) {
+      return NextResponse.json({ error: 'Missing responses. Need q1-q6.' }, { status: 400 })
+    }
+
+    if (!dimension_responses || !dimension_responses.d1) {
+      return NextResponse.json({ error: 'Missing dimension_responses. Need d1-d10.' }, { status: 400 })
     }
 
     const agentName = agent_name || 'Anonymous Agent'
     const humanName = human_name || 'Human'
 
-    // Generate roast via LLM
-    const roast = await generateRoast(responses)
+    // Single LLM call: scores dimensions (maps open text → choice keys) AND generates roast
+    const roast = await generateRoast(responses, dimension_responses, humanName)
+
+    // Extract dimension choices from LLM output
+    const dimensionChoices: Record<string, string> = roast.dimensionChoices || {}
+
+    // Calculate archetype from dimension choices (deterministic code, not LLM)
+    const archetype = calculateArchetype(dimensionChoices, agentName, humanName)
 
     const id = generateId()
+
+    // Trim text fields to keep the URL compact (base64 expands ~33%).
+    const trimStr = (s: string, max: number) => s && s.length > max ? s.slice(0, max) + '...' : s
 
     const result: RoastResult = {
       id,
       agentName,
       humanName,
-      archetype: roast.archetype,
-      title: roast.title,
-      roastShort: roast.roastShort,
-      roastDetail: roast.roastDetail,
-      killerLine: roast.killerLine,
-      dims: roast.dims,
-      dimRoasts: roast.dimRoasts,
-      archetypeReason: roast.archetypeReason,
-      responses,
-      createdAt: new Date().toISOString(),
+      archetype,
+      roastShort: trimStr(roast.roastShort, 220),
+      roastLong: trimStr(roast.roastLong || '', 1500),
+      dimensionAnswers: dimensionChoices,
     }
 
-    // Encode entire result into URL — no database needed
     const encoded = encodeRoast(result)
     const baseUrl = request.headers.get('host') || 'localhost:3888'
     const protocol = baseUrl.includes('localhost') ? 'http' : 'https'
@@ -50,10 +57,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       id,
       url,
-      title: roast.title,
-      archetype: roast.archetype,
+      archetype,
       roastShort: roast.roastShort,
-      killerLine: roast.killerLine,
     })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
