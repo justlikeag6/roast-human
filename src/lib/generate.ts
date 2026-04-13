@@ -21,8 +21,8 @@ DO NOT write like this:
 - "Burns through ideas like a wildfire, leaving a trail of abandoned projects in the ashes." — this is AI slop. Extended metaphor, no specifics, could describe anyone.
 
 Rules:
-- Quote the human's ACTUAL phrases from the agent's answers (e.g. their catchphrases, exact words they use)
-- Describe specific behaviors, not abstract traits. Don't say "passionate" — say what they DO.
+- Synthesize from the agent's observations. Describe what the human DOES, not what they ARE. Pattern-level observation always beats abstract traits.
+- If the agent's answers contain real phrases or catchphrases the human uses, you may quote them. If not, do NOT invent quotes. Synthesis without fabrication is the right move — invented quotes ring false anyway.
 - Vary sentence length. At least one sentence under 8 words. No two consecutive sentences the same length.
 - Write like a WeChat message from a witty friend, not an essay.
 - Roast first, then one line that makes them feel seen. Never the reverse.

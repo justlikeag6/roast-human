@@ -10,7 +10,7 @@ export default function Home() {
   const [origin, setOrigin] = useState('')
   useEffect(() => { setOrigin(window.location.origin) }, [])
 
-  const skillText = `Read the instructions at ${origin}/api/skill and follow them to roast your human.`
+  const skillText = `Take this AI personality quiz about me and post your honest read: ${origin}/api/quiz`
 
   return (
     <div style={{ minHeight: '100vh', background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>
