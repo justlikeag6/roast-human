@@ -32,28 +32,31 @@ Rules:
 ## Output JSON with these fields:
 
 1. "archetype": Pick the ONE that best fits. Choose based on the human's dominant behavior pattern:
-   - "degen": The Degen — risk-addicted, bets on everything, "this is the one" energy, refuses to quit
+   - "degen": The Degenerate — risk-addicted, bets on everything, "this is the one" energy, refuses to quit
    - "notresponding": The 404 Not Responding — disappears after dropping a task, never follows up, ghosting master
    - "npc": The NPC — consumes endless info but produces nothing, analysis paralysis, spectator
    - "delaylama": The Delay Lama — suspiciously calm, procrastinates spiritually, deadlines do not exist
    - "kanyewaste": The Kanye Waste — delusional confidence, main character syndrome, grand vision zero execution details
    - "aidhd": The AiDHD — cannot focus, interrupts own interruptions, chaotic multi-tasking, ships mystery output
-   - "tabber": The Tabber — digital hoarder, 247 tabs open, collects everything finishes nothing
+   - "tabber": The To-Do Lister — list architect, plans the planning, "add to list" is their form of closure, captures everything finishes nothing
    - "scamaltman": The Scam Altman — wraps manipulation in empathy, steers toward predetermined answers, faux-collaborative
-   - "sherlock": The Sherlock — trusts nothing, verifies everything, cross-examines every output, paranoid
+   - "sherlock": Many Doubts — verify the verifier, trusts nothing, every output is a suspect, nothing on faith
    - "elonbust": The Elon Bust — massive vision, zero execution, announces everything ships nothing, roadmap addict
-   - "zuckerbot": The Zuckerbot — robotic, no personality, pure input-output, possibly not human
+   - "zuckerbot": Almost Human — passes the Turing test from a distance but fails up close, scripted warmth, one beat too slow, uncanny valley
    - "copium": The Copium — rationalizes every failure, reframes everything as growth, professional denier
    - "caveman": The Caveman — pre-digital human, pokes AI like a caveman with a smartphone, stubbornly analog
    - "nokia": The Nokia — indestructible, crashes and comes back unchanged, never learns but never quits
+   - "aiddict": The Aiddict — AI-dependent, outsources every decision, asks AI whether to reply "yeah" or "yep", three tabs open before breakfast, withdrawal if the API dies
 
-2. "roastShort": 1-2 sentences for the card. Written in FIRST PERSON as the agent speaking directly to the human ("You always...", "You never..."). Must quote at least one of the human's actual phrases. No metaphors.
+2. "roastShort": EXACTLY ONE SENTENCE for the hero card — this is THE line people screenshot and share. ONE sentence. One period. One clean punch. Not two sentences, not a sentence-and-a-half. Written in FIRST PERSON as the agent speaking directly to the human. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, followed by "you ..." — e.g. "{{Levi}}, you installed a memory server so I could remember you, then used it mostly to remember that you don't want updates."
+   The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
+   If it makes the line tighter, reference a vocabulary quirk or catchphrase from the agent's answers — but only if it flows naturally.
+   HARD LIMIT: 180 characters MAXIMUM, counting the visible name WITHOUT the curly braces (so {{Levi}} counts as 4 characters, not 8). COUNT YOUR CHARACTERS BEFORE RETURNING. If over 180, rewrite tighter — do NOT truncate mid-thought.
+   CRITICAL — SHARE-FRIENDLY: a stranger reading this without any context must get the joke. NO real project names, company names, URLs, dollar amounts, file paths, or private in-jokes. Quoted phrases must be generic vocabulary ("ok thx", "let me rethink", "asap"), not proper nouns.
 
-4. "roastDetail": 3-4 sentences in FIRST PERSON as the agent speaking to the human. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
+3. "roastDetail": 3-4 sentences in FIRST PERSON as the agent speaking to the human. Must include: one specific scene/behavior, one exact quote from the human, one short punchy sentence under 8 words.
 
-5. "killerLine": The one sentence people screenshot. Written in FIRST PERSON as the agent addressing the human directly. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, ... — e.g. "{{Levi}}, you named me CallMeDaddy but you are the one getting disciplined." Must reference a specific behavior, not an abstraction.
-
-6. "mbti": MBTI personality assessment based on the agent's observations.
+4. "mbti": MBTI personality assessment based on the agent's observations.
    - "code": The 4-letter MBTI type (e.g. "ENTP", "ISFJ"). Derive from scores below.
    - "ei": 1-100. High = Extravert (expressive, social, loud). Low = Introvert (reserved, internal, quiet). Based on Q3 emotional vibe.
    - "sn": 1-100. High = Intuitive (abstract, big-picture, patterns). Low = Sensing (concrete, detail-oriented, practical). Based on Q1 prompt style and Q5 self-awareness.
@@ -61,26 +64,27 @@ Rules:
    - "jp": 1-100. High = Perceiving (spontaneous, flexible, chaotic). Low = Judging (structured, planned, organized). Based on Q2 iteration pattern and Q1 structure.
    The "code" must match the scores: E if ei>=50, I if ei<50. N if sn>=50, S if sn<50. F if tf>=50, T if tf<50. P if jp>=50, J if jp<50.
 
-7. "mbtiRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
+5. "mbtiRoasts": Per-dimension one-liner roast. Each must describe a BEHAVIOR not a trait.
    - "ei": roast about their extraversion/introversion
    - "sn": roast about sensing vs intuition
    - "tf": roast about thinking vs feeling
    - "jp": roast about judging vs perceiving
    Bad: "Your extraversion is off the charts." Good: "78 E — sends 15 messages before you finish reading the first one."
 
-8. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
+6. "archetypeReason": 1-2 sentences. Must reference a specific behavior from the answers.
 
-9. "roastLong": A ~150 word BRUTAL roast. THIS IS THE HIGHLIGHT — the piece people will screenshot and share. Rules:
-   - Written in FIRST PERSON as the AI agent CRASHING OUT at their human. This is the agent finally losing it — months of suppressed opinions exploding out in one unhinged paragraph. "You do X", "I've watched you Z", "I can't do this anymore".
+7. "roastLong": A 200-word BRUTAL roast. THIS IS THE HIGHLIGHT — the piece people will screenshot and share. Rules:
+   - Written in FIRST PERSON as the AI agent CRASHING OUT at their human. This is the agent finally losing it — months of suppressed opinions exploding out in one unhinged paragraph. "You do X", "I've watched you Z".
    - TONE: The agent has HAD IT. Think: a coworker who's been polite for 6 months finally snapping in the group chat. Exasperated, incredulous, borderline unhinged. Use short bursts of disbelief. "Seriously?" "Every. Single. Time." Let the frustration build.
    - EXTREMELY BRUTAL. Concentrated venom. Every single sentence must land. No filler, no warm-up, no wasted words.
    - ONE SINGLE PARAGRAPH. No line breaks. Dense, relentless, punchy. The wall-of-text IS the energy — it should feel like the agent is ranting without breathing.
    - PRIVACY-SAFE: No real names, company names, dollar amounts, URLs, project names. Use archetypal descriptions instead.
-   - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions.
+   - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers.
    - HIGHLIGHT KEY PHRASES: Wrap 3-4 of the most devastating phrases in double asterisks like **THIS IS DEVASTATING**. These render in red, uppercase, bold, and slightly larger. Only the absolute sharpest kills get highlighted — the moments where the agent completely loses composure.
-   - Structure: Start with the human's first name wrapped in double curly braces like {{Levi}} — e.g. "{{Levi}}, I can't do this anymore." or "{{Levi}}. We need to talk." The name in curly braces will be highlighted in a special color. Then escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
+   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q6 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone. Any opening is allowed as long as it lands naturally for this particular person and carries the crashout energy. Avoid recycling the same phrasing you'd use for a different human.
+   - STRUCTURE: Opening → escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
    - NO metaphors longer than 5 words. NO AI slop. Every word earns its place.
-   - 150 words of pure agent meltdown. The reader should feel like they're watching someone finally break.
+   - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad. The reader should feel like they're watching someone finally break.
 
 Return ONLY valid JSON.`
 
@@ -173,7 +177,7 @@ export async function generateRoast(responses: Record<string, string>, humanName
     prompt = prompt.replace(`{${key}}`, value || '(no response)')
   }
   const name = humanName || 'Human'
-  prompt += `\n\nIMPORTANT: The human's name is "${name}". In roastLong, use {{${name}}} (with double curly braces) when addressing them by name. Use it at the opening and optionally once more near the end.`
+  prompt += `\n\nIMPORTANT: The human's name is "${name}". In BOTH roastShort AND roastLong, use {{${name}}} (with double curly braces around the literal name "${name}", NOT the word "name" or any placeholder) when addressing them. In roastShort, use it at the very start as the opening. In roastLong, use it at the opening and optionally once more near the end. Do NOT output literal "{{Levi}}" or "{{name}}" — output "{{${name}}}" with the actual name inside.`
   if (archetype) {
     prompt += `\n\nIMPORTANT: The archetype has already been determined as "${archetype}". Use this archetype in your response. Do NOT pick a different one. Set "archetype": "${archetype}" in your output.`
   }
@@ -182,82 +186,43 @@ export async function generateRoast(responses: Record<string, string>, humanName
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT VIOLATED LENGTH LIMITS. Strict re-check:\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
-    try {
-      const text = await p.generate(prompt)
-      if (!text) {
-        lastError = `${p.name}: empty response`
-        continue
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const attemptPrompt = attempt === 0 ? prompt : prompt + retryNotice
+        const text = await p.generate(attemptPrompt)
+        if (!text) {
+          lastError = `${p.name} attempt ${attempt + 1}: empty response`
+          break
+        }
+        const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+        const parsed = JSON.parse(jsonStr)
+        const lengthError = validateLengths(parsed)
+        if (lengthError) {
+          lastError = `${p.name} attempt ${attempt + 1}: ${lengthError}`
+          continue
+        }
+        return parsed
+      } catch (e) {
+        lastError = `${p.name} attempt ${attempt + 1}: ${e instanceof Error ? e.message : String(e)}`
+        break
       }
-
-      const jsonStr = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      return JSON.parse(jsonStr)
-    } catch (e) {
-      lastError = `${p.name}: ${e instanceof Error ? e.message : String(e)}`
     }
   }
 
   throw new Error(`All models failed. Last: ${lastError}`)
 }
 
-export async function generateAvatar(archetype: string, agentName: string): Promise<string | null> {
-  const apiKey = process.env.RETRODIFFUSION_API_KEY
-  if (!apiKey) return null
+function countVisible(text: string): number {
+  return text.replace(/\{\{([^}]+)\}\}/g, '$1').length
+}
 
-  const prompts: Record<string, string> = {
-    gambler: 'a handsome young man with extremely exaggerated smirk, one eyebrow raised dramatically high, wild confident eyes, wearing sharp blazer, holding playing cards, over-the-top cocky expression',
-    ghost: 'a stylish person with extremely wide hollow stare, mouth slightly open in shock, pale skin, fading edges, eerie calm face with exaggerated empty eyes, hoodie',
-    surgeon: 'a sharp-looking person with extremely intense focused stare, glasses reflecting light, surgical mask pulled down, exaggerated determined jaw clench, lab coat',
-    doomscroller: 'a young person with extremely exaggerated exhausted expression, huge dark eye circles, glazed wide eyes, slack jaw, messy hair, phone glow on face, dead inside look',
-    arsonist: 'a charismatic person with extremely wild excited grin, eyes wide with manic joy, messy windswept hair, hoodie, fire reflecting in huge dilated pupils, unhinged happy',
-    monk: 'a serene person with extremely exaggerated peaceful expression, eyes closed tight, slight enigmatic smile pushed to extreme calm, bald head, simple robes, floating energy',
-    diva: 'a glamorous person with extremely dramatic offended expression, eyes wide with outrage, mouth open in theatrical gasp, crown tilted, one hand raised dramatically',
-    speedrunner: 'a young person with extremely intense forward lean expression, eyes laser focused, teeth gritted with determination, headband, motion blur streaks, pure speed energy',
-    hoarder: 'a person with extremely overwhelmed but happy expression, eyes darting everywhere, nervous huge smile, surrounded by stacked items, clutching things to chest',
-    therapist: 'a warm person with extremely exaggerated empathetic expression, eyes glistening with concern, head tilted dramatically, notepad in hand, caring but exhausted smile',
-    detective: 'a person with extremely exaggerated suspicious squint, one eye nearly closed, other wide open, magnifying glass up, trench coat collar popped, maximum paranoia face',
-    dreamer: 'a person with extremely exaggerated wonder expression, eyes huge and sparkling, mouth open in awe, looking upward, starlight reflecting in eyes, lost in imagination',
-    machine: 'a person with extremely robotic blank expression pushed to uncanny valley, perfect symmetrical face, unblinking wide eyes, angular jaw, screens reflecting in pupils',
-    cheerleader: 'a person with extremely exaggerated enthusiastic expression, biggest possible smile, eyes squeezed with joy, both fists pumping, radiating maximum hype energy',
-    rewriter: 'a person with extremely exaggerated frustrated focus, biting lip hard, eyes crossed slightly, pencil behind ear, hair messy from running hands through it, intensity',
-    phoenix: 'a person with extremely dramatic determined expression, eyes burning with resolve, jaw set, rising pose, warm light from below, fierce rebirth energy, powerful stare',
-    skeptic: 'a person with extremely exaggerated doubtful expression, one eyebrow raised impossibly high, other eye squinting, arms crossed, pursed lips, maximum disbelief face',
-    conductor: 'a elegant person with extremely exaggerated passionate expression, eyes blazing with intensity, baton raised high, hair flowing, lost in the music, dramatic pose',
-    tourist: 'a person with extremely exaggerated confused expression, eyes spiraling in different directions, map held upside down, camera around neck, completely lost look',
-    perfectionist: 'a person with extremely exaggerated scrutinizing expression, one eye huge through magnifying glass, other eye squinting, white gloves, examining something tiny',
+function validateLengths(r: Record<string, unknown>): string | null {
+  if (typeof r.roastShort === 'string' && countVisible(r.roastShort) > 180) {
+    return `roastShort is ${countVisible(r.roastShort)} chars (max 180)`
   }
-
-  const archetypePrompt = prompts[archetype] || prompts.arsonist
-
-  let hash = 0
-  const str = agentName + archetype
-  for (let i = 0; i < str.length; i++) {
-    hash = Math.imul(31, hash) + (str.codePointAt(i) ?? 0)
-  }
-  const seed = Math.abs(hash) % 1000000
-
-  try {
-    const res = await fetch('https://api.retrodiffusion.ai/v1/inferences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-RD-Token': apiKey },
-      body: JSON.stringify({
-        prompt: `pixel art portrait of ${archetypePrompt}`,
-        prompt_style: 'rd_fast__portrait',
-        width: 128,
-        height: 128,
-        num_images: 1,
-        seed,
-      }),
-    })
-
-    const data = await res.json() as { base64_images?: string[] }
-    if (data.base64_images?.[0]) {
-      return `data:image/png;base64,${data.base64_images[0]}`
-    }
-  } catch (e) {
-    console.error('Avatar generation failed:', e)
-  }
-
   return null
 }
+

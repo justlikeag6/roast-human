@@ -41,10 +41,9 @@ export async function POST(request: NextRequest) {
       agentName,
       humanName,
       archetype,
-      roastShort: trimStr(roast.roastShort, 200),
+      roastShort: trimStr(roast.roastShort, 220),
       roastDetail: trimStr(roast.roastDetail, 300),
-      killerLine: trimStr(roast.killerLine, 200),
-      roastLong: trimStr(roast.roastLong || '', 800),
+      roastLong: trimStr(roast.roastLong || '', 1500),
       dimensionAnswers: dimension_answers,
       archetypeReason: roast.archetypeReason,
       responses,
@@ -61,7 +60,6 @@ export async function POST(request: NextRequest) {
       url,
       archetype,
       roastShort: roast.roastShort,
-      killerLine: roast.killerLine,
     })
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

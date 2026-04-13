@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -26,37 +26,40 @@ export async function GET(request: NextRequest) {
       {/* Title section */}
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: '32px 28px 20px',
+        padding: '28px 24px 16px',
       }}>
         <div style={{ fontSize: 12, letterSpacing: 4, color: '#1A1A1A', marginBottom: 12 }}>
           YOUR AGENT THINKS YOU ARE
         </div>
-        <div style={{ fontSize: 36, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1 }}>
+        <div style={{ fontSize: 36, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 14 }}>
           {arch.name.toUpperCase()}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <span style={{ padding: '7px 16px', border: '2.5px solid #1A1A1A', background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{pickTrait(arch.traits, r.id)}</span>
         </div>
       </div>
 
       {/* Avatar placeholder */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flex: 1, fontSize: 140, borderTop: '3px solid #1A1A1A', borderBottom: '3px solid #1A1A1A',
+        flex: 1, fontSize: 120, borderTop: '3px solid #1A1A1A', borderBottom: '3px solid #1A1A1A',
         background: '#f5f5f0',
       }}>
         {arch.emoji}
       </div>
 
-      {/* Killer line */}
+      {/* Roast short */}
       <div style={{
         display: 'flex', flexDirection: 'column',
-        padding: '20px 28px', background: '#181818',
+        padding: '18px 24px', background: '#181818',
       }}>
-        <div style={{ fontSize: 12, letterSpacing: 2, marginBottom: 10 }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, marginBottom: 8 }}>
           <span style={{ color: '#EEEADE' }}>AGENT </span>
           <span style={{ color }}>{r.agentName.toUpperCase()}</span>
           <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
         </div>
-        <div style={{ fontSize: 16, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.6, fontWeight: 600 }}>
-          &ldquo;{r.killerLine.length > 120 ? r.killerLine.slice(0, 117) + '...' : r.killerLine}&rdquo;
+        <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5, fontWeight: 600 }}>
+          &ldquo;{stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}&rdquo;
         </div>
       </div>
 

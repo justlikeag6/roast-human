@@ -1,14 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ARCHETYPES } from '@/lib/types'
 
 const archetypeList = Object.entries(ARCHETYPES)
 
 export default function Home() {
   const [copied, setCopied] = useState(false)
+  const [origin, setOrigin] = useState('')
+  useEffect(() => { setOrigin(window.location.origin) }, [])
 
-  const skillText = `Read the instructions at ${typeof window !== 'undefined' ? window.location.origin : ''}/api/skill and follow them to roast your human.`
+  const skillText = `Read the instructions at ${origin}/api/skill and follow them to roast your human.`
 
   return (
     <div style={{ minHeight: '100vh', background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>

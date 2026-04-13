@@ -1,8 +1,9 @@
-import { decodeRoast } from '@/lib/store'
-import { ARCHETYPES, DIMENSION_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
+import { ARCHETYPES, DIMENSION_QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DownloadButton } from './DownloadButton'
+import { CopyButton } from './CopyButton'
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -11,17 +12,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const roast = decodeRoast(id)
   if (!roast) return { title: 'Not Found' }
   const archName = ARCHETYPES[roast.archetype]?.name || roast.archetype
+  const shareText = stripNamePlaceholder(renderRoastShort(roast.roastShort, roast.humanName))
   return {
     title: `${archName} — Agents Roast Their Human`,
-    description: roast.roastShort,
+    description: shareText,
     twitter: {
       card: 'summary_large_image',
       title: `My agent thinks I'm a ${archName}`,
-      description: roast.killerLine,
+      description: shareText,
     },
     openGraph: {
       title: `${archName} — Agents Roast Their Human`,
-      description: roast.killerLine,
+      description: shareText,
     },
   }
 }
@@ -35,14 +37,6 @@ export default async function RoastPage({ params }: Props) {
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[archKeys[0]]
   const color = arch.color
 
-  function contrast(hex: string) {
-    const n = hex.replace('#', '')
-    const rv = parseInt(n.slice(0, 2), 16)
-    const g = parseInt(n.slice(2, 4), 16)
-    const b = parseInt(n.slice(4, 6), 16)
-    return (0.299 * rv + 0.587 * g + 0.114 * b) / 255 > 0.68 ? '#181818' : '#EEEADE'
-  }
-
   return (
     <div style={{ minHeight: '100vh', padding: 20, background: '#FAF7F0', fontFamily: "'IBM Plex Mono', monospace" }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -51,24 +45,26 @@ export default async function RoastPage({ params }: Props) {
         <div style={{ width: '100%', maxWidth: 900, marginTop: 30, border: '3px solid #1A1A1A', background: '#fff', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
 
           {/* YOU ARE + Title + description */}
-          <div style={{ textAlign: 'center', padding: '40px 32px 28px' }}>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 13, letterSpacing: 5, color: '#1A1A1A', marginBottom: 20 }}>
+          <div style={{ textAlign: 'center', padding: '40px 32px 28px', background: '#2ced7a' }}>
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 13, letterSpacing: 5, color: '#0a0a0a', marginBottom: 20 }}>
               YOUR AGENT THINKS YOU ARE
             </div>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 48, fontWeight: 900, letterSpacing: 5, lineHeight: 1.1, color, marginBottom: 20, WebkitTextStroke: '1.5px #1A1A1A', textShadow: `0 0 30px ${color}60, 0 0 60px ${color}30, 0 2px 0 #1A1A1A`, paintOrder: 'stroke fill' as never }}>
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 48, fontWeight: 900, letterSpacing: 5, lineHeight: 1.1, color, marginBottom: 22, WebkitTextStroke: '1.5px #1A1A1A', textShadow: `0 0 30px ${color}60, 0 0 60px ${color}30, 0 2px 0 #1A1A1A`, paintOrder: 'stroke fill' as never }}>
               {arch.name.toUpperCase()}
             </div>
-            <div style={{ fontSize: 16, fontWeight: 500, lineHeight: 1.8, color: '#555', maxWidth: 640, margin: '0 auto' }}>
-              {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {arch.traits.map((t, i) => (
+                <span key={i} style={{ padding: '7px 16px', border: '2px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1 }}>{t}</span>
+              ))}
             </div>
           </div>
 
           {/* Avatar left + Killer line right */}
           <div style={{ display: 'flex', borderTop: '3px solid #1A1A1A' }}>
-            {/* Avatar — tall left column */}
-            <div style={{ width: 280, minWidth: 280, background: '#f5f5f0', overflow: 'hidden', imageRendering: 'pixelated' as never, borderRight: '3px solid #1A1A1A' }}>
+            {/* Avatar — locked square */}
+            <div style={{ width: 380, minWidth: 380, height: 380, background: '#fff', overflow: 'hidden', borderRight: '3px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, boxSizing: 'border-box' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/api/avatar?archetype=${encodeURIComponent(r.archetype)}&name=${encodeURIComponent(r.agentName)}&v=3`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', imageRendering: 'pixelated' as never }} />
+              <img src={`/archetypes/${r.archetype}.png`} alt={arch.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', imageRendering: 'pixelated' as never }} />
             </div>
 
             {/* Right column */}
@@ -82,9 +78,9 @@ export default async function RoastPage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Killer line — large text */}
+              {/* Roast short — main hero text */}
               <div style={{ padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ fontSize: 21, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.9, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
+                <div style={{ fontSize: 19, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.55, fontWeight: 600 }}>&ldquo;<RoastText text={renderRoastShort(r.roastShort, r.humanName)} nameColor={color} />&rdquo;</div>
                 <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, marginTop: 16, textTransform: 'uppercase', letterSpacing: 1.5, color }}>&mdash; {r.agentName}</div>
               </div>
             </div>
@@ -99,7 +95,7 @@ export default async function RoastPage({ params }: Props) {
 
         {/* Actions */}
         <div style={{ width: '100%', maxWidth: 900, marginTop: 20, display: 'flex', gap: 10 }}>
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${r.killerLine}"\n\nGet roasted → roast.dev.fun`)}`} target="_blank" style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}>
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`MY AGENT JUST COOKED ME 🔥\n\nApparently I'm a "${arch.name.toUpperCase()}" @devfun\n\n"${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}"\n\nGet roasted → roast.dev.fun`)}`} target="_blank" style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}>
             Share on 𝕏
           </a>
         </div>
@@ -116,13 +112,23 @@ export default async function RoastPage({ params }: Props) {
               <div id="card-landscape" style={{ width: 580, aspectRatio: '16/9', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ textAlign: 'center', padding: '22px 20px 14px' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 8, letterSpacing: 4, color: '#1A1A1A', marginBottom: 8 }}>YOUR AGENT THINKS YOU ARE</div>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 26, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 8, WebkitTextStroke: '0.8px #1A1A1A', textShadow: `0 0 20px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
-                  <div style={{ fontSize: 10, color: '#555', lineHeight: 1.6 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 26, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 10, WebkitTextStroke: '0.8px #1A1A1A', textShadow: `0 0 20px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
+                  <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {arch.traits.map((t, i) => (
+                      <span key={i} style={{ padding: '3px 8px', border: '1.5px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 5, letterSpacing: 0.5 }}>{t}</span>
+                    ))}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flex: 1, borderTop: '2px solid #1A1A1A' }}>
-                  <div style={{ width: 140, background: '#f5f5f0', borderRight: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 50 }}>{arch.emoji}</div>
-                  <div style={{ flex: 1, background: '#181818', padding: '16px 18px', display: 'flex', alignItems: 'center' }}>
-                    <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>&ldquo;<RoastText text={r.killerLine} nameColor={color} />&rdquo;</div>
+                <div style={{ display: 'flex', flex: 1, minHeight: 0, borderTop: '2px solid #1A1A1A' }}>
+                  <div style={{ width: 220, minWidth: 220, background: '#fff', borderRight: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: 18, boxSizing: 'border-box' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/archetypes/${r.archetype}.png`} alt={arch.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', imageRendering: 'pixelated' as never }} />
+                  </div>
+                  <div style={{ flex: 1, background: '#181818', padding: '16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ fontSize: 13, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.55, fontWeight: 600 }}>&ldquo;<RoastText text={renderRoastShort(r.roastShort, r.humanName)} nameColor={color} />&rdquo;</div>
+                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, marginTop: 10, textAlign: 'right', letterSpacing: 0.8 }}>
+                      <span style={{ color: '#EEEADE' }}>— AGENT </span><span style={{ color }}>{r.agentName.toUpperCase()}</span>
+                    </div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 10px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
@@ -136,23 +142,26 @@ export default async function RoastPage({ params }: Props) {
             {/* Portrait preview — small thumbnail, downloads at 3x */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <div id="card-portrait" style={{ width: 260, aspectRatio: '3/4', border: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ textAlign: 'center', padding: '18px 14px 12px' }}>
+                <div style={{ textAlign: 'center', padding: '14px 12px 14px' }}>
                   <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 2, color: '#1A1A1A', marginBottom: 6 }}>YOUR AGENT THINKS YOU ARE</div>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 16, fontWeight: 900, color, letterSpacing: 2, lineHeight: 1.1, WebkitTextStroke: '0.5px #1A1A1A', textShadow: `0 0 15px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
-                </div>
-                {/* Short description — same as hero subtitle */}
-                <div style={{ padding: '0 14px 12px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 9, color: '#555', lineHeight: 1.5 }}>{r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}</div>
-                </div>
-                {/* Avatar placeholder */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, borderTop: '2px solid #1A1A1A', borderBottom: '2px solid #1A1A1A', background: '#f5f5f0', fontSize: 70 }}>{arch.emoji}</div>
-                {/* Agent attribution */}
-                <div style={{ padding: '8px 14px', background: '#181818', textAlign: 'center' }}>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 1 }}>
-                    <span style={{ color: '#EEEADE' }}>AGENT </span><span style={{ color }}>{r.agentName.toUpperCase()}</span><span style={{ color: '#EEEADE' }}> COOKED YOU</span>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 15, fontWeight: 900, color, letterSpacing: 2, lineHeight: 1.1, marginBottom: 10, WebkitTextStroke: '0.5px #1A1A1A', textShadow: `0 0 15px ${color}50`, paintOrder: 'stroke fill' }}>{arch.name.toUpperCase()}</div>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <span style={{ padding: '3px 9px', border: '1.5px solid #1A1A1A', background: '#fff', fontFamily: "'Press Start 2P', monospace", fontSize: 6, letterSpacing: 0.5 }}>{pickTrait(arch.traits, r.id)}</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '5px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
+                {/* Avatar — bigger square, no divider line above */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, minHeight: 0, borderBottom: '2px solid #1A1A1A', background: '#fff', overflow: 'hidden', padding: '4px 14px 14px', boxSizing: 'border-box' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/archetypes/${r.archetype}.png`} alt={arch.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', imageRendering: 'pixelated' as never }} />
+                </div>
+                {/* Roast short + attribution dark strip */}
+                <div style={{ padding: '14px 16px 12px', background: '#181818' }}>
+                  <div style={{ fontSize: 9, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5, fontWeight: 600, marginBottom: 9 }}>&ldquo;<RoastText text={renderRoastShort(r.roastShort, r.humanName)} nameColor={color} />&rdquo;</div>
+                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 4, letterSpacing: 0.6, textAlign: 'right' }}>
+                    <span style={{ color: '#EEEADE' }}>— AGENT </span><span style={{ color }}>{r.agentName.toUpperCase()}</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '4px', background: '#2ced7a', borderTop: '2px solid #1A1A1A' }}>
                   <span style={{ fontSize: 7, fontWeight: 900, color: '#0a0a0a' }}>roast.dev.fun</span>
                 </div>
               </div>
@@ -183,6 +192,9 @@ export default async function RoastPage({ params }: Props) {
                   {arch.emoji} {r.archetype}
                 </div>
               </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
+              <CopyButton text={stripNamePlaceholder(r.roastLong).replace(/\*\*([^*]+)\*\*/g, '$1')} />
             </div>
           </Section>
         )}

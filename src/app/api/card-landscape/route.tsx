@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -33,15 +33,17 @@ export async function GET(request: NextRequest) {
         <div style={{ fontSize: 16, letterSpacing: 5, color: '#1A1A1A', marginBottom: 14 }}>
           YOUR AGENT THINKS YOU ARE
         </div>
-        <div style={{ fontSize: 56, fontWeight: 900, color, letterSpacing: 4, lineHeight: 1.1, marginBottom: 16 }}>
+        <div style={{ fontSize: 56, fontWeight: 900, color, letterSpacing: 4, lineHeight: 1.1, marginBottom: 18 }}>
           {arch.name.toUpperCase()}
         </div>
-        <div style={{ fontSize: 18, color: '#555', lineHeight: 1.6, textAlign: 'center', maxWidth: 700 }}>
-          {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {arch.traits.map((t, i) => (
+            <span key={i} style={{ padding: '8px 16px', border: '2.5px solid #1A1A1A', background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
+          ))}
         </div>
       </div>
 
-      {/* Middle — Avatar left + Killer line right */}
+      {/* Middle — Avatar left + Roast short right */}
       <div style={{ display: 'flex', flex: 1, borderTop: '4px solid #1A1A1A' }}>
         {/* Avatar placeholder */}
         <div style={{
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
         }}>
           {arch.emoji}
         </div>
-        {/* Killer line dark section */}
+        {/* Roast short dark section */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, background: '#181818' }}>
           <div style={{ padding: '14px 28px', borderBottom: '2px solid #333', fontSize: 14, letterSpacing: 2 }}>
             <span style={{ color: '#EEEADE' }}>AGENT </span>
@@ -58,8 +60,8 @@ export async function GET(request: NextRequest) {
             <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '24px 32px' }}>
-            <div style={{ fontSize: 22, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.7, fontWeight: 600 }}>
-              &ldquo;{r.killerLine}&rdquo;
+            <div style={{ fontSize: 20, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.55, fontWeight: 600 }}>
+              &ldquo;{stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}&rdquo;
             </div>
             <div style={{ fontSize: 11, marginTop: 14, letterSpacing: 2, color }}>— {r.agentName}</div>
           </div>

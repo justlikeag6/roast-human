@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast } from '@/lib/store'
+import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 
 export const runtime = 'edge'
@@ -55,23 +55,19 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           fontWeight: 900,
           letterSpacing: 4,
           color,
-          marginBottom: 20,
+          marginBottom: 24,
           textShadow: `0 2px 0 #1A1A1A`,
         }}>
           {arch.name.toUpperCase()}
         </div>
-        <div style={{
-          fontSize: 22,
-          color: '#555',
-          maxWidth: 800,
-          textAlign: 'center',
-          lineHeight: 1.6,
-        }}>
-          {r.humanName ? `${r.humanName}, ${r.roastShort.charAt(0).toLowerCase()}${r.roastShort.slice(1)}` : r.roastShort}
+        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          {arch.traits.map((t, i) => (
+            <span key={i} style={{ padding: '10px 22px', border: '3px solid #1A1A1A', background: '#fff', fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
+          ))}
         </div>
       </div>
 
-      {/* Killer line dark section */}
+      {/* Roast short dark section */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -79,13 +75,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         padding: '30px 60px',
       }}>
         <div style={{
-          fontSize: 24,
+          fontSize: 22,
           fontStyle: 'italic',
           color: '#EEEADE',
-          lineHeight: 1.6,
+          lineHeight: 1.55,
           fontWeight: 600,
         }}>
-          &ldquo;{r.killerLine}&rdquo;
+          &ldquo;{stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}&rdquo;
         </div>
         <div style={{
           fontSize: 14,
