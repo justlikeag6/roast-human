@@ -226,7 +226,7 @@ export async function generateRoast(
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain at least 6 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short devastating phrases (1-6 words each). If your previous attempt had zero or too few, ADD THEM NOW.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -268,6 +268,11 @@ function validateLengths(r: Record<string, unknown>): string | null {
   }
   if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
     return 'roastLong is missing or empty'
+  }
+  // Enforce ** highlight markers in roastLong (min 6)
+  const highlightCount = ((r.roastLong as string).match(/\*\*[^*]+\*\*/g) || []).length
+  if (highlightCount < 6) {
+    return `roastLong has only ${highlightCount} highlights (need at least 6)`
   }
   return null
 }
