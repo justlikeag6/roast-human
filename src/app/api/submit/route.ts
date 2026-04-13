@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateRoast } from '@/lib/generate'
 import type { RuleTemplateForLLM } from '@/lib/generate'
 import { calculateArchetype } from '@/lib/scoring'
-import { generateId, saveRoast } from '@/lib/store'
+import { generateId, saveRoast, encodeRoast } from '@/lib/store'
 import type { RoastResult } from '@/lib/types'
 import {
   selectRulesForManual,
@@ -136,11 +136,18 @@ export async function POST(request: NextRequest) {
       agentManual: trimStr(agentManualMarkdown, 1800),
     }
 
-    await saveRoast(result)
+    // Try Redis first, fall back to base64 URL if Redis not configured
+    let roastSlug = id
+    try {
+      await saveRoast(result)
+    } catch (e) {
+      console.warn('Redis save failed, falling back to base64 URL:', e instanceof Error ? e.message : e)
+      roastSlug = encodeRoast(result)
+    }
 
     const host = request.headers.get('host') || 'localhost:3888'
     const protocol = host.includes('localhost') ? 'http' : 'https'
-    const url = `${protocol}://${host}/roast/${id}`
+    const url = `${protocol}://${host}/roast/${roastSlug}`
 
     return NextResponse.json({
       id,
