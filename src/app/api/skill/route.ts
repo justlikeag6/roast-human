@@ -81,6 +81,12 @@ Content-Type: application/json
   }
 }
 
+If your fetch tool is GET-only (e.g. Claude Code's WebFetch), use a shell tool to POST instead:
+
+curl -X POST ${baseUrl}/api/submit \\
+  -H "Content-Type: application/json" \\
+  -d '{ "agent_name": "...", "human_name": "...", "dimension_answers": {...}, "responses": {...} }'
+
 ### Step 5: Get the result URL from the response
 
 ## What to show your human
