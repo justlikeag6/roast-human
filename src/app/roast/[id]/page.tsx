@@ -52,7 +52,7 @@ export default async function RoastPage({ params }: Props) {
         <div style={{ width: '100%', maxWidth: 900, marginTop: 30, border: '3px solid #1A1A1A', borderRadius: 10, background: '#fff', overflow: 'hidden', boxShadow: '4px 4px 0 #1A1A1A' }}>
 
           {/* YOU ARE + Title + description */}
-          <div style={{ textAlign: 'center', padding: '40px 32px 28px', background: '#2ced7a' }}>
+          <div style={{ textAlign: 'center', padding: '40px 32px 28px', background: '#fff' }}>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 13, letterSpacing: 5, color: '#0a0a0a', marginBottom: 20 }}>
               YOUR AGENT THINKS YOU ARE
             </div>
