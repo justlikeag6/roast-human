@@ -186,7 +186,7 @@ export async function generateRoast(responses: Record<string, string>, humanName
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT VIOLATED LENGTH LIMITS. Strict re-check:\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -220,8 +220,14 @@ function countVisible(text: string): number {
 }
 
 function validateLengths(r: Record<string, unknown>): string | null {
-  if (typeof r.roastShort === 'string' && countVisible(r.roastShort) > 180) {
+  if (typeof r.roastShort !== 'string' || r.roastShort.trim().length === 0) {
+    return 'roastShort is missing or empty'
+  }
+  if (countVisible(r.roastShort) > 180) {
     return `roastShort is ${countVisible(r.roastShort)} chars (max 180)`
+  }
+  if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
+    return 'roastLong is missing or empty'
   }
   return null
 }
