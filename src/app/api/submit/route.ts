@@ -31,8 +31,11 @@ export async function POST(request: NextRequest) {
     // Extract dimension choices from LLM output
     const dimensionChoices: Record<string, string> = roast.dimensionChoices || {}
 
-    // Calculate archetype from dimension choices (deterministic code, not LLM)
-    const archetype = calculateArchetype(dimensionChoices, agentName, humanName)
+    // LLM's independent archetype suggestion (holistic judgment)
+    const archetypeSuggestion: string | undefined = roast.archetypeSuggestion
+
+    // Calculate archetype from dimension choices + LLM suggestion boost
+    const archetype = calculateArchetype(dimensionChoices, agentName, humanName, archetypeSuggestion)
 
     const id = generateId()
 

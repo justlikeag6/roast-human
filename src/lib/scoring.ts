@@ -8,6 +8,7 @@ export function calculateArchetype(
   dimensionAnswers: Record<string, string>,
   agentName: string,
   humanName: string,
+  archetypeSuggestion?: string,
 ): string {
   // Tally scores for each archetype
   const scores: Record<string, number> = {}
@@ -26,6 +27,13 @@ export function calculateArchetype(
     for (const [archetype, points] of Object.entries(option.scores)) {
       scores[archetype] = (scores[archetype] || 0) + points
     }
+  }
+
+  // LLM archetype suggestion boost: if the LLM independently suggests an archetype,
+  // give it a significant boost to help resolve cases where dimension scoring
+  // picks a close-but-wrong archetype (e.g. degen vs caveman, aiddict vs degen)
+  if (archetypeSuggestion && archetypeSuggestion in scores) {
+    scores[archetypeSuggestion] += 5
   }
 
   // Hash-based tie-breaking perturbation (±0.5)

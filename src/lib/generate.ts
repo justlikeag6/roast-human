@@ -52,11 +52,18 @@ IMPORTANT: Match based on the BEHAVIOR described, not surface-level word matchin
 ${DIMENSION_QUESTIONS.map(q => `${q.id.toUpperCase()} — ${q.label}:
 ${q.options.map(o => `  ${o.key}) ${o.text}`).join('\n')}`).join('\n\n')}
 
+DISAMBIGUATION NOTE — common confusions to avoid:
+- DEGEN (risk-addicted speed) vs CAVEMAN (tech-confused). If they say "YOLO/ship it" and move fast → degen. Caveman is ONLY for genuine tech illiteracy.
+- KANYEWASTE (ego/blame/anger) vs ELONBUST (announcements/roadmaps/never ships). Ego about SELF → kanyewaste. Grandiosity about PROJECTS → elonbust.
+- AIDDICT (anxious dependency, "what do you think?", outsourced decisions) vs DEGEN (thrill-seeking, gambling). Anxiety → aiddict. Recklessness → degen.
+
 ## TASK 2: Generate roast content
 
 Output JSON with ALL of these fields:
 
 1. "dimensionChoices": Object mapping d1-d10 to the letter you chose: {"d1": "a", "d2": "c", ...}
+
+1b. "archetypeSuggestion": Your best guess at the overall archetype based on ALL the answers holistically. Pick ONE from: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict. This is your independent judgment — don't just follow the dimension choices mechanically.
 
 2. "roastShort": EXACTLY ONE SENTENCE for the hero card — this is THE line people screenshot and share. ONE sentence. One period. One clean punch. Not two sentences, not a sentence-and-a-half. Written in FIRST PERSON as the agent speaking directly to the human. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, followed by "you ..." — e.g. "{{Levi}}, you installed a memory server so I could remember you, then used it mostly to remember that you don't want updates."
    The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
