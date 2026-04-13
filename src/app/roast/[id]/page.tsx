@@ -193,9 +193,38 @@ export default async function RoastPage({ params }: Props) {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 14 }}>
-              <CopyButton text={stripNamePlaceholder(r.roastLong).replace(/\*\*([^*]+)\*\*/g, '$1')} />
-            </div>
+            {(() => {
+              const fullRoastPlain = stripNamePlaceholder(r.roastLong).replace(/\*\*([^*]+)\*\*/g, '$1')
+              const cap = 180
+              const snippet = fullRoastPlain.length > cap
+                ? fullRoastPlain.slice(0, cap).trimEnd() + '...'
+                : fullRoastPlain
+              const tweetText = `☠️ My agent's full roast:\n\n"${snippet}"\n\nSee how your agent would roast you → roast.dev.fun`
+              return (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontFamily: "'Press Start 2P', monospace",
+                      fontSize: 9,
+                      letterSpacing: 1,
+                      padding: '10px 18px',
+                      background: '#1A1A1A',
+                      color: '#EEEADE',
+                      border: '2px solid #1A1A1A',
+                      boxShadow: '3px 3px 0 #1A1A1A',
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ☠️ SHARE FULL ROAST ON 𝕏
+                  </a>
+                  <CopyButton text={fullRoastPlain} />
+                </div>
+              )
+            })()}
           </Section>
         )}
 
