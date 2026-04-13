@@ -134,14 +134,21 @@ export default function Home() {
     }
 
     if (stepsRef.current) {
-      anime({
-        targets: stepsRef.current.children,
-        opacity: [0, 1],
-        translateY: [30, 0],
-        delay: anime.stagger(200, { start: 500 }),
-        duration: 500,
-        easing: 'easeOutCubic',
-      })
+      try {
+        anime({
+          targets: stepsRef.current.children,
+          opacity: [0, 1],
+          translateY: [30, 0],
+          delay: anime.stagger(200, { start: 500 }),
+          duration: 500,
+          easing: 'easeOutCubic',
+        })
+      } catch {
+        // Fallback: show all steps immediately if anime fails
+        Array.from(stepsRef.current.children).forEach(el => {
+          (el as HTMLElement).style.opacity = '1'
+        })
+      }
     }
 
     if (factsRef.current) {
@@ -229,8 +236,8 @@ export default function Home() {
 
         {/* Steps — separate boxes */}
         <div ref={stepsRef} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40 }}>
-          {/* Step 1 */}
-          <div {...stepHover} style={{ background: '#fff', border: '3px solid #1A1A1A', padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A', display: 'flex', gap: 20, alignItems: 'flex-start', opacity: 0 }}>
+          {/* Step 1 — no opacity:0, always visible (most important CTA) */}
+          <div {...stepHover} style={{ background: '#fff', border: '3px solid #1A1A1A', padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A', display: 'flex', gap: 20, alignItems: 'flex-start' }}>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 28, color: '#1A1A1A', minWidth: 40, lineHeight: 1 }}>1</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>

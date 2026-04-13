@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"cd ~/roast-human-levi && git remote set-url origin git@github.com:chenziz/roast-human.git && git push origin main 2>&1\",\"timeout\":30000,\"description\":\"Push via SSH\"}",
+  "error": "Exit code 1\nTo github.com:chenziz/roast-human.git\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'github.com:chenziz/roast-human.git'\nhint: Updates were rejected because the remote contains work that you do\nhint: not have locally. This is usually caused by another repository pushing\nhint: to the same ref. You may want to first integrate the remote changes\nhint: (e.g., 'git pull ...') before pushing again.\nhint: See the 'Note about fast-forwards' in 'git push -...",
+  "timestamp": "2026-04-13T09:39:36.629Z",
+  "retry_count": 1
+}
