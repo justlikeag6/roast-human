@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
+import { loadRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 
 export const runtime = 'edge'
@@ -9,7 +9,7 @@ export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const r = decodeRoast(id)
+  const r = await loadRoast(id)
 
   if (!r) {
     return new ImageResponse(

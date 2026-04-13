@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
+import { loadRoast, renderRoastShort, stripNamePlaceholder } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -8,7 +8,7 @@ export const runtime = 'edge'
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id')
   if (!id) return new Response('Missing id', { status: 400 })
-  const r = decodeRoast(id)
+  const r = await loadRoast(id)
   if (!r) return new Response('Not found', { status: 404 })
 
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[Object.keys(ARCHETYPES)[0]]
@@ -45,25 +45,24 @@ export async function GET(request: NextRequest) {
 
       {/* Middle — Avatar left + Roast short right */}
       <div style={{ display: 'flex', flex: 1, borderTop: '4px solid #1A1A1A' }}>
-        {/* Avatar placeholder */}
+        {/* Avatar */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: 320, background: '#f5f5f0', borderRight: '4px solid #1A1A1A', fontSize: 120,
+          width: 320, background: '#fff', borderRight: '4px solid #1A1A1A', padding: 24,
         }}>
-          {arch.emoji}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${request.nextUrl.origin}/archetypes/${r.archetype}.png`} alt={arch.name} width={272} height={272} style={{ objectFit: 'contain' }} />
         </div>
         {/* Roast short dark section */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, background: '#181818' }}>
-          <div style={{ padding: '14px 28px', borderBottom: '2px solid #333', fontSize: 14, letterSpacing: 2 }}>
+          <div style={{ display: 'flex', padding: '14px 28px', borderBottom: '2px solid #333', fontSize: 14, letterSpacing: 2 }}>
             <span style={{ color: '#EEEADE' }}>AGENT </span>
             <span style={{ color }}>{r.agentName.toUpperCase()}</span>
             <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '24px 32px' }}>
-            <div style={{ fontSize: 20, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.55, fontWeight: 600 }}>
-              &ldquo;{stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}&rdquo;
-            </div>
-            <div style={{ fontSize: 11, marginTop: 14, letterSpacing: 2, color }}>— {r.agentName}</div>
+            <div style={{ fontSize: 20, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.55, fontWeight: 600 }}>{`\u201C${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}\u201D`}</div>
+            <div style={{ fontSize: 11, marginTop: 14, letterSpacing: 2, color }}>{`— ${r.agentName}`}</div>
           </div>
         </div>
       </div>

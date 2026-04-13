@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateRoast } from '@/lib/generate'
 import { calculateArchetype } from '@/lib/scoring'
-import { encodeRoast, generateId } from '@/lib/store'
+import { generateId, saveRoast } from '@/lib/store'
 import type { RoastResult } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
 
     const id = generateId()
 
-    // Trim text fields to keep the URL compact (base64 expands ~33%).
     const trimStr = (s: string, max: number) => s && s.length > max ? s.slice(0, max) + '...' : s
 
     const result: RoastResult = {
@@ -46,10 +45,11 @@ export async function POST(request: NextRequest) {
       dimensionAnswers: dimension_answers,
     }
 
-    const encoded = encodeRoast(result)
-    const baseUrl = request.headers.get('host') || 'localhost:3888'
-    const protocol = baseUrl.includes('localhost') ? 'http' : 'https'
-    const url = `${protocol}://${baseUrl}/roast/${encoded}`
+    await saveRoast(result)
+
+    const host = request.headers.get('host') || 'localhost:3888'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const url = `${protocol}://${host}/roast/${id}`
 
     return NextResponse.json({
       id,

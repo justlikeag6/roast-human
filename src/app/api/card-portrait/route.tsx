@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { decodeRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
+import { loadRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
 import { ARCHETYPES } from '@/lib/types'
 import { NextRequest } from 'next/server'
 
@@ -8,7 +8,7 @@ export const runtime = 'edge'
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get('id')
   if (!id) return new Response('Missing id', { status: 400 })
-  const r = decodeRoast(id)
+  const r = await loadRoast(id)
   if (!r) return new Response('Not found', { status: 404 })
 
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[Object.keys(ARCHETYPES)[0]]
@@ -39,13 +39,14 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
 
-      {/* Avatar placeholder */}
+      {/* Avatar */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flex: 1, fontSize: 120, borderTop: '3px solid #1A1A1A', borderBottom: '3px solid #1A1A1A',
-        background: '#f5f5f0',
+        flex: 1, borderTop: '3px solid #1A1A1A', borderBottom: '3px solid #1A1A1A',
+        background: '#fff', padding: 16,
       }}>
-        {arch.emoji}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={`${request.nextUrl.origin}/archetypes/${r.archetype}.png`} alt={arch.name} width={220} height={220} style={{ objectFit: 'contain' }} />
       </div>
 
       {/* Roast short */}
@@ -53,14 +54,12 @@ export async function GET(request: NextRequest) {
         display: 'flex', flexDirection: 'column',
         padding: '18px 24px', background: '#181818',
       }}>
-        <div style={{ fontSize: 11, letterSpacing: 2, marginBottom: 8 }}>
+        <div style={{ display: 'flex', fontSize: 11, letterSpacing: 2, marginBottom: 8 }}>
           <span style={{ color: '#EEEADE' }}>AGENT </span>
           <span style={{ color }}>{r.agentName.toUpperCase()}</span>
           <span style={{ color: '#EEEADE' }}> COOKED YOU</span>
         </div>
-        <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5, fontWeight: 600 }}>
-          &ldquo;{stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}&rdquo;
-        </div>
+        <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5, fontWeight: 600 }}>{`\u201C${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}\u201D`}</div>
       </div>
 
       {/* Green footer */}

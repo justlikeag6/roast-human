@@ -1,4 +1,4 @@
-import { decodeRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
+import { loadRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
 import { ARCHETYPES, DIMENSION_QUESTIONS } from '@/lib/types'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -9,7 +9,7 @@ interface Props { params: Promise<{ id: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  const roast = decodeRoast(id)
+  const roast = await loadRoast(id)
   if (!roast) return { title: 'Not Found' }
   const archName = ARCHETYPES[roast.archetype]?.name || roast.archetype
   const shareText = stripNamePlaceholder(renderRoastShort(roast.roastShort, roast.humanName))
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RoastPage({ params }: Props) {
   const { id } = await params
-  const r = decodeRoast(id)
+  const r = await loadRoast(id)
   if (!r) return <div style={{ padding: 60, textAlign: 'center', fontFamily: "'Press Start 2P', monospace", fontSize: 14 }}>This roast doesn&apos;t exist.</div>
 
   const archKeys = Object.keys(ARCHETYPES)
