@@ -58,8 +58,8 @@ export default function Home() {
                 <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>
                   Works with Claude, ChatGPT, Gemini, or any AI agent
                 </div>
-                <div style={{ fontSize: 11, color: '#666', marginTop: 8, fontStyle: 'italic' }}>
-                  💡 Best results in a chat where your agent already knows you — memory enabled, prior conversations, or a workspace you&apos;ve shared for a while. Fresh chats produce generic roasts.
+                <div style={{ fontSize: 11, color: '#1A1A1A', marginTop: 10, lineHeight: 1.6 }}>
+                  💡 <span style={{ background: '#FFF3A1', padding: '1px 4px', boxDecorationBreak: 'clone' as never, WebkitBoxDecorationBreak: 'clone' as never }}>Best results in a chat where your agent already knows you — memory enabled, prior conversations, or a workspace you&apos;ve shared for a while. Fresh chats produce generic roasts.</span>
                 </div>
               </div>
             </div>
