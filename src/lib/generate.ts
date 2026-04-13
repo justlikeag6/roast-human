@@ -267,26 +267,30 @@ function ensureHighlights(text: string): string {
   const existing = (text.match(/\*\*[^*]+\*\*/g) || []).length
   if (existing >= 3) return text
 
-  // Split into sentences, highlight short punchy ones (2-8 words)
-  const parts = text.split(/(?<=\.)\s+/)
-  let added = existing
-  const target = Math.max(5, existing)
+  let result = text
 
-  for (let i = 0; i < parts.length && added < target; i++) {
-    const s = parts[i]
-    if (s.includes('**') || s.startsWith('{{')) continue
-    const words = s.trim().split(/\s+/).length
-    if (words >= 2 && words <= 8) {
-      const trimmed = s.replace(/\.\s*$/, '')
-      parts[i] = `**${trimmed}**.`
-      added++
+  // Pattern 0: "Every. Single. Time." emphatic fragments
+  result = result.replace(/(?<!\*\*)(\w+\.\s\w+\.\s\w+\.)(?!\*\*)/g, '**$1**')
+
+  // Pattern 1: Split into sentences, highlight short punchy ones (2-10 words)
+  const count1 = (result.match(/\*\*[^*]+\*\*/g) || []).length
+  if (count1 < 4) {
+    const parts = result.split(/(?<=\.)\s+/)
+    let added = count1
+    for (let i = 0; i < parts.length && added < 5; i++) {
+      const s = parts[i]
+      if (s.includes('**') || s.startsWith('{{')) continue
+      const words = s.trim().split(/\s+/).length
+      if (words >= 2 && words <= 10) {
+        const trimmed = s.replace(/\.\s*$/, '')
+        parts[i] = `**${trimmed}**.`
+        added++
+      }
     }
+    if (added > count1) result = parts.join(' ')
   }
 
-  if (added > existing) return parts.join(' ')
-
   // Fallback: highlight key phrases within longer sentences
-  let result = text
   const punchPhrases = [
     /(?<!\*\*)(just a ghost)(?!\*\*)/gi,
     /(?<!\*\*)(like it's confetti)(?!\*\*)/gi,
