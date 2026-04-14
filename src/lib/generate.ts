@@ -202,7 +202,7 @@ export async function generateRoast(
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -220,6 +220,11 @@ export async function generateRoast(
           lastError = `${p.name} attempt ${attempt + 1}: ${lengthError}`
           continue
         }
+        // Guarantee a minimum highlight count regardless of LLM compliance.
+        // Prompt asks for 10-15; this is the safety net for undershoot.
+        if (typeof parsed.roastLong === 'string') {
+          parsed.roastLong = ensureHighlights(parsed.roastLong, 10)
+        }
         return parsed
       } catch (e) {
         lastError = `${p.name} attempt ${attempt + 1}: ${e instanceof Error ? e.message : String(e)}`
@@ -229,6 +234,94 @@ export async function generateRoast(
   }
 
   throw new Error(`All models failed. Last: ${lastError}`)
+}
+
+function countHighlights(text: string): number {
+  return (text.match(/\*\*[^*]+\*\*/g) || []).length
+}
+
+// Inject ** highlights into roastLong until it has at least `target` of them.
+// The prompt asks the LLM for 10-15 highlights but compliance is unreliable, so
+// this is a deterministic safety net. Two-stage approach: first wrap emphatic
+// triple fragments ("Every. Single. Time."), then select the shortest clauses
+// between punctuation boundaries until the target is reached.
+function ensureHighlights(text: string, target = 10): string {
+  let result = text
+
+  // STAGE 1 — emphatic triple-fragment pattern ("Every. Single. Time.")
+  //   Almost always deserves to be red. Requires sentence boundary to avoid
+  //   greedy matches that cross sentences like "rest. Every. Single.".
+  result = result.replace(
+    /(?<=^|[.!?]\s)((?:[A-Z][a-z]{0,7}\.\s+){2}[A-Z][a-z]{0,7}\.)/g,
+    '**$1**',
+  )
+  if (countHighlights(result) >= target) return result
+
+  // STAGE 2 — pick shortest punctuation-delimited clauses and wrap them.
+  //   Temporarily replace existing **X** blocks with placeholders so they
+  //   don't pollute segmentation or candidate filtering. Segment the cleaned
+  //   text on . ! ? , ; : — – newline. Candidates: 2-10 words, 6-80 chars,
+  //   no leading apostrophe (avoids clipping mid-contraction). Pick the
+  //   shortest `needed` candidates and wrap them. Finally, restore the
+  //   original highlights from the placeholders.
+  const needed = target - countHighlights(result)
+  if (needed <= 0) return result
+
+  const blocks: string[] = []
+  const sentinel = (i: number) => `\x00HL${i}\x00`
+  const cleaned = result.replace(/\*\*[^*]+\*\*/g, (match) => {
+    const i = blocks.length
+    blocks.push(match)
+    return sentinel(i)
+  })
+
+  interface Segment { start: number; end: number; text: string }
+  const segments: Segment[] = []
+  // Split on punctuation AND on our placeholder sentinels, so a segment is
+  // always pure text between an existing highlight and a punctuation boundary.
+  const boundaryRx = /[.!?,;:—–\n]|\x00HL\d+\x00/g
+  let lastEnd = 0
+  let m: RegExpExecArray | null
+  while ((m = boundaryRx.exec(cleaned)) !== null) {
+    if (m.index > lastEnd) {
+      segments.push({ start: lastEnd, end: m.index, text: cleaned.slice(lastEnd, m.index) })
+    }
+    lastEnd = m.index + m[0].length
+  }
+  if (lastEnd < cleaned.length) {
+    segments.push({ start: lastEnd, end: cleaned.length, text: cleaned.slice(lastEnd) })
+  }
+
+  const candidates = segments.filter(s => {
+    const t = s.text.trim()
+    if (!t) return false
+    if (t.includes('{{') || t.includes('}}')) return false
+    if (t.startsWith("'") || t.startsWith('’')) return false
+    const wc = t.split(/\s+/).length
+    return wc >= 2 && wc <= 10 && t.length >= 6
+  })
+
+  // Prefer shorter clauses (punchier in red).
+  candidates.sort((a, b) => a.text.trim().length - b.text.trim().length)
+  const picked = candidates.slice(0, needed).sort((a, b) => a.start - b.start)
+  if (picked.length === 0) {
+    return cleaned.replace(/\x00HL(\d+)\x00/g, (_, i) => blocks[Number(i)])
+  }
+
+  // Rebuild the cleaned string with wrapped clauses, then restore the
+  // original highlights from the sentinels.
+  let output = ''
+  let pos = 0
+  for (const seg of picked) {
+    output += cleaned.slice(pos, seg.start)
+    const lead = seg.text.match(/^\s*/)?.[0] || ''
+    const tail = seg.text.match(/\s*$/)?.[0] || ''
+    const core = seg.text.slice(lead.length, seg.text.length - tail.length)
+    output += lead + `**${core}**` + tail
+    pos = seg.end
+  }
+  output += cleaned.slice(pos)
+  return output.replace(/\x00HL(\d+)\x00/g, (_, i) => blocks[Number(i)])
 }
 
 function countVisible(text: string): number {
