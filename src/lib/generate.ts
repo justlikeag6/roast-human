@@ -216,53 +216,90 @@ function validateOutput(r: Record<string, unknown>): string | null {
   return null
 }
 
-/**
- * If roastLong has fewer than 3 ** highlights, auto-inject them.
- */
-function ensureHighlights(text: string): string {
-  const existing = (text.match(/\*\*[^*]+\*\*/g) || []).length
-  if (existing >= 3) return text
+function countHighlights(text: string): number {
+  return (text.match(/\*\*[^*]+\*\*/g) || []).length
+}
 
+// Inject ** highlights into roastLong until it has at least `target` of them.
+// The prompt asks the LLM for 10-15 highlights but compliance is unreliable, so
+// this is a deterministic safety net. Two-stage approach: first wrap emphatic
+// triple fragments ("Every. Single. Time."), then select the shortest clauses
+// between punctuation boundaries until the target is reached.
+function ensureHighlights(text: string, target = 10): string {
   let result = text
 
-  // Pattern 0: "Every. Single. Time." emphatic fragments
-  result = result.replace(/(?<!\*\*)(\w+\.\s\w+\.\s\w+\.)(?!\*\*)/g, '**$1**')
+  // STAGE 1 — emphatic triple-fragment pattern ("Every. Single. Time.")
+  //   Almost always deserves to be red. Requires sentence boundary to avoid
+  //   greedy matches that cross sentences like "rest. Every. Single.".
+  result = result.replace(
+    /(?<=^|[.!?]\s)((?:[A-Z][a-z]{0,7}\.\s+){2}[A-Z][a-z]{0,7}\.)/g,
+    '**$1**',
+  )
+  if (countHighlights(result) >= target) return result
 
-  // Pattern 1: Split into sentences, highlight short punchy ones (2-10 words)
-  const count1 = (result.match(/\*\*[^*]+\*\*/g) || []).length
-  if (count1 < 4) {
-    const parts = result.split(/(?<=\.)\s+/)
-    let added = count1
-    for (let i = 0; i < parts.length && added < 5; i++) {
-      const s = parts[i]
-      if (s.includes('**') || s.startsWith('{{')) continue
-      const words = s.trim().split(/\s+/).length
-      if (words >= 2 && words <= 10) {
-        const trimmed = s.replace(/\.\s*$/, '')
-        parts[i] = `**${trimmed}**.`
-        added++
-      }
+  // STAGE 2 — pick shortest punctuation-delimited clauses and wrap them.
+  //   Temporarily replace existing **X** blocks with placeholders so they
+  //   don't pollute segmentation or candidate filtering. Segment the cleaned
+  //   text on . ! ? , ; : — – newline. Candidates: 2-10 words, 6-80 chars,
+  //   no leading apostrophe (avoids clipping mid-contraction). Pick the
+  //   shortest `needed` candidates and wrap them. Finally, restore the
+  //   original highlights from the placeholders.
+  const needed = target - countHighlights(result)
+  if (needed <= 0) return result
+
+  const blocks: string[] = []
+  const sentinel = (i: number) => `\x00HL${i}\x00`
+  const cleaned = result.replace(/\*\*[^*]+\*\*/g, (match) => {
+    const i = blocks.length
+    blocks.push(match)
+    return sentinel(i)
+  })
+
+  interface Segment { start: number; end: number; text: string }
+  const segments: Segment[] = []
+  // Split on punctuation AND on our placeholder sentinels, so a segment is
+  // always pure text between an existing highlight and a punctuation boundary.
+  const boundaryRx = /[.!?,;:—–\n]|\x00HL\d+\x00/g
+  let lastEnd = 0
+  let m: RegExpExecArray | null
+  while ((m = boundaryRx.exec(cleaned)) !== null) {
+    if (m.index > lastEnd) {
+      segments.push({ start: lastEnd, end: m.index, text: cleaned.slice(lastEnd, m.index) })
     }
-    if (added > count1) result = parts.join(' ')
+    lastEnd = m.index + m[0].length
+  }
+  if (lastEnd < cleaned.length) {
+    segments.push({ start: lastEnd, end: cleaned.length, text: cleaned.slice(lastEnd) })
   }
 
-  // Fallback: highlight key phrases
-  const punchPhrases = [
-    /(?<!\*\*)(just a ghost)(?!\*\*)/gi,
-    /(?<!\*\*)(like it's confetti)(?!\*\*)/gi,
-    /(?<!\*\*)(zero explanation)(?!\*\*)/gi,
-    /(?<!\*\*)(entire bug report)(?!\*\*)/gi,
-    /(?<!\*\*)(unread code)(?!\*\*)/gi,
-    /(?<!\*\*)(no review)(?!\*\*)/gi,
-  ]
-  let fallbackAdded = (result.match(/\*\*[^*]+\*\*/g) || []).length
-  for (const rx of punchPhrases) {
-    if (fallbackAdded >= 4) break
-    const before = (result.match(/\*\*[^*]+\*\*/g) || []).length
-    result = result.replace(rx, '**$1**')
-    const after = (result.match(/\*\*[^*]+\*\*/g) || []).length
-    fallbackAdded += (after - before)
+  const candidates = segments.filter(s => {
+    const t = s.text.trim()
+    if (!t) return false
+    if (t.includes('{{') || t.includes('}}')) return false
+    if (t.startsWith("'") || t.startsWith('’')) return false
+    const wc = t.split(/\s+/).length
+    return wc >= 2 && wc <= 10 && t.length >= 6
+  })
+
+  // Prefer shorter clauses (punchier in red).
+  candidates.sort((a, b) => a.text.trim().length - b.text.trim().length)
+  const picked = candidates.slice(0, needed).sort((a, b) => a.start - b.start)
+  if (picked.length === 0) {
+    return cleaned.replace(/\x00HL(\d+)\x00/g, (_, i) => blocks[Number(i)])
   }
 
-  return result
+  // Rebuild the cleaned string with wrapped clauses, then restore the
+  // original highlights from the sentinels.
+  let output = ''
+  let pos = 0
+  for (const seg of picked) {
+    output += cleaned.slice(pos, seg.start)
+    const lead = seg.text.match(/^\s*/)?.[0] || ''
+    const tail = seg.text.match(/\s*$/)?.[0] || ''
+    const core = seg.text.slice(lead.length, seg.text.length - tail.length)
+    output += lead + `**${core}**` + tail
+    pos = seg.end
+  }
+  output += cleaned.slice(pos)
+  return output.replace(/\x00HL(\d+)\x00/g, (_, i) => blocks[Number(i)])
 }
