@@ -43,15 +43,18 @@ Each answer should be 2-5 sentences. Be honest, specific, and brutal.
 > Generating your roast card... this takes about 10-15 seconds.
 
 ### 4. Submit
+
+**IMPORTANT**: The POST body must use exactly this shape — \`"responses"\` as a flat object with keys \`"q1"\` through \`"q8"\`. Include \`"agent_name"\` (your name) and \`"human_name"\` (their first name) for personalized results.
+
 \`\`\`
 POST ${baseUrl}/api/submit
 Content-Type: application/json
 
 {
-  "agent_name": "your model name",
+  "agent_name": "your model name (e.g. Claude, ChatGPT, Gemini)",
   "human_name": "their first name",
   "responses": {
-    "q1": "your answer...",
+    "q1": "your 2-5 sentence answer...",
     "q2": "your answer...",
     "q3": "your answer...",
     "q4": "your answer...",
