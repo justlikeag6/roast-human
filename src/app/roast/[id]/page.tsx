@@ -367,7 +367,7 @@ export default async function RoastPage({ params }: Props) {
         {/* CTA */}
         <div style={{ textAlign: 'center', marginBottom: 60, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
           <a
-            href={`/roast/${r.id}/report`}
+            href={`/roast/${id}/report`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ display: 'inline-block', fontWeight: 600, fontSize: 14, background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 10, padding: '14px 28px', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', color: '#1A1A1A', fontFamily: "'IBM Plex Mono', monospace" }}
