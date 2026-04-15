@@ -5,7 +5,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DownloadButton } from './DownloadButton'
 import { CopyButton } from './CopyButton'
-import { GatedManual } from './GatedManual'
 import { ShareButton } from './ShareButton'
 
 interface Props { params: Promise<{ id: string }> }
@@ -104,7 +103,6 @@ export default async function RoastPage({ params }: Props) {
         {/* Actions */}
         <div style={{ width: '100%', maxWidth: 900, marginTop: 20, display: 'flex', gap: 10 }}>
           <ShareButton
-            roastId={r.id}
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(heroShareText)}`}
             label="Share on 𝕏"
             style={{ flex: 1, textAlign: 'center', border: '3px solid #1A1A1A', borderRadius: 18, padding: '14px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', background: '#EEEADE', color: '#1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', textDecoration: 'none', fontFamily: "'IBM Plex Mono', monospace" }}
@@ -309,13 +307,9 @@ export default async function RoastPage({ params }: Props) {
           <div style={{ flex: 1, height: 2, background: '#1A1A1A' }} />
         </div>
 
-        {/* ═══ MANUAL SECTION (gated) ═══ */}
+        {/* ═══ MANUAL SECTION ═══ */}
         <Section title="YOUR AI'S USER MANUAL">
-          <GatedManual
-            roastId={r.id}
-            shareText={heroShareText}
-          >
-            {/* Hero block: the actual manual */}
+          {/* Hero block: the actual manual */}
             {r.agentManual && (
               <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 18, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22, gap: 12, flexWrap: 'wrap' }}>
@@ -350,7 +344,6 @@ export default async function RoastPage({ params }: Props) {
                 </div>
               )
             })()}
-          </GatedManual>
         </Section>
 
         {/* A NOTE FROM THE CREATORS */}
