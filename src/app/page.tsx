@@ -288,7 +288,7 @@ export default function Home() {
                     </button>
                   </div>
                   <div style={{ fontSize: 11, color: '#999', marginTop: 8 }}>
-                    Works with ChatGPT, Claude.ai, Gemini, 豆包, 文心 — any chatbot
+                    Works with ChatGPT, Claude.ai, Gemini, Grok, 豆包, 文心 — any chatbot
                   </div>
                   <div style={{ fontSize: 11, color: '#1A1A1A', marginTop: 10, lineHeight: 1.6 }}>
                     💡 <span style={{ background: '#FFF3A1', padding: '1px 4px', boxDecorationBreak: 'clone' as never, WebkitBoxDecorationBreak: 'clone' as never }}>Best results when your chatbot actually knows you — memory on, or after a long shared conversation. Fresh chats produce generic roasts.</span>
