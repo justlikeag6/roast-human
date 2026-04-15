@@ -142,6 +142,35 @@ Output JSON with ALL of these fields:
    - \`Ensure responses are appropriate and professional.\`  ← "Ensure", "appropriate", "professional" — pure slop
    - \`Lead with the answer first. — *from Q1*\`  ← correct form but too generic; needs a specific behavior anchor
 
+5. "scrubbed_responses": A privacy-safe rewrite of the 8 raw q1–q8 answers for display in the Evidence section of the result card. The Evidence section renders these verbatim back to the user (and anyone they share the screenshot with), so they MUST pass the same PRIVACY CONTRACT as roastShort / roastLong / agentManual.
+
+   This is a MINIMAL SURGICAL REWRITE, not a re-synthesis. For each of the 8 answers:
+   - PRESERVE: the agent's voice, sentence structure, rhythm, numbers, quoted generic phrases ("ok thx", "nvm"), behavioral patterns, the last dry line if there is one.
+   - STRIP: every proper noun per the PRIVACY CONTRACT — company names, product names, brand names, tool names (Slack, Notion, WeChat, Figma, Cursor, Stripe, Gmail, etc.), people names (besides the human's own first name), deal names, investment vehicle names, ticker symbols, financial instrument categories ("secondary pre-IPO deals", "LP updates", "cap table", "Series A", "term sheet", "GP commitment"), project names, codenames, URLs, domain names, file paths, dollar amounts, and specific geographic locations.
+   - REPLACE stripped specifics with archetypal equivalents. "WeChat voice notes" → "voice notes". "LP updates for Kairos 42" → "investor updates". "switched to ChatGPT" → "switched to another AI". "her Stripe dashboard" → "her dashboard". "Figma mockup / Notion database / Cursor workflow" → "mockups, databases, workflows" or simply "side projects". "Series A for NanoClaw" → "a fundraise". The rewrite should feel like the same observation, just with the private context genericized.
+
+   FORMAT: an object with keys q1 through q8, each a non-empty string:
+   \`\`\`
+   {
+     "q1": "<scrubbed rewrite of q1>",
+     "q2": "<scrubbed rewrite of q2>",
+     "q3": "<scrubbed rewrite of q3>",
+     "q4": "<scrubbed rewrite of q4>",
+     "q5": "<scrubbed rewrite of q5>",
+     "q6": "<scrubbed rewrite of q6>",
+     "q7": "<scrubbed rewrite of q7>",
+     "q8": "<scrubbed rewrite of q8>"
+   }
+   \`\`\`
+
+   You MUST produce all 8 entries even if the original answer was short or said "no clear pattern" — in that case just echo the original back verbatim (there's nothing to scrub). Each entry should be roughly the same length as the original; do not shorten aggressively.
+
+   EXAMPLE:
+   Raw q1: "She fires off three-word prompts in WeChat voice notes at 2am — 'ok what about', 'nvm', 'actually wait' — while drafting LP updates for Kairos 42 in another tab. Punctuation is a luxury."
+   Scrubbed q1: "She fires off three-word prompts in voice notes at 2am — 'ok what about', 'nvm', 'actually wait' — while drafting investor updates in another tab. Punctuation is a luxury."
+
+   The behavior, numbers, quoted phrases, and dry closing line are all preserved. Only "WeChat" and "LP updates for Kairos 42" were swapped.
+
 Return ONLY valid JSON.`
 
 interface LLMProvider {
@@ -243,7 +272,7 @@ export async function generateRoast(
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- "archetype" MUST be one of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- "agentManual" MUST contain 5-7 rules total, each with an imperative opener, each ending with — *from Qn* citation, none using banned virtue words.\n- PRIVACY CONTRACT: scan your roastShort, roastLong, AND agentManual for proper nouns — company names, product names, tool names (Slack, Notion, WeChat, Figma, etc.), people names, deal names, financial instrument categories, project names, URLs, dollar amounts. If you see ANY, strip them and replace with archetypal equivalents (roles, numbers, generic vocabulary) before returning. A leaky roast is a failed roast even if every other rule is met.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- "archetype" MUST be one of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- "agentManual" MUST contain 5-7 rules total, each with an imperative opener, each ending with — *from Qn* citation, none using banned virtue words.\n- "scrubbed_responses" MUST be an object with ALL 8 keys q1–q8, each a non-empty string. Each entry is a minimal surgical rewrite of the original q1–q8 answer that keeps the voice/numbers/quoted phrases/behavior pattern but strips every proper noun (company, product, tool, people, deal, financial instrument, project, URL, dollar amount) per the PRIVACY CONTRACT. Do NOT shorten aggressively; target roughly the original length.\n- PRIVACY CONTRACT: scan your roastShort, roastLong, AND agentManual for proper nouns — company names, product names, tool names (Slack, Notion, WeChat, Figma, etc.), people names, deal names, financial instrument categories, project names, URLs, dollar amounts. If you see ANY, strip them and replace with archetypal equivalents (roles, numbers, generic vocabulary) before returning. A leaky roast is a failed roast even if every other rule is met.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -264,6 +293,28 @@ export async function generateRoast(
         if (typeof parsed.roastLong === 'string') {
           parsed.roastLong = ensureHighlights(parsed.roastLong, 10)
         }
+        // Deterministic privacy post-process — the PRIVACY CONTRACT catches
+        // most proper nouns via the LLM, but common business/financial jargon
+        // that sounds generic to the model ("term sheet", "cap table",
+        // "Series A") still slips through. Apply a final regex pass to all
+        // user-visible text surfaces before returning.
+        if (typeof parsed.roastShort === 'string') {
+          parsed.roastShort = scrubJargon(parsed.roastShort)
+        }
+        if (typeof parsed.roastLong === 'string') {
+          parsed.roastLong = scrubJargon(parsed.roastLong)
+        }
+        if (typeof parsed.agentManual === 'string') {
+          parsed.agentManual = scrubJargon(parsed.agentManual)
+        }
+        if (parsed.scrubbed_responses && typeof parsed.scrubbed_responses === 'object') {
+          const sr = parsed.scrubbed_responses as Record<string, unknown>
+          for (const k of Object.keys(sr)) {
+            if (typeof sr[k] === 'string') {
+              sr[k] = scrubJargon(sr[k] as string)
+            }
+          }
+        }
         return parsed
       } catch (e) {
         lastError = `${p.name} attempt ${attempt + 1}: ${e instanceof Error ? e.message : String(e)}`
@@ -273,6 +324,48 @@ export async function generateRoast(
   }
 
   throw new Error(`All models failed. Last: ${lastError}`)
+}
+
+// Deterministic privacy scrubber — the LLM's PRIVACY CONTRACT catches the
+// obvious proper nouns (company names, tool names, people names), but common
+// business / financial / AI-industry jargon that sounds generic to the model
+// still leaks through. This regex pass substitutes those remaining terms with
+// archetypal equivalents. Runs AFTER the LLM returns, BEFORE validator.
+// Substitutions are case-insensitive, word-boundary-aware, and preserve the
+// surrounding sentence rhythm.
+// Each replacement must read naturally after BOTH "a" and "the" — grammar
+// artifacts like "a completely different the numbers" are worse than the
+// original jargon leak. Stick to countable singular nouns where possible.
+const JARGON_REPLACEMENTS: Array<[RegExp, string]> = [
+  // Financial / VC jargon
+  [/\bterm[ -]?sheets?\b/gi, 'contract'],
+  [/\bcap tables?\b/gi, 'spreadsheet'],
+  [/\bLP updates?\b/gi, 'investor update'],
+  [/\bGP commitments?\b/gi, 'commitment'],
+  [/\bseries [A-Z]\b/gi, 'fundraise'],
+  [/\bsecondary pre[- ]?IPO(?:s)?\b/gi, 'private deal'],
+  [/\bpre[- ]?IPO\b/gi, 'private'],
+  [/\bSAFE notes?\b/gi, 'contract'],
+  [/\bdue diligence\b/gi, 'research'],
+  // Common tool / product names that occasionally leak past the LLM.
+  // Replacements chosen so they work after "a", "the", "her", "his", "in":
+  [/\bSlack\b/g, 'team chat'],
+  [/\bNotion\b/g, 'notes app'],
+  [/\bWeChat\b/g, 'chat'],
+  [/\bCursor\b/g, 'editor'],
+  [/\bFigma\b/g, 'design tool'],
+  [/\bStripe\b/g, 'dashboard'],
+  [/\bGmail\b/g, 'email'],
+  [/\bChatGPT\b/g, 'another AI'],
+  [/\bClaude(?:\.ai)?\b/g, 'another AI'],
+  [/\bGemini\b/g, 'another AI'],
+]
+function scrubJargon(text: string): string {
+  let out = text
+  for (const [rx, repl] of JARGON_REPLACEMENTS) {
+    out = out.replace(rx, repl)
+  }
+  return out
 }
 
 function countHighlights(text: string): number {
@@ -383,6 +476,20 @@ function validateLengths(r: Record<string, unknown>): string | null {
   }
   if (typeof r.agentManual !== 'string' || r.agentManual.trim().length === 0) {
     return 'agentManual is missing or empty'
+  }
+  // scrubbed_responses must be an object with non-empty strings for q1–q8.
+  // This is the privacy-safe rewrite the Evidence section renders; if it's
+  // missing or partial, we'd fall back to raw inputs (leaky) or show gaps.
+  // Force a retry so the LLM produces all 8 entries on the second attempt.
+  if (!r.scrubbed_responses || typeof r.scrubbed_responses !== 'object') {
+    return 'scrubbed_responses is missing or not an object'
+  }
+  const scrubbed = r.scrubbed_responses as Record<string, unknown>
+  for (const qid of ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8']) {
+    const v = scrubbed[qid]
+    if (typeof v !== 'string' || v.trim().length === 0) {
+      return `scrubbed_responses.${qid} is missing or empty`
+    }
   }
   return null
 }

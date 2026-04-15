@@ -66,11 +66,22 @@ export async function POST(request: NextRequest) {
     const trimStr = (s: string, max: number) =>
       s && s.length > max ? s.slice(0, max) + '...' : s
 
+    // Evidence section uses the LLM-scrubbed q1–q8 rewrites, NOT the raw
+    // agent inputs. The raw inputs may contain real company / tool / deal /
+    // people names the agent leaked in its observations — we don't want to
+    // render those back to the user's screenshot. If the LLM fails to
+    // produce a scrubbed version for a particular qid (unlikely, validator
+    // forces a retry), fall back to the raw input so the section never
+    // renders empty.
+    const scrubbed = (roast.scrubbed_responses as Record<string, string> | undefined) || {}
     const trimmedResponses: Record<string, string> = {}
     for (const q of ROAST_QUESTIONS) {
-      const v = responses[q.id]
-      if (typeof v === 'string' && v.trim()) {
-        trimmedResponses[q.id] = trimStr(v.trim(), 400)
+      const scrubbedV = scrubbed[q.id]
+      const rawV = responses[q.id]
+      const chosen =
+        typeof scrubbedV === 'string' && scrubbedV.trim() ? scrubbedV : rawV
+      if (typeof chosen === 'string' && chosen.trim()) {
+        trimmedResponses[q.id] = trimStr(chosen.trim(), 400)
       }
     }
 
