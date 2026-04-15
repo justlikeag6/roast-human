@@ -155,7 +155,7 @@ export default function Home() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 14, paddingLeft: 4 }}>
           {([
             { key: 'agent' as const, label: '🤖 AGENT', hint: 'Claude Code, Cursor, CLI' },
-            { key: 'chatbot' as const, label: '💬 CHATBOT', hint: 'ChatGPT, Claude.ai, Gemini' },
+            { key: 'chatbot' as const, label: '💬 AI CHATBOT', hint: 'ChatGPT, Claude.ai, Gemini' },
           ]).map(t => {
             const active = tab === t.key
             return (
