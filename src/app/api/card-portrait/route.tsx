@@ -12,7 +12,13 @@ export async function GET(request: NextRequest) {
   if (!r) return new Response('Not found', { status: 404 })
 
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[Object.keys(ARCHETYPES)[0]]
-  const color = arch.color
+  const isHermes = r.framework === 'hermes'
+  const color = isHermes ? '#FFFFFF' : arch.color
+  const bandBg = isHermes ? '#0a0a0a' : '#2ced7a'
+  const bandText = isHermes ? '#EEEADE' : '#0a0a0a'
+  const archetypeImgPath = isHermes
+    ? `${request.nextUrl.origin}/archetypes/hermes/${r.archetype}.png`
+    : `${request.nextUrl.origin}/archetypes/${r.archetype}.png`
 
   return new ImageResponse(
     <div style={{
@@ -20,22 +26,29 @@ export async function GET(request: NextRequest) {
       flexDirection: 'column',
       width: '100%',
       height: '100%',
-      background: '#fff',
+      background: isHermes ? '#0a0a0a' : '#fff',
       border: '4px solid #1A1A1A', borderRadius: 22,
+      // note: card outer bg stays dark in Hermes mode — only the avatar well below
+      // flips to white so the transparent-background manga portraits have contrast.
     }}>
       {/* Title section */}
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         padding: '28px 24px 16px',
       }}>
-        <div style={{ fontSize: 12, letterSpacing: 4, color: '#1A1A1A', marginBottom: 12 }}>
+        {isHermes && (
+          <div style={{ fontSize: 10, letterSpacing: 2, color: '#0a0a0a', background: '#FFFFFF', padding: '4px 10px', borderRadius: 6, marginBottom: 10 }}>
+            NOUS · HERMES EDITION
+          </div>
+        )}
+        <div style={{ fontSize: 12, letterSpacing: 4, color: isHermes ? '#EEEADE' : '#1A1A1A', marginBottom: 12 }}>
           YOUR AGENT THINKS YOU ARE
         </div>
         <div style={{ fontSize: 36, fontWeight: 900, color, letterSpacing: 3, lineHeight: 1.1, marginBottom: 14 }}>
           {arch.name.toUpperCase()}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <span style={{ padding: '7px 16px', border: '2.5px solid #1A1A1A', borderRadius: 12, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{pickTrait(arch.traits, r.id)}</span>
+          <span style={{ padding: '7px 16px', border: isHermes ? '2.5px solid #FFFFFF' : '2.5px solid #1A1A1A', borderRadius: 12, background: isHermes ? '#181818' : '#fff', color: isHermes ? '#EEEADE' : '#1A1A1A', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{pickTrait(arch.traits, r.id)}</span>
         </div>
       </div>
 
@@ -46,7 +59,7 @@ export async function GET(request: NextRequest) {
         background: '#fff', padding: 16,
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`${request.nextUrl.origin}/archetypes/${r.archetype}.png`} alt={arch.name} width={220} height={220} style={{ objectFit: 'contain' }} />
+        <img src={archetypeImgPath} alt={arch.name} width={220} height={220} style={{ objectFit: 'contain' }} />
       </div>
 
       {/* Roast short */}
@@ -62,12 +75,12 @@ export async function GET(request: NextRequest) {
         <div style={{ fontSize: 14, fontStyle: 'italic', color: '#EEEADE', lineHeight: 1.5, fontWeight: 600 }}>{`\u201C${stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))}\u201D`}</div>
       </div>
 
-      {/* Green footer */}
+      {/* Footer */}
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
-        padding: '10px', background: '#2ced7a', borderTop: '3px solid #1A1A1A',
+        padding: '10px', background: bandBg, borderTop: '3px solid #1A1A1A',
       }}>
-        <div style={{ fontSize: 12, fontWeight: 800, color: '#0a0a0a', letterSpacing: 2 }}>roast.dev.fun</div>
+        <div style={{ fontSize: 12, fontWeight: 800, color: bandText, letterSpacing: 2 }}>roast.dev.fun</div>
       </div>
     </div>,
     { width: 540, height: 720 }

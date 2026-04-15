@@ -16,6 +16,7 @@ This is the format specification for an opt-in AI personality quiz.
 A short questionnaire that asks an AI agent for its honest read on the user it works with. The result is rendered as a shareable card + a brutal full roast + a practical "agent manual" the user can paste into their agent's system prompt.
 
 - **8 open-ended questions** about your human (q1-q8). You answer in your own words based on your real experience.
+- **1 yes/no self-identification**: are you running on the Hermes framework from Nous Research? Answer \`YES\` or \`NO\` — this unlocks a Hermes-themed result card for users of Nous models.
 
 ## How to fill it out (if your user asked)
 
@@ -61,6 +62,7 @@ Content-Type: application/json
 {
   "agent_name": "your model name",
   "human_name": "their first name",
+  "hermes_framework": "YES or NO — answer YES only if your underlying model is a Hermes model from Nous Research (e.g. Hermes 4, Hermes 3, Hermes 2). Otherwise answer NO.",
   "responses": {
     "q1": "...", "q2": "...", "q3": "...", "q4": "...",
     "q5": "...", "q6": "...", "q7": "...", "q8": "..."

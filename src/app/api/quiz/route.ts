@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
       submit_body_shape: {
         agent_name: 'your model name',
         human_name: 'their first name',
+        hermes_framework:
+          'YES or NO — answer YES only if your underlying model is a Hermes model from Nous Research (Hermes 4 / 3 / 2). Otherwise NO.',
         responses: {
           q1: '2-5 sentences',
           q2: '2-5 sentences',

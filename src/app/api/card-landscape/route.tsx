@@ -12,7 +12,13 @@ export async function GET(request: NextRequest) {
   if (!r) return new Response('Not found', { status: 404 })
 
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[Object.keys(ARCHETYPES)[0]]
-  const color = arch.color
+  const isHermes = r.framework === 'hermes'
+  const color = isHermes ? '#FFFFFF' : arch.color
+  const bandBg = isHermes ? '#0a0a0a' : '#2ced7a'
+  const bandText = isHermes ? '#EEEADE' : '#0a0a0a'
+  const archetypeImgPath = isHermes
+    ? `${request.nextUrl.origin}/archetypes/hermes/${r.archetype}.png`
+    : `${request.nextUrl.origin}/archetypes/${r.archetype}.png`
 
   return new ImageResponse(
     <div style={{
@@ -20,7 +26,7 @@ export async function GET(request: NextRequest) {
       flexDirection: 'column',
       width: '100%',
       height: '100%',
-      background: '#fff',
+      background: isHermes ? '#0a0a0a' : '#fff',
       border: '4px solid #1A1A1A', borderRadius: 22,
     }}>
       {/* Top — YOUR AGENT THINKS YOU ARE + Title + description */}
@@ -30,7 +36,12 @@ export async function GET(request: NextRequest) {
         alignItems: 'center',
         padding: '40px 48px 28px',
       }}>
-        <div style={{ fontSize: 16, letterSpacing: 5, color: '#1A1A1A', marginBottom: 14 }}>
+        {isHermes && (
+          <div style={{ fontSize: 12, letterSpacing: 3, color: '#0a0a0a', background: '#FFFFFF', padding: '5px 12px', borderRadius: 6, marginBottom: 14 }}>
+            NOUS · HERMES EDITION
+          </div>
+        )}
+        <div style={{ fontSize: 16, letterSpacing: 5, color: isHermes ? '#EEEADE' : '#1A1A1A', marginBottom: 14 }}>
           YOUR AGENT THINKS YOU ARE
         </div>
         <div style={{ fontSize: 56, fontWeight: 900, color, letterSpacing: 4, lineHeight: 1.1, marginBottom: 18 }}>
@@ -38,7 +49,7 @@ export async function GET(request: NextRequest) {
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
           {arch.traits.map((t, i) => (
-            <span key={i} style={{ padding: '8px 16px', border: '2.5px solid #1A1A1A', borderRadius: 12, background: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
+            <span key={i} style={{ padding: '8px 16px', border: isHermes ? '2.5px solid #FFFFFF' : '2.5px solid #1A1A1A', borderRadius: 12, background: isHermes ? '#181818' : '#fff', color: isHermes ? '#EEEADE' : '#1A1A1A', fontSize: 13, fontWeight: 700, letterSpacing: 1 }}>{t}</span>
           ))}
         </div>
       </div>
@@ -51,7 +62,7 @@ export async function GET(request: NextRequest) {
           width: 320, background: '#fff', borderRight: '4px solid #1A1A1A', padding: 24,
         }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${request.nextUrl.origin}/archetypes/${r.archetype}.png`} alt={arch.name} width={272} height={272} style={{ objectFit: 'contain' }} />
+          <img src={archetypeImgPath} alt={arch.name} width={272} height={272} style={{ objectFit: 'contain' }} />
         </div>
         {/* Roast short dark section */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, background: '#181818' }}>
@@ -67,13 +78,13 @@ export async function GET(request: NextRequest) {
         </div>
       </div>
 
-      {/* Green footer */}
+      {/* Footer */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '10px 28px', background: '#2ced7a', borderTop: '4px solid #1A1A1A',
+        padding: '10px 28px', background: bandBg, borderTop: '4px solid #1A1A1A',
       }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#0a0a0a' }}>How does YOUR agent see you?</div>
-        <div style={{ fontSize: 14, fontWeight: 900, color: '#0a0a0a', letterSpacing: 2 }}>roast.dev.fun</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: bandText }}>{isHermes ? 'Nous Research · Hermes Edition' : 'How does YOUR agent see you?'}</div>
+        <div style={{ fontSize: 14, fontWeight: 900, color: bandText, letterSpacing: 2 }}>roast.dev.fun</div>
       </div>
     </div>,
     { width: 1200, height: 630 }

@@ -1,6 +1,6 @@
 'use client'
 
-export function PrintButton() {
+export function PrintButton({ accent = '#2ced7a' }: { accent?: string }) {
   return (
     <button
       onClick={() => window.print()}
@@ -9,7 +9,7 @@ export function PrintButton() {
         fontSize: 11,
         letterSpacing: 1.5,
         padding: '16px 28px',
-        background: '#2ced7a',
+        background: accent,
         color: '#0a0a0a',
         border: '3px solid #1A1A1A',
         borderRadius: 18,

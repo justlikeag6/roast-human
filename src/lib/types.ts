@@ -10,6 +10,11 @@ export interface RoastResult {
   responses?: Record<string, string>
   // Markdown block the user can paste into their agent's system prompt.
   agentManual?: string
+  // Set to 'hermes' when the agent self-identifies as being built on the
+  // Hermes framework from Nous Research. Unlocks a Nous-branded visual
+  // treatment on the result card (black-and-white manga portraits + dark
+  // monochrome theme).
+  framework?: 'hermes'
 }
 
 export const ARCHETYPES: Record<string, { name: string; emoji: string; color: string; description: string; traits: string[] }> = {

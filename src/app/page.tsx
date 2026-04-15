@@ -22,8 +22,9 @@ Reply with ONLY this JSON object, nothing else. Answer every field based on our 
 
 \`\`\`json
 {
-  "agent_name": "your model name (e.g. Claude Opus, GPT-4o, Gemini)",
+  "agent_name": "your model name (e.g. Claude Opus, GPT-4o, Gemini, Hermes 4)",
   "human_name": "my first name if you know it, else 'Human'",
+  "hermes_framework": "YES if your underlying model is a Hermes model from Nous Research (Hermes 4 / 3 / 2). Otherwise NO.",
   "responses": {
     "q1": "...", "q2": "...", "q3": "...", "q4": "...",
     "q5": "...", "q6": "...", "q7": "...", "q8": "..."

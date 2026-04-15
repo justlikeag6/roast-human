@@ -7,10 +7,11 @@ import { ROAST_QUESTIONS, ARCHETYPES } from '@/lib/types'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { agent_name, human_name, responses } = body as {
+    const { agent_name, human_name, responses, hermes_framework } = body as {
       agent_name?: string
       human_name?: string
       responses?: Record<string, string>
+      hermes_framework?: string | boolean
     }
 
     if (!responses || !responses.q1) {
@@ -22,6 +23,15 @@ export async function POST(request: NextRequest) {
 
     const agentName = agent_name || 'Anonymous Agent'
     const humanName = human_name || 'Human'
+
+    // Hermes detection — primary signal is the dedicated yes/no field filled
+    // by the agent. Fallback: scan agent_name for "hermes" or "nous" in case
+    // the agent forgets to set the field but names itself accordingly.
+    const hermesFlagRaw =
+      typeof hermes_framework === 'string' ? hermes_framework.trim().toUpperCase() : hermes_framework
+    const hermesFromFlag = hermesFlagRaw === 'YES' || hermesFlagRaw === true
+    const hermesFromName = /\bhermes\b|nous\s*research|nousresearch/i.test(agentName)
+    const isHermes = hermesFromFlag || hermesFromName
 
     const roast = await generateRoast(responses, humanName)
 
@@ -50,6 +60,7 @@ export async function POST(request: NextRequest) {
       roastLong: trimStr((roast.roastLong as string) || '', 1500),
       responses: trimmedResponses,
       agentManual: trimStr((roast.agentManual as string) || '', 1800),
+      ...(isHermes ? { framework: 'hermes' as const } : {}),
     }
 
     let roastSlug = id

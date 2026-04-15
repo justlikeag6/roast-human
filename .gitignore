@@ -9,3 +9,4 @@ out
 # Private dev notes — symlinked from justlikeag6/roast-notes (private repo)
 CLAUDE.md
 .claude/
+.hermes-heavy-backup/

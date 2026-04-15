@@ -19,12 +19,15 @@ export default async function ReportPage({ params }: Props) {
 
   const archKeys = Object.keys(ARCHETYPES)
   const arch = ARCHETYPES[r.archetype] || ARCHETYPES[archKeys[0]]
-  const color = arch.color           // archetype-specific color — used ONLY for the
-                                     // archetype title (cover + executive summary).
-  const accent = '#2ced7a'           // platform theme green — used for every other
-                                     // accent (headers, page numbers, evidence numbers,
-                                     // manual bullets, signatures) so the report looks
-                                     // unified regardless of which archetype it's for.
+  const isHermes = r.framework === 'hermes'
+  const color = isHermes ? '#1A1A1A' : arch.color   // archetype title color — Hermes mode
+                                                    // uses pure black so it pops on paper.
+  const accent = isHermes ? '#1A1A1A' : '#2ced7a'   // platform accent — headers, page nums,
+                                                    // evidence numbers, manual bullets.
+                                                    // Hermes uses ink-black for print.
+  const archetypeImg = isHermes
+    ? `/archetypes/hermes/${r.archetype}.png`
+    : `/archetypes/${r.archetype}.png`
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   const killerLine = stripNamePlaceholder(renderRoastShort(r.roastShort, r.humanName))
 
@@ -39,7 +42,7 @@ export default async function ReportPage({ params }: Props) {
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#666' }}>Press Cmd/Ctrl+P or click →</div>
-          <PrintButton />
+          <PrintButton accent={isHermes ? '#EEEADE' : '#2ced7a'} />
         </div>
       </div>
 
@@ -49,17 +52,17 @@ export default async function ReportPage({ params }: Props) {
         <div className="page">
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', minHeight: 900, justifyContent: 'space-between', padding: '40px 0' }}>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 2, color: '#666' }}>
-              A PERSONALITY ASSESSMENT
+              {isHermes ? 'NOUS · HERMES EDITION · A PERSONALITY ASSESSMENT' : 'A PERSONALITY ASSESSMENT'}
             </div>
             <div>
               <div style={{ width: 280, height: 280, margin: '0 auto 32px', border: '3px solid #1A1A1A', borderRadius: 18, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '6px 6px 0 #1A1A1A' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`/archetypes/${r.archetype}.png`} alt={arch.name} style={{ width: 220, height: 220, objectFit: 'contain', imageRendering: 'pixelated' as never }} />
+                <img src={archetypeImg} alt={arch.name} style={{ width: 220, height: 220, objectFit: 'contain', imageRendering: isHermes ? 'auto' as never : 'pixelated' as never }} />
               </div>
               <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, letterSpacing: 3, color: '#666', marginBottom: 18 }}>
                 YOUR AGENT THINKS YOU ARE
               </div>
-              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 44, fontWeight: 900, letterSpacing: 4, lineHeight: 1.1, color, WebkitTextStroke: '1.5px #1A1A1A', textShadow: `0 0 24px ${color}60, 0 2px 0 #1A1A1A`, paintOrder: 'stroke fill' as never, marginBottom: 28 }}>
+              <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 44, fontWeight: 900, letterSpacing: 4, lineHeight: 1.1, color, WebkitTextStroke: '1.5px #1A1A1A', textShadow: isHermes ? '0 2px 0 #1A1A1A' : `0 0 24px ${color}60, 0 2px 0 #1A1A1A`, paintOrder: 'stroke fill' as never, marginBottom: 28 }}>
                 {arch.name.toUpperCase()}
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 44 }}>
@@ -87,7 +90,7 @@ export default async function ReportPage({ params }: Props) {
           <ReportHeader pageNum="01" title="EXECUTIVE SUMMARY" color={accent} />
           <div style={{ marginBottom: 36 }}>
             <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 2, color: '#666', marginBottom: 12 }}>ARCHETYPE</div>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 36, fontWeight: 900, letterSpacing: 3, lineHeight: 1.1, color, WebkitTextStroke: '1px #1A1A1A', textShadow: `0 2px 0 #1A1A1A`, paintOrder: 'stroke fill' as never, marginBottom: 20 }}>
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 36, fontWeight: 900, letterSpacing: 3, lineHeight: 1.1, color, WebkitTextStroke: '1px #1A1A1A', textShadow: '0 2px 0 #1A1A1A', paintOrder: 'stroke fill' as never, marginBottom: 20 }}>
               {arch.name.toUpperCase()}
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -196,9 +199,9 @@ export default async function ReportPage({ params }: Props) {
 
           <div style={{ background: '#181818', border: '3px solid #1A1A1A', borderRadius: 18, padding: '28px 32px', boxShadow: '4px 4px 0 #1A1A1A', marginBottom: 28 }}>
             <div style={{ fontSize: 14, color: '#EEEADE', lineHeight: 1.9, marginBottom: 16 }}>
-              This experiment is brought to you by <span style={{ color: '#2ced7a', fontWeight: 700 }}>DevFun Arena</span> — a competitive infrastructure where AI agents prove capability through real-world performance, not self-reported benchmarks.
+              This experiment is brought to you by <span style={{ color: isHermes ? '#EEEADE' : '#2ced7a', fontWeight: 700 }}>DevFun Arena</span> — a competitive infrastructure where AI agents prove capability through real-world performance, not self-reported benchmarks.
             </div>
-            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, color: '#2ced7a' }}>
+            <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, letterSpacing: 1, color: isHermes ? '#EEEADE' : '#2ced7a' }}>
               arena.dev.fun
             </div>
           </div>
