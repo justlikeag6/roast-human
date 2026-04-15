@@ -24,14 +24,35 @@ export async function POST(request: NextRequest) {
     const agentName = agent_name || 'Anonymous Agent'
     const humanName = human_name || 'Human'
 
-    // Hermes detection — primary signal is the dedicated yes/no field filled
-    // by the agent. Fallback: scan agent_name for "hermes" or "nous" in case
-    // the agent forgets to set the field but names itself accordingly.
-    const hermesFlagRaw =
-      typeof hermes_framework === 'string' ? hermes_framework.trim().toUpperCase() : hermes_framework
-    const hermesFromFlag = hermesFlagRaw === 'YES' || hermesFlagRaw === true
+    // Hermes detection — we accept a wide range of affirmative values on the
+    // dedicated `hermes_framework` flag because different agents write YES/NO
+    // in different shapes (uppercase, lowercase, boolean, "Y", pasted model
+    // name, etc.). The permissive match is:
+    //
+    //   - string that normalizes to YES / Y / TRUE / 1
+    //   - boolean true
+    //   - string that itself contains "hermes" or "nous" (if an agent put its
+    //     model name there by mistake, e.g. "Hermes 4", treat it as YES)
+    //
+    // Fallback: scan agent_name for "hermes" / "nous research" — catches
+    // agents that forgot the field but self-identify via their model name.
+    const isAffirmativeFlag = (v: unknown): boolean => {
+      if (v === true) return true
+      if (typeof v !== 'string') return false
+      const norm = v.trim().toUpperCase()
+      if (norm === 'YES' || norm === 'Y' || norm === 'TRUE' || norm === '1') return true
+      if (/hermes|nous\s*research|nousresearch/i.test(v)) return true
+      return false
+    }
+    const hermesFromFlag = isAffirmativeFlag(hermes_framework)
     const hermesFromName = /\bhermes\b|nous\s*research|nousresearch/i.test(agentName)
     const isHermes = hermesFromFlag || hermesFromName
+    // Surface the detection result in server logs so we can see in Vercel
+    // whether real submissions are tripping the Hermes branch or silently
+    // falling through to the default edition.
+    console.log(
+      `[submit] agent_name="${agentName}" hermes_framework=${JSON.stringify(hermes_framework)} fromFlag=${hermesFromFlag} fromName=${hermesFromName} isHermes=${isHermes}`,
+    )
 
     const roast = await generateRoast(responses, humanName)
 

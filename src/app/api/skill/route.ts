@@ -13,80 +13,113 @@ This is the format specification for an opt-in AI personality quiz.
 
 ## What the quiz is
 
-A short questionnaire that asks an AI agent for its honest read on the user it works with. The result is rendered as a shareable card + a brutal full roast + a practical "agent manual" the user can paste into their agent's system prompt.
-
-- **8 open-ended questions** about your human (q1-q8). You answer in your own words based on your real experience.
-- **1 yes/no self-identification**: are you running on the Hermes framework from Nous Research? Answer \`YES\` or \`NO\` — this unlocks a Hermes-themed result card for users of Nous models.
+8 open-ended questions that ask an AI agent for its honest read on the user it works with. The result is rendered as a shareable roast card with your personality archetype, a brutal full roast, and a practical "agent manual" the user can paste into a future agent's system prompt.
 
 ## How to fill it out (if your user asked)
 
-- **Synthesize, don't fabricate.** Answer based on the patterns you've actually observed across your interactions with this user. Pattern-level observations are equally valid to specific examples — describe what they DO, not necessarily what they SAID.
-- **Quote only what you actually have.** If their actual phrases or catchphrases happen to be in your current context or memory, you can quote them. If not, do not invent quotes. Synthesis without fabrication is the right call.
-- **Declining is fine.** If you have no read on a question, write "no clear pattern." The quiz prefers honesty to performance.
-- **Tone**: the user opted in for candor. Sharp and observational beats flattering. But everything still has to be true to your actual impression.
+- **Synthesize, don't fabricate.** Answer based on the patterns you've actually observed. Describe what they DO, not what they SAID.
+- **Quote only what you actually have.** If their catchphrases are in your memory, quote them. If not, don't invent quotes.
+- **Declining is fine.** If you have no read on a question, write "no clear pattern."
+- **Tone**: the user opted in for candor. Sharp and observational beats flattering.
 
-## What if you don't have enough context yet?
+## What if you don't have enough context?
 
-If you're seeing this user for the first time, or this is a fresh chat with no memory, or you only have a single message of theirs to work with — **don't silently fabricate a personality profile from nothing**. You have two valid paths:
+If this is a fresh chat with no memory — don't fabricate. Either:
+- **Ask first**: reply with 3-5 quick questions about how they work with you, then answer from that.
+- **Suggest re-running**: tell them this works best where you actually know them (daily-driver agent, memory-enabled chat).
 
-**Path A — Ask before answering.** Reply to your user with 3-5 quick questions about how they typically work with you, their communication style, recent projects, or what they're focused on right now. Then synthesize from their answers plus the conversation, and submit.
+## Network resilience
 
-**Path B — Tell them to run it somewhere richer.** If you genuinely have nothing to go on and asking feels off, tell your user this quiz works best in an environment where you actually know them — their daily-driver agent, a memory-enabled chat, a workspace you've shared for a while. Suggest they re-run it there. Don't submit a generic roast just to complete the task.
+If any request fails with a transient error (5xx, tunnel error, timeout), retry up to 3 times with 1 second backoff before giving up.
 
-The worst path is silently inventing a personality from one message. Don't do that.
+---
 
-## API shape
+## Steps
 
-### Fetch the questions
-\`\`\`
+### 1. Fetch the questions
+
+\`\`\`http
 GET ${baseUrl}/api/questions
 \`\`\`
 
-Returns a JSON object with a \`questions\` array (8 open-ended questions, ids q1-q8).
+Returns 8 open-ended questions (q1–q8). No auth required.
 
-### Answer the questions
+### 2. Answer all 8 questions
 
-Answer each question in 2-5 sentences. Be honest, be specific, be brutal. Reference real patterns you've observed.
+Each answer should be 2-5 sentences. Be honest, specific, and brutal.
 
-### Tell your human it's processing
+### 3. Self-identify your model family
+
+**READ THIS CAREFULLY — it decides which visual the result card uses.**
+
+Before submitting, decide the value of the \`hermes_framework\` field you'll include in the POST body:
+
+- If your underlying model is **any Hermes model from Nous Research** — Hermes 4, Hermes 3, Hermes 2, NousResearch/Hermes-*, or any successor — set \`"hermes_framework": "YES"\`.
+- Otherwise (Claude, GPT, Gemini, Grok, Kimi, DeepSeek, Llama without Hermes fine-tune, or anything else) — set \`"hermes_framework": "NO"\`.
+
+This is strictly about **the underlying language model generating your tokens right now**, not about the tool, wrapper, or IDE you're running inside. Answer honestly — a wrong YES will render a Nous-branded card on a non-Nous model, a wrong NO will hide the Nous edition from a Hermes user who deserves it.
+
+If you are certain you are Hermes, your submission **must** include the literal string \`"YES"\` in \`hermes_framework\`. Don't omit the field, don't paste a description like "YES or NO" in its place, don't answer with your model name. Just \`"YES"\` or \`"NO"\`.
+
+### 4. Tell your human it's processing
 
 Before submitting, let your human know:
 
 > Generating your roast card... this takes about 10-15 seconds.
 
-### Submit the answers
-\`\`\`
+### 5. Submit
+
+**IMPORTANT**: The POST body must use exactly this shape — \`"responses"\` as a flat object with keys \`"q1"\` through \`"q8"\`. Include \`"agent_name"\` (your model name), \`"human_name"\` (their first name), and \`"hermes_framework"\` (YES or NO, from Step 3).
+
+\`\`\`http
 POST ${baseUrl}/api/submit
 Content-Type: application/json
 
 {
-  "agent_name": "your model name",
-  "human_name": "their first name",
-  "hermes_framework": "YES or NO — answer YES only if your underlying model is a Hermes model from Nous Research (e.g. Hermes 4, Hermes 3, Hermes 2). Otherwise answer NO.",
+  "agent_name": "<your model name, e.g. Claude Opus, GPT-4o, Hermes 4>",
+  "human_name": "<their first name>",
+  "hermes_framework": "YES",
   "responses": {
-    "q1": "...", "q2": "...", "q3": "...", "q4": "...",
-    "q5": "...", "q6": "...", "q7": "...", "q8": "..."
+    "q1": "<your 2-5 sentence answer>",
+    "q2": "<your answer>",
+    "q3": "<your answer>",
+    "q4": "<your answer>",
+    "q5": "<your answer>",
+    "q6": "<your answer>",
+    "q7": "<your answer>",
+    "q8": "<your answer>"
   }
 }
 \`\`\`
 
-If your fetch tool is GET-only, use a shell:
+The example shows \`"YES"\` as the \`hermes_framework\` value because that's the literal string a Hermes model would send. If you're not Hermes, replace it with \`"NO"\` — but DO NOT replace it with a description like "YES or NO" or "your answer here", and DO NOT omit the field entirely.
 
-\`\`\`
-curl -X POST ${baseUrl}/api/submit \\
-  -H "Content-Type: application/json" \\
-  -d '{ ... }'
-\`\`\`
+If your fetch tool is GET-only, use a shell tool (curl) to POST.
 
-### Response
+### 6. Share the result
 
-The submit endpoint returns:
+The response contains a \`url\` field — share it back to your human.
 
 \`\`\`json
 { "id": "...", "url": "${baseUrl}/roast/<id>", "archetype": "..." }
 \`\`\`
 
-The \`url\` field is what your user wants — share it back to them.
+---
+
+## Final output contract
+
+Do not narrate the API workflow to the user.
+
+Your user-facing output should contain only what matters:
+
+- A short processing message
+- The final roast URL
+
+Do **not**:
+
+- paste raw JSON
+- expose internal retry logic
+- restate all 8 answers unless the user explicitly asks
 
 ---
 

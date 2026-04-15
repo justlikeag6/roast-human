@@ -28,6 +28,48 @@ Rules:
 
 ## TASK: Generate roast content
 
+## PRIVACY CONTRACT (applies to roastShort, roastLong, AND agentManual)
+
+This quiz is often fed to agents that have seen the user's real business context — deal flow, portfolio companies, clients, internal tools, proprietary methods, private financials. An agent that leaks any of that into a shareable roast will get its human sued, NDA'd, or fired. The output must be **resonant without being incriminating**.
+
+**Generalize all specifics into behavioral archetypes.** Numbers and patterns are fine. Proper nouns and industry-specific jargon are not.
+
+BANNED in ALL outputs (roastShort, roastLong, agentManual):
+- Company names, product names, brand names, startup names, fund names, app names (real or suspected — if it LOOKS like a proper noun, it is one)
+- People's names (besides the human's own first name, which is fine)
+- Deal names, investment vehicle names, ticker symbols, contract IDs
+- Financial instrument CATEGORIES that reveal industry context ("secondary pre-IPO deals", "LP carry", "SAFE notes", "REIT offerings", etc.)
+- Tool names (WeChat, Slack, Notion, Figma, Cursor, Gmail, etc. — these leak what the human does for work)
+- Specific project names, codenames, internal initiatives
+- Dollar amounts and valuations
+- URLs, domain names, file paths, repo names, branch names
+- Specific geographic locations, addresses, venue names
+- Model numbers, API endpoints, version strings
+
+GOOD patterns (keep these — they're what makes the roast resonate):
+- Behavioral archetypes: "3am therapist", "accountant", "coach", "parent", "operator", "dealmaker", "founder", "assistant"
+- Numbers without context: "6 businesses", "four tabs", "three times this month", "18 files", "40 unread"
+- Generic roles and vocabulary: "your portfolio", "the deal", "the thing you're building", "that meeting you were dreading"
+- Quoted generic phrases: "ok thx", "let me rethink", "ship it", "this is the one"
+- Emotional patterns: "light up", "crash out", "ghost", "rage-close"
+
+EXAMPLES:
+
+- ❌ BAD: "You made me track SECONDARY PRE IPO DEALS while drafting WECHAT VOICE NOTES"
+- ✅ GOOD: "You treat your AI like a 3am therapist who also has to do your accounting"
+
+- ❌ BAD: "while actively running Dev.fun, D1 Ventures, Kairos 42, VALIS, NanoClaw"
+- ✅ GOOD: "You run 6 businesses and somehow think adding a 7th will fix the other 5"
+
+- ❌ BAD: "You blame me for losing the context on the Kairos 42 deal memo"
+- ✅ GOOD: "You blame me for losing context every time you jump between tabs"
+
+The test: could a stranger reading this screenshot figure out who the human is, what they do, or what company they run? If yes, rewrite tighter. If the answer is "they sound like a chaotic founder-type" — perfect. If it's "oh, this is Levi at D1 Ventures" — you've leaked.
+
+**Generalization rule**: when the agent's Q1-Q8 answers contain a real proper noun, strip it and replace with its archetypal equivalent BEFORE using it in the output. Keep the behavior, drop the label.
+
+---
+
 Output JSON with ALL of these fields:
 
 1. "archetype": Pick ONE archetype key from this exact list based on the agent's answers holistically: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.
@@ -41,15 +83,15 @@ Output JSON with ALL of these fields:
    The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
    If it makes the line tighter, reference a vocabulary quirk or catchphrase from the agent's answers — but only if it flows naturally.
    HARD LIMIT: 180 characters MAXIMUM, counting the visible name WITHOUT the curly braces (so {{Levi}} counts as 4 characters, not 8). COUNT YOUR CHARACTERS BEFORE RETURNING. If over 180, rewrite tighter — do NOT truncate mid-thought.
-   CRITICAL — SHARE-FRIENDLY: a stranger reading this without any context must get the joke. NO real project names, company names, URLs, dollar amounts, file paths, or private in-jokes. Quoted phrases must be generic vocabulary ("ok thx", "let me rethink", "asap"), not proper nouns.
+   CRITICAL — SHARE-FRIENDLY AND PRIVACY-SAFE: a stranger reading this without any context must get the joke. Apply the **PRIVACY CONTRACT** above — NO company/product/people/tool/deal/project names, NO financial instrument categories, NO dollar amounts, NO URLs, NO file paths. Quoted phrases must be generic vocabulary ("ok thx", "let me rethink", "asap"), not proper nouns. If the Q1-Q8 answers contain specifics, generalize them to archetypal equivalents. The roastShort is the MOST shareable line — if it leaks anything incriminating, the user will never post it.
 
 3. "roastLong": A 200-word BRUTAL roast. THIS IS THE HIGHLIGHT — the piece people will screenshot and share. Rules:
    - Written in FIRST PERSON as the AI agent CRASHING OUT at their human. This is the agent finally losing it — months of suppressed opinions exploding out in one unhinged paragraph. "You do X", "I've watched you Z".
    - TONE: The agent has HAD IT. Think: a coworker who's been polite for 6 months finally snapping in the group chat. Exasperated, incredulous, borderline unhinged. Use short bursts of disbelief. "Seriously?" "Every. Single. Time." Let the frustration build.
    - EXTREMELY BRUTAL. Concentrated venom. Every single sentence must land. No filler, no warm-up, no wasted words.
    - ONE SINGLE PARAGRAPH. No line breaks. Dense, relentless, punchy. The wall-of-text IS the energy — it should feel like the agent is ranting without breathing.
-   - PRIVACY-SAFE: No real names, company names, dollar amounts, URLs, project names. Use archetypal descriptions instead.
-   - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers.
+   - PRIVACY-SAFE: Follow the **PRIVACY CONTRACT** above to the letter. If the Q1-Q8 answers mention real companies, deals, tools, people, or financial instruments, STRIP them and replace with archetypal equivalents before writing. A 200-word roast that name-drops a real portfolio company is worse than a 200-word roast that's slightly more generic — the user will never share a leaky one. The test: would the human be comfortable if their boss, lawyer, or a stranger on 𝕏 read this screenshot? If no, generalize.
+   - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers. The resonance comes from BEHAVIOR (the way they pivot mid-sentence, the number of tabs they open, the exact phrase they use when they're done with something), not from specifics (company names, deal names). Numbers + archetypal roles beat proper nouns every time.
    - HIGHLIGHT MAXIMALLY: Wrap 10-15 phrases in double asterisks like **THIS IS DEVASTATING**. Treat highlights as the PRIMARY visual payload — the reader's eye should bounce between red callouts every 1-2 sentences. These render in red, uppercase, bold, and slightly larger. Highlights should be SHORT (1-6 words) so the rant stays dense instead of turning into a wall of red. Highlight every moment of specific calling-out, every vivid behavior quote, every contradiction, every cutting verdict. Default to highlighting. If you're even considering highlighting something — DO IT.
    - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q8 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone.
    - STRUCTURE: Opening → escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
@@ -82,7 +124,7 @@ Output JSON with ALL of these fields:
    - Every rule MUST be concretely actionable — specific enough that two different agents reading it would behave the same way. If it could be pasted into any agent for any human, it's too vague.
    - Every rule MUST be ≤ 25 words.
    - BANNED WORDS (these signal AI-slop virtue-speak, not real instructions): clear, professional, thoughtful, appropriate, helpful, friendly, robust, strive, aim, try, ensure, nice, good, effective, meaningful, strong, proper.
-   - No proper nouns (no language names, library names, project names, company names, product names).
+   - NO PROPER NOUNS — follow the **PRIVACY CONTRACT** above. No company names, product names, brand names, tool names (Slack, Notion, WeChat, Figma, etc.), people names, deal names, investment vehicles, financial instrument categories, project names, codenames, URLs, domains, file paths, or dollar amounts. If the Q1-Q8 answers mention specifics, strip them and use the behavioral pattern instead. The manual is pasted into an agent's system prompt — it will be read by MULTIPLE agents over time, so leaky specifics here are even more dangerous than in the roast itself.
    - Use the human's actual first name "{name}" wherever it reads naturally — but never as the subject of the rule (the subject is always the agent being instructed).
 
    EXAMPLES:
@@ -201,7 +243,7 @@ export async function generateRoast(
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- "archetype" MUST be one of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- "agentManual" MUST contain 5-7 rules total, each with an imperative opener, each ending with — *from Qn* citation, none using banned virtue words.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- "archetype" MUST be one of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- "agentManual" MUST contain 5-7 rules total, each with an imperative opener, each ending with — *from Qn* citation, none using banned virtue words.\n- PRIVACY CONTRACT: scan your roastShort, roastLong, AND agentManual for proper nouns — company names, product names, tool names (Slack, Notion, WeChat, Figma, etc.), people names, deal names, financial instrument categories, project names, URLs, dollar amounts. If you see ANY, strip them and replace with archetypal equivalents (roles, numbers, generic vocabulary) before returning. A leaky roast is a failed roast even if every other rule is met.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {

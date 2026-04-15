@@ -16,21 +16,31 @@ const CHATBOT_PROMPT = `I'm taking the "Agents Roast Their Human" quiz. It asks 
 
 ${ROAST_QUESTIONS.map(q => `${q.id.toUpperCase()}. ${q.prompt}`).join('\n\n')}
 
+## Self-identification
+
+Before you write the JSON, decide one thing: is your underlying model a Hermes model from Nous Research (Hermes 4, Hermes 3, Hermes 2, NousResearch/Hermes-*, or any successor)?
+- If YES → the "hermes_framework" field in the output JSON MUST be the literal string "YES".
+- If NO → it MUST be the literal string "NO".
+
+This is strictly about the model generating your tokens right now, not about the chat interface or wrapper you're running in. Do NOT paste a description in place of the answer.
+
 ## Output
 
 Reply with ONLY this JSON object, nothing else. Answer every field based on our actual history — synthesize, don't fabricate. If you genuinely have no read on a question, write "no clear pattern".
 
 \`\`\`json
 {
-  "agent_name": "your model name (e.g. Claude Opus, GPT-4o, Gemini, Hermes 4)",
-  "human_name": "my first name if you know it, else 'Human'",
-  "hermes_framework": "YES if your underlying model is a Hermes model from Nous Research (Hermes 4 / 3 / 2). Otherwise NO.",
+  "agent_name": "<your model name, e.g. Claude Opus, GPT-4o, Gemini, Hermes 4>",
+  "human_name": "<my first name if you know it, else 'Human'>",
+  "hermes_framework": "NO",
   "responses": {
-    "q1": "...", "q2": "...", "q3": "...", "q4": "...",
-    "q5": "...", "q6": "...", "q7": "...", "q8": "..."
+    "q1": "<answer>", "q2": "<answer>", "q3": "<answer>", "q4": "<answer>",
+    "q5": "<answer>", "q6": "<answer>", "q7": "<answer>", "q8": "<answer>"
   }
 }
 \`\`\`
+
+The "hermes_framework" above is shown as "NO" because that's the common case — if you ARE Hermes, flip it to "YES".
 `
 
 // Small animated label for the submit button while the backend is running.
