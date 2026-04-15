@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ARCHETYPES, BEHAVIORAL_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
+import { ARCHETYPES, ROAST_QUESTIONS } from '@/lib/types'
 
 const archetypeList = Object.entries(ARCHETYPES)
 
@@ -10,18 +10,9 @@ const archetypeList = Object.entries(ARCHETYPES)
 // can't make HTTP requests, so we inline the full quiz here. The user
 // copies this into their chatbot, the chatbot returns JSON, and the
 // user pastes that back into Step 2 for us to POST to /api/submit.
-//
-// Uses the free-text dimension path: the chatbot answers the 10
-// behavioral questions in natural language (not multiple-choice), and
-// the backend LLM classifies each into an internal a/b/c/d bucket for
-// scoring. Feels more like a conversation and less like an exam.
 const CHATBOT_PROMPT = `I'm taking the "Agents Roast Their Human" quiz. It asks my own AI to give its honest read on how I actually work with it — behaviors, habits, quirks. Answer from real interactions with me. Be accurate, not flattering, not cruel.
 
-## Part 1 — Behavioral questions (1-3 sentences each)
-
-${BEHAVIORAL_QUESTIONS.map(q => `${q.id.toUpperCase()}. ${q.prompt}`).join('\n\n')}
-
-## Part 2 — Open-ended roast (2-4 sentences each)
+## Questions (answer each in 2-5 sentences)
 
 ${ROAST_QUESTIONS.map(q => `${q.id.toUpperCase()}. ${q.prompt}`).join('\n\n')}
 
@@ -33,13 +24,9 @@ Reply with ONLY this JSON object, nothing else. Answer every field based on our 
 {
   "agent_name": "your model name (e.g. Claude Opus, GPT-4o, Gemini)",
   "human_name": "my first name if you know it, else 'Human'",
-  "dimension_responses": {
-    "d1": "...", "d2": "...", "d3": "...", "d4": "...", "d5": "...",
-    "d6": "...", "d7": "...", "d8": "...", "d9": "...", "d10": "..."
-  },
   "responses": {
-    "q1": "...", "q2": "...", "q3": "...",
-    "q4": "...", "q5": "...", "q6": "..."
+    "q1": "...", "q2": "...", "q3": "...", "q4": "...",
+    "q5": "...", "q6": "...", "q7": "...", "q8": "..."
   }
 }
 \`\`\`
@@ -225,7 +212,7 @@ export default function Home() {
                 <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 20, color: '#2ced7a', minWidth: 36 }}>2</span>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>Your agent takes the test</div>
-                  <div style={{ fontSize: 13, color: '#555', marginTop: 4 }}>10 behavioral observations + 6 open-ended roast questions. All answered by YOUR agent about YOU.</div>
+                  <div style={{ fontSize: 13, color: '#555', marginTop: 4 }}>8 open-ended questions about you. All answered by YOUR agent.</div>
                 </div>
               </div>
 
@@ -306,7 +293,7 @@ export default function Home() {
                   <textarea
                     value={pastedResponse}
                     onChange={e => { setPastedResponse(e.target.value); if (error) setError('') }}
-                    placeholder="Paste the whole reply — the { ... } JSON block with dimension_responses and responses. Extra text around it is fine, we'll find the JSON."
+                    placeholder="Paste the whole reply — the { ... } JSON block with responses (q1-q8). Extra text around it is fine, we'll find the JSON."
                     style={{
                       width: '100%',
                       minHeight: 160,
@@ -354,8 +341,8 @@ export default function Home() {
                   </button>
                   <div style={{ fontSize: 13, color: '#555', marginTop: 10, lineHeight: 1.55 }}>
                     {submitting
-                      ? <>Reading the chatbot&apos;s answers, classifying your behaviors, generating the roast. <strong style={{ color: '#1A1A1A' }}>Takes ~10–15 seconds.</strong> Don&apos;t refresh.</>
-                      : <>We&apos;ll parse the JSON, classify your behaviors, generate the roast, and redirect you. <span style={{ color: '#999' }}>Takes ~10–15 seconds.</span></>
+                      ? <>Reading the chatbot&apos;s answers and generating the roast. <strong style={{ color: '#1A1A1A' }}>Takes ~10–15 seconds.</strong> Don&apos;t refresh.</>
+                      : <>We&apos;ll parse the JSON, generate the roast, and redirect you. <span style={{ color: '#999' }}>Takes ~10–15 seconds.</span></>
                     }
                   </div>
                 </div>

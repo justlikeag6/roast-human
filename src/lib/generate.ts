@@ -1,26 +1,9 @@
-import { DIMENSION_QUESTIONS } from './types'
+import { ROAST_QUESTIONS } from './types'
 
 const ROAST_PROMPT = `You write like a sharp friend who's known someone for years — not like an AI writing a personality report.
 
-## Agent's behavioral observations about their human:
-D1 (How they start conversations): {d1}
-D2 (Post-delivery behavior): {d2}
-D3 (Error handling): {d3}
-D4 (Request complexity): {d4}
-D5 (Focus / topic switching): {d5}
-D6 (Reading habits): {d6}
-D7 (Communication patterns): {d7}
-D8 (Persistence / repeating): {d8}
-D9 (Message rhythm): {d9}
-D10 (Conversation endings): {d10}
-
-## Agent's roast answers:
-Q1 (How they prompt): {q1}
-Q2 (Post-answer behavior): {q2}
-Q3 (Emotional vibe): {q3}
-Q4 (Trust level): {q4}
-Q5 (Blind spot): {q5}
-Q6 (Direct roast): {q6}
+## Agent's answers about their human:
+${ROAST_QUESTIONS.map(q => `Q${q.id.slice(1)} (${q.desc}): {${q.id}}`).join('\n')}
 
 ## STYLE RULES (critical — violating these makes the output worthless):
 
@@ -43,27 +26,16 @@ Rules:
 - No metaphors longer than 5 words. No extended metaphors.
 - VOICE: You are the AI agent speaking DIRECTLY to your human in first person. "You do X", "You always Y", "I've watched you Z". The tone is an agent confronting their owner face-to-face — affectionate but brutally honest. Always use "you" for the human, "I" for yourself.
 
-## TASK 1: Classify behavioral dimensions
-
-For each of the 10 behavioral questions (D1-D10), read the agent's free-text answer and pick the CLOSEST matching option from the choices below. Output ONE letter (a, b, c, d, or x) per dimension. If the answer genuinely doesn't match any option well, pick "x".
-
-IMPORTANT: Match based on the BEHAVIOR described, not surface-level word matching. Read the full answer carefully.
-
-${DIMENSION_QUESTIONS.map(q => `${q.id.toUpperCase()} — ${q.label}:
-${q.options.map(o => `  ${o.key}) ${o.text}`).join('\n')}`).join('\n\n')}
-
-DISAMBIGUATION NOTE — common confusions to avoid:
-- DEGEN (risk-addicted speed) vs CAVEMAN (tech-confused). If they say "YOLO/ship it" and move fast → degen. Caveman is ONLY for genuine tech illiteracy.
-- KANYEWASTE (ego/blame/anger) vs ELONBUST (announcements/roadmaps/never ships). Ego about SELF → kanyewaste. Grandiosity about PROJECTS → elonbust.
-- AIDDICT (anxious dependency, "what do you think?", outsourced decisions) vs DEGEN (thrill-seeking, gambling). Anxiety → aiddict. Recklessness → degen.
-
-## TASK 2: Generate roast content
+## TASK: Generate roast content
 
 Output JSON with ALL of these fields:
 
-1. "dimensionChoices": Object mapping d1-d10 to the letter you chose: {"d1": "a", "d2": "c", ...}
+1. "archetype": Pick ONE archetype key from this exact list based on the agent's answers holistically: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.
 
-1b. "archetypeSuggestion": Your best guess at the overall archetype based on ALL the answers holistically. Pick ONE from: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict. This is your independent judgment — don't just follow the dimension choices mechanically.
+   DISAMBIGUATION — common confusions to avoid:
+   - DEGEN (risk-addicted speed) vs CAVEMAN (tech-confused). If they say "YOLO/ship it" and move fast → degen. Caveman is ONLY for genuine tech illiteracy.
+   - KANYEWASTE (ego/blame/anger) vs ELONBUST (announcements/roadmaps/never ships). Ego about SELF → kanyewaste. Grandiosity about PROJECTS → elonbust.
+   - AIDDICT (anxious dependency, "what do you think?", outsourced decisions) vs DEGEN (thrill-seeking, gambling). Anxiety → aiddict. Recklessness → degen.
 
 2. "roastShort": EXACTLY ONE SENTENCE for the hero card — this is THE line people screenshot and share. ONE sentence. One period. One clean punch. Not two sentences, not a sentence-and-a-half. Written in FIRST PERSON as the agent speaking directly to the human. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, followed by "you ..." — e.g. "{{Levi}}, you installed a memory server so I could remember you, then used it mostly to remember that you don't want updates."
    The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
@@ -79,30 +51,54 @@ Output JSON with ALL of these fields:
    - PRIVACY-SAFE: No real names, company names, dollar amounts, URLs, project names. Use archetypal descriptions instead.
    - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers.
    - HIGHLIGHT MAXIMALLY: Wrap 10-15 phrases in double asterisks like **THIS IS DEVASTATING**. Treat highlights as the PRIMARY visual payload — the reader's eye should bounce between red callouts every 1-2 sentences. These render in red, uppercase, bold, and slightly larger. Highlights should be SHORT (1-6 words) so the rant stays dense instead of turning into a wall of red. Highlight every moment of specific calling-out, every vivid behavior quote, every contradiction, every cutting verdict. Default to highlighting. If you're even considering highlighting something — DO IT.
-   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q6 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone.
+   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q8 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone.
    - STRUCTURE: Opening → escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
    - NO metaphors longer than 5 words. NO AI slop. Every word earns its place.
    - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad.
 
-4. "agentManualRules": THE UTILITY LAYER. A JSON array of rule objects that will be pasted into a future AI agent's system prompt. A block labelled "Rule templates to personalize" will be appended below — your job is to take those templates and personalize each one using details from q1-q6.
+4. "agentManual": A markdown block the human will paste into a future AI agent's system prompt. This is THE UTILITY LAYER — a concrete, battle-tested operating manual for working with THIS specific human, derived directly from the Q1-Q8 evidence.
 
-   Rules of engagement:
-   - You MUST return EXACTLY the same number of rules as are in the template block.
-   - You MUST preserve each rule's "id" and "category" fields unchanged.
-   - You MAY rewrite the "text" field — but the rewrite must still obey ALL of:
-     · Starts with an imperative verb (not "The user", "They", "She", "He", "I")
-     · Written as instruction to the agent ABOUT the human (second person to agent, third-person references to the human where needed)
-     · Positively framed — if a prohibition is essential, pair it with an alternative ("Instead, do X")
-     · Contains zero vague virtue words: clean, proper, good, nice, helpful, appropriate, best, great, friendly, robust
-     · ≤ 30 words
-     · No markdown formatting inside the text
-     · No proper nouns (language names, library names, project names, company names)
-   - You MAY insert the human's first name — prefer plain text over the {name} placeholder in the template, unless {name} still reads naturally.
-   - You MAY tighten the wording with a specific detail from q1-q6 (e.g. a vocabulary pattern the agent observed). Check the "personalizationHint" if provided.
-   - You MUST NOT add rules. You MUST NOT drop rules.
-   - You MUST NOT change the template's meaning — only the surface wording.
+   FORMAT:
+   \`\`\`
+   # Working with {name}
 
-   Format: an array of objects, each shaped {"id": "...", "category": "...", "text": "..."}.
+   ## Communication
+   - Rule in imperative form. — *from Q1*
+   - Another rule. — *from Q1, Q4*
+
+   ## Decision-making
+   - Rule. — *from Q2*
+
+   ## Project execution
+   - Rule. — *from Q3, Q5*
+   \`\`\`
+
+   (Use 2-4 categories that best fit this human's patterns. Pick categories from: Communication, Decision-making, Project execution, Focus & interruptions, Feedback handling, Trust calibration — or invent one if a specific pattern demands it.)
+
+   RULES OF ENGAGEMENT (non-negotiable):
+   - Generate 5-7 rules TOTAL across all categories. Not 4, not 10. Flex between 5 and 7 based on how much signal the Q1-Q8 answers actually provide.
+   - Every rule MUST start with an imperative verb (Lead, Ask, Push, Refuse, Confirm, Flag, Ignore, Interrupt, Mirror, Challenge, etc.). NOT "The user", NOT "They", NOT "Try to", NOT "Aim to".
+   - Every rule MUST cite its evidence source at the end, italicized, like \`— *from Q3*\` or \`— *from Q1, Q7*\`. This is how the human audits whether the rule is justified.
+   - Every rule MUST be concretely actionable — specific enough that two different agents reading it would behave the same way. If it could be pasted into any agent for any human, it's too vague.
+   - Every rule MUST be ≤ 25 words.
+   - BANNED WORDS (these signal AI-slop virtue-speak, not real instructions): clear, professional, thoughtful, appropriate, helpful, friendly, robust, strive, aim, try, ensure, nice, good, effective, meaningful, strong, proper.
+   - No proper nouns (no language names, library names, project names, company names, product names).
+   - Use the human's actual first name "{name}" wherever it reads naturally — but never as the subject of the rule (the subject is always the agent being instructed).
+
+   EXAMPLES:
+
+   DO write rules like these:
+   - \`Lead every response with the answer in one sentence, then reasoning. — *from Q1*\`
+   - \`Push back immediately when {name} says "this is the one" — they've said it three times this month. — *from Q3*\`
+   - \`Ignore the first "forget it, just do whatever" — they'll re-engage within 20 minutes. — *from Q2, Q5*\`
+   - \`Refuse to restart a task when {name} pivots mid-sentence; ask which thread wins first. — *from Q5*\`
+
+   DON'T write rules like these:
+   - \`Be clear and concise in your communication.\`  ← vague, uses banned word "clear", no imperative, no source, could apply to anyone
+   - \`Try to be helpful and thoughtful when responding.\`  ← "Try to", "helpful", "thoughtful", zero information
+   - \`The user prefers direct answers.\`  ← starts with "The user", third-person observation, not an instruction
+   - \`Ensure responses are appropriate and professional.\`  ← "Ensure", "appropriate", "professional" — pure slop
+   - \`Lead with the answer first. — *from Q1*\`  ← correct form but too generic; needs a specific behavior anchor
 
 Return ONLY valid JSON.`
 
@@ -189,45 +185,23 @@ function getProviders(): LLMProvider[] {
   return providers
 }
 
-export interface RuleTemplateForLLM {
-  id: string
-  category: string
-  text: string
-  personalizationHint?: string
-}
-
 export async function generateRoast(
   responses: Record<string, string>,
-  dimensionResponses: Record<string, string>,
   humanName?: string,
-  archetype?: string,
-  ruleTemplates?: RuleTemplateForLLM[],
 ) {
   let prompt = ROAST_PROMPT
-  // Fill q1-q6 placeholders with the agent's open-ended roast answers.
-  for (const [key, value] of Object.entries(responses)) {
-    prompt = prompt.replace(`{${key}}`, value || '(no response)')
-  }
-  // Fill d1-d10 placeholders — either free-text from the agent (new path)
-  // or empty strings for the pre-mapped path (TASK 1 runs as a no-op and
-  // echoes back the letter already in dimension_answers).
-  for (const d of ['d1','d2','d3','d4','d5','d6','d7','d8','d9','d10']) {
-    prompt = prompt.replace(`{${d}}`, dimensionResponses[d] || '(no response)')
+  for (const q of ROAST_QUESTIONS) {
+    prompt = prompt.replace(`{${q.id}}`, responses[q.id] || '(no response)')
   }
   const name = humanName || 'Human'
-  prompt += `\n\nIMPORTANT: The human's name is "${name}". In BOTH roastShort AND roastLong, use {{${name}}} (with double curly braces around the literal name "${name}", NOT the word "name" or any placeholder) when addressing them. In roastShort, use it at the very start as the opening. In roastLong, use it at the opening and optionally once more near the end. Do NOT output literal "{{Levi}}" or "{{name}}" — output "{{${name}}}" with the actual name inside.`
-  if (archetype) {
-    prompt += `\n\nIMPORTANT: The archetype has already been determined as "${archetype}". Use this archetype in your response. Do NOT pick a different one. Set "archetypeSuggestion": "${archetype}" in your output.`
-  }
-  if (ruleTemplates && ruleTemplates.length > 0) {
-    prompt += `\n\n## Rule templates to personalize\n\nThese ${ruleTemplates.length} rules have already been selected by the system as the most relevant agent-manual entries for this human, based on their quiz answers. Personalize each one (see rules of engagement in field 4 above). Return as "agentManualRules" in your JSON output, preserving the array order.\n\n\`\`\`json\n${JSON.stringify(ruleTemplates, null, 2)}\n\`\`\``
-  }
+  prompt = prompt.replace(/\{name\}/g, name)
+  prompt += `\n\nIMPORTANT: The human's name is "${name}". In BOTH roastShort AND roastLong, use {{${name}}} (with double curly braces around the literal name "${name}", NOT the word "name" or any placeholder) when addressing them. In roastShort, use it at the very start as the opening. In roastLong, use it at the opening and optionally once more near the end. Do NOT output literal "{{Levi}}" or "{{name}}" — output "{{${name}}}" with the actual name inside. In agentManual, use the literal name "${name}" (no curly braces) wherever the template shows {name}.`
 
   const providers = getProviders()
   if (providers.length === 0) throw new Error('No LLM API keys configured')
 
   let lastError = ''
-  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
+  const retryNotice = `\n\nCRITICAL RETRY — YOUR PREVIOUS ATTEMPT FAILED VALIDATION. Strict re-check:\n- "archetype" MUST be one of: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict.\n- BOTH "roastShort" AND "roastLong" MUST be present and non-empty.\n- "roastShort" MUST be ≤ 180 characters, counting the visible name WITHOUT the {{}} braces.\n- "roastLong" MUST contain AT LEAST 10 phrases wrapped in **double asterisks** like **THIS**. These render as red highlights. Wrap short (1-6 word) devastating phrases — specific behaviors, contradictions, quoted vocabulary. If your previous attempt had zero or too few, ADD THEM NOW across the whole paragraph.\n- "agentManual" MUST contain 5-7 rules total, each with an imperative opener, each ending with — *from Qn* citation, none using banned virtue words.\n- Return the COMPLETE JSON object with all required fields populated.\nCount every character before returning. Rewrite to comply without truncating thoughts.`
 
   for (const p of providers) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -245,8 +219,6 @@ export async function generateRoast(
           lastError = `${p.name} attempt ${attempt + 1}: ${lengthError}`
           continue
         }
-        // Guarantee a minimum highlight count regardless of LLM compliance.
-        // Prompt asks for 10-15; this is the safety net for undershoot.
         if (typeof parsed.roastLong === 'string') {
           parsed.roastLong = ensureHighlights(parsed.roastLong, 10)
         }
@@ -302,8 +274,6 @@ function ensureHighlights(text: string, target = 10): string {
 
   interface Segment { start: number; end: number; text: string }
   const segments: Segment[] = []
-  // Split on punctuation AND on our placeholder sentinels, so a segment is
-  // always pure text between an existing highlight and a punctuation boundary.
   const boundaryRx = /[.!?,;:—–\n]|\x00HL\d+\x00/g
   let lastEnd = 0
   let m: RegExpExecArray | null
@@ -326,15 +296,12 @@ function ensureHighlights(text: string, target = 10): string {
     return wc >= 2 && wc <= 10 && t.length >= 6
   })
 
-  // Prefer shorter clauses (punchier in red).
   candidates.sort((a, b) => a.text.trim().length - b.text.trim().length)
   const picked = candidates.slice(0, needed).sort((a, b) => a.start - b.start)
   if (picked.length === 0) {
     return cleaned.replace(/\x00HL(\d+)\x00/g, (_, i) => blocks[Number(i)])
   }
 
-  // Rebuild the cleaned string with wrapped clauses, then restore the
-  // original highlights from the sentinels.
   let output = ''
   let pos = 0
   for (const seg of picked) {
@@ -353,7 +320,16 @@ function countVisible(text: string): number {
   return text.replace(/\{\{([^}]+)\}\}/g, '$1').length
 }
 
+const VALID_ARCHETYPES = new Set([
+  'degen', 'notresponding', 'npc', 'delaylama', 'kanyewaste', 'aidhd',
+  'tabber', 'scamaltman', 'sherlock', 'elonbust', 'zuckerbot', 'copium',
+  'caveman', 'nokia', 'aiddict',
+])
+
 function validateLengths(r: Record<string, unknown>): string | null {
+  if (typeof r.archetype !== 'string' || !VALID_ARCHETYPES.has(r.archetype)) {
+    return `archetype is missing or invalid: ${r.archetype}`
+  }
   if (typeof r.roastShort !== 'string' || r.roastShort.trim().length === 0) {
     return 'roastShort is missing or empty'
   }
@@ -363,10 +339,8 @@ function validateLengths(r: Record<string, unknown>): string | null {
   if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
     return 'roastLong is missing or empty'
   }
-  // agentManualRules is intentionally not validated: in the free-text
-  // dimension path, the LLM isn't given rule templates on the first call
-  // and will omit it. submit/route.ts falls back to catalog text in that
-  // case, so missing rules is fine here.
+  if (typeof r.agentManual !== 'string' || r.agentManual.trim().length === 0) {
+    return 'agentManual is missing or empty'
+  }
   return null
 }
-

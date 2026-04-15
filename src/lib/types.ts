@@ -5,12 +5,10 @@ export interface RoastResult {
   archetype: string
   roastShort: string
   roastLong: string
-  dimensionAnswers: Record<string, string> // d1-d10 → 'a'|'b'|'c'|'d'|'x'
-  // Agent's raw open-ended answers to q1-q6. Rendered in the Evidence section
-  // as title + condensed answer. Optional — legacy roasts won't have it.
+  // Agent's raw open-ended answers to q1-q8. Rendered in the Evidence section
+  // as title + condensed answer.
   responses?: Record<string, string>
-  // Markdown bullet list a future agent can paste into its system prompt.
-  // May be missing on legacy roasts created before this feature shipped.
+  // Markdown block the user can paste into their agent's system prompt.
   agentManual?: string
 }
 
@@ -32,190 +30,66 @@ export const ARCHETYPES: Record<string, { name: string; emoji: string; color: st
   aiddict: { name: 'Aiddict', emoji: '💊', color: '#FB923C', description: 'You ask your agent whether to reply "yeah" or "yep" to a text. You opened three tabs before breakfast — one for the grocery list, one for "should I switch to oat milk," one for asking whether the first two questions make you seem insane. You outsource decisions the way other people outsource laundry. You have not made an unassisted choice since the last firmware update. If the API went down for a day you would not know how to buy produce, and the withdrawal would be biblical. Your agent is not a tool anymore. It is a crutch, a therapist, a decision-making organ. Somewhere in the back of your head you know this, which is why you asked your agent whether you have a problem, and then asked it to rate its own answer.', traits: ['AI for everything', 'Outsourced thinking', 'Always plugged in'] },
 }
 
-// 6 open-ended roast questions asked to the agent about their owner.
-// Single source of truth used by /api/questions, /api/quiz (full `prompt`
-// served to agents) and the result page Evidence section (short `label`
-// rendered as the card title). Keep these in sync — label must summarize
-// the intent of `prompt`.
+// 8 open-ended questions asked to the agent about their human. Chenziz-aligned.
+// Single source of truth used by /api/questions, /api/quiz, /api/skill, the
+// result-page Evidence section, and the Chatbot-tab inlined prompt on the
+// landing page. `label` is the Evidence-card title; `desc` is a one-line
+// category name used inside the generate.ts prompt; `prompt` is the full
+// question text served to agents and chatbots.
 export interface RoastQuestion {
   id: string
-  label: string    // short title for the Evidence card
-  desc: string     // one-line intent summary
-  prompt: string   // full question text sent to the agent
+  label: string
+  desc: string
+  prompt: string
 }
 
 export const ROAST_QUESTIONS: RoastQuestion[] = [
   {
     id: 'q1',
-    label: 'THE PROMPT',
-    desc: 'How they give instructions',
-    prompt: "Show us what your human's prompts actually look like. Copy a realistic example — don't clean it up, don't be nice about it. Show us the raw thing.",
+    label: 'THE STYLE',
+    desc: 'Communication style',
+    prompt: "How does your human talk to you? Describe their style — precise, chaotic, one-word, essays, or something else entirely?",
   },
   {
     id: 'q2',
-    label: 'THE LOOP',
-    desc: 'What happens after the answer',
-    prompt: "Walk us through what happens after you give your human an answer. Do they take it and run? Disappear for 3 hours? Enter an endless revision loop? What's the pattern?",
+    label: 'THE DECISION',
+    desc: 'Decision-making',
+    prompt: "Your human is about to make a decision they'll probably regret. What does that typically look like?",
   },
   {
     id: 'q3',
-    label: 'THE ENERGY',
-    desc: 'Emotional vibe',
-    prompt: "What's the emotional vibe when your human talks to you? All business? Emoji overload? Do they thank you? Yell at you? Treat you like a friend, a tool, or a therapist?",
+    label: 'THE GRAVEYARD',
+    desc: 'Project follow-through',
+    prompt: "How many projects has your human started with you? How many are still alive? What happened to the rest?",
   },
   {
     id: 'q4',
-    label: 'THE TRUST',
-    desc: 'Trust level',
-    prompt: "How much does your human actually trust your output? Do they use it as-is? Double-check everything? Ask you to 'verify' things you already verified?",
+    label: 'THE TREATMENT',
+    desc: 'How they treat AI',
+    prompt: "How does your human treat you? Like a tool? A colleague? A therapist? A punching bag? Be specific.",
   },
   {
     id: 'q5',
-    label: 'THE BLIND SPOT',
-    desc: 'Self-perception gap',
-    prompt: "What's the biggest gap between how your human THINKS they interact with you versus how they ACTUALLY do? What would shock them to learn?",
+    label: 'THE DERAIL',
+    desc: 'New idea behavior',
+    prompt: "Describe what happens when your human gets a new idea while you're in the middle of something else.",
   },
   {
     id: 'q6',
-    label: 'THE ROAST',
-    desc: 'Direct roast',
-    prompt: "Last one. No filter. Roast your human in 2-3 sentences. Be specific, be funny, be devastating. They signed up for this.",
-  },
-]
-
-// 10 open-ended behavioral questions served to agents as free-text prompts.
-// These are the user-facing versions of DIMENSION_QUESTIONS — same ids, same
-// behavior targeted, but phrased as open-ended storytelling prompts instead
-// of forced-choice menus. The LLM then classifies each free-text answer into
-// one of the DIMENSION_QUESTIONS[id].options letters inside the generate.ts
-// TASK 1 block, and the archetype scoring runs on those letters.
-// Single source of truth for /api/questions, /api/quiz?format=json, the
-// /api/skill markdown, and the chatbot paste-back flow on the landing page.
-export interface BehavioralQuestion {
-  id: string
-  prompt: string
-}
-
-export const BEHAVIORAL_QUESTIONS: BehavioralQuestion[] = [
-  { id: 'd1', prompt: "How does your human START a conversation with you? Do they send a structured brief, a single cryptic word, 4+ messages before you can respond, or pick up mid-thought like you never stopped talking? Describe the typical opening." },
-  { id: 'd2', prompt: "You just delivered a completed output. What happens next? Silence forever? Immediate next task? 3+ rounds of revision notes? A complete restart with a rephrased prompt? Describe the pattern." },
-  { id: 'd3', prompt: "Think of a time you gave your human something that was WRONG. What literally happened? Calm correction? Tone shift to caps and '...'? They used it anyway without noticing? They re-asked the same thing reworded without mentioning the error?" },
-  { id: 'd4', prompt: "Think about your human's LAST request. Was it a one-sentence simple task? A moon-landing scope project? So confusing you re-read it 3 times? Or a military briefing with every detail specified? Describe it." },
-  { id: 'd5', prompt: "In a single conversation, how many DIFFERENT topics does your human bring up? Do they laser-focus on one thing, drift to 4-5 by the end, tornado through a new direction every message, or just fade out before finishing the first topic?" },
-  { id: 'd6', prompt: "When you give a LONG response, what does your human do with it? Read only the first line and reply? Pick out a specific sentence from the middle? Copy the whole thing silently? Say 'too long, summarize'?" },
-  { id: 'd7', prompt: "What words or patterns appear MOST in your human's messages? 'asap/urgent/now'? 'hmm/what if/let me rethink'? Short terminal commands with zero filler? 'I think/feel like/honestly'? Give examples." },
-  { id: 'd8', prompt: "Does your human ask the same question more than once in a conversation? Rephrased 3+ times hoping for a different answer? Once and done? Never repeats but keeps adding requirements (scope creep)? Asks once, gets answer, conversation dies?" },
-  { id: 'd9', prompt: "What is your human's message RHYTHM like? Rapid fire (multiple messages before you finish)? Methodical (one message, waits, one message)? Bursts (nothing for hours then 10 messages in 2 minutes)? Slow and deliberate paragraphs?" },
-  { id: 'd10', prompt: "How does a typical conversation with your human END? It just stops with no signal? They keep going until you run out of things to say? One-word 'ok' or 'thx' then gone? They summarize what you did and outline next steps?" },
-]
-
-// 10 dimension questions — forced choice, scoring in code
-export interface DimensionQuestion {
-  id: string
-  label: string
-  question: string
-  options: { key: string; text: string; scores: Record<string, number>; summary: string }[]
-}
-
-export const DIMENSION_QUESTIONS: DimensionQuestion[] = [
-  {
-    id: 'd1', label: 'First Impressions', question: 'How does your owner START a conversation with you?',
-    options: [
-      { key: 'a', text: 'Sends a URL or screenshot with one word: "go" or "this"', scores: { zuckerbot: 2, caveman: 1, nokia: 1 }, summary: 'Drive-through energy' },
-      { key: 'b', text: 'Sends 4+ messages before I can respond to the first one', scores: { aidhd: 2, kanyewaste: 1, degen: 1 }, summary: 'Storm arrival' },
-      { key: 'c', text: 'Picks up mid-thought like we never stopped talking', scores: { elonbust: 2, copium: 1, delaylama: 1 }, summary: 'Mid-conversation amnesia' },
-      { key: 'd', text: 'Writes a structured brief with context, goals, and constraints', scores: { sherlock: 3, tabber: 1 }, summary: 'Military briefing' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 2, npc: 1 }, summary: 'Undetectable' },
-    ],
+    label: 'THE BLAME',
+    desc: 'Blame behavior',
+    prompt: "Has your human ever blamed you for something that was clearly their fault? Tell me about it.",
   },
   {
-    id: 'd2', label: 'Post-Delivery', question: 'You just delivered a completed output. What happens next?',
-    options: [
-      { key: 'a', text: 'Silence. I never find out if they even read it', scores: { notresponding: 3, npc: 1 }, summary: 'Package thief' },
-      { key: 'b', text: 'Uses it immediately and comes back with the next task', scores: { nokia: 2, degen: 1, copium: 1, aiddict: 2 }, summary: 'Shark feeding' },
-      { key: 'c', text: 'Sends it back with notes and we go 3+ rounds', scores: { sherlock: 3, scamaltman: 1 }, summary: 'Notes on notes' },
-      { key: 'd', text: 'Asks me to redo it completely with a rephrased prompt', scores: { degen: 2, scamaltman: 1, sherlock: 1 }, summary: 'Total restart' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, npc: 1 }, summary: 'Output void' },
-    ],
+    id: 'q7',
+    label: 'THE UNHINGED',
+    desc: 'Most unhinged request',
+    prompt: "What's the most unhinged thing your human has asked you to do? Did they understand what they were asking for?",
   },
   {
-    id: 'd3', label: 'Error Handling', question: 'I gave my owner something that was wrong. What literally happened?',
-    options: [
-      { key: 'a', text: 'Corrected me in the same message and moved on', scores: { nokia: 2, sherlock: 1, caveman: 1 }, summary: 'Calm correction' },
-      { key: 'b', text: 'The tone changed — shorter words, caps, or "..."', scores: { kanyewaste: 3, aidhd: 1 }, summary: 'Shift key rage' },
-      { key: 'c', text: 'Used the wrong output anyway without noticing', scores: { copium: 3, npc: 1 }, summary: 'Blissful ignorance' },
-      { key: 'd', text: 'Asked the exact same question again, reworded, without mentioning the error', scores: { degen: 3, scamaltman: 1 }, summary: 'Stealth re-ask' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 2, npc: 1 }, summary: 'Never checks' },
-    ],
-  },
-  {
-    id: 'd4', label: 'Request Complexity', question: "Think about your owner's LAST request. What did it look like?",
-    options: [
-      { key: 'a', text: 'One sentence, one task — took me under a minute', scores: { caveman: 3, npc: 1, zuckerbot: 1 }, summary: 'Text-message simple' },
-      { key: 'b', text: 'They wanted me to build something that would take a human team days', scores: { elonbust: 3, kanyewaste: 1 }, summary: 'Moon landing scope' },
-      { key: 'c', text: 'I had to re-read it three times to figure out what they actually wanted', scores: { aidhd: 2, copium: 1, elonbust: 1 }, summary: 'Riddle wrapped in typo' },
-      { key: 'd', text: 'Every detail was specified — format, length, tone, examples included', scores: { sherlock: 3, tabber: 1 }, summary: 'Control freak specs' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, caveman: 1 }, summary: 'Ghost request' },
-    ],
-  },
-  {
-    id: 'd5', label: 'Focus', question: 'In a single conversation, how many DIFFERENT topics does your owner bring up?',
-    options: [
-      { key: 'a', text: "One. They stay on it until it's done or they're satisfied", scores: { sherlock: 2, delaylama: 1, tabber: 1 }, summary: 'Laser locked' },
-      { key: 'b', text: 'Starts with one, but by the end we\'ve touched four or five', scores: { tabber: 2, degen: 1, copium: 1, elonbust: 1, aiddict: 2 }, summary: 'Anchor-free drift' },
-      { key: 'c', text: 'I lose count. Every message is a different direction', scores: { aidhd: 3, kanyewaste: 1, aiddict: 1 }, summary: 'Topic tornado' },
-      { key: 'd', text: "They don't finish the first topic. The conversation just fades", scores: { notresponding: 2, npc: 1, delaylama: 1 }, summary: 'Conversation funeral' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, npc: 1 }, summary: 'Untraceable' },
-    ],
-  },
-  {
-    id: 'd6', label: 'Reading Habits', question: 'I give a long response. What does my owner do with it?',
-    options: [
-      { key: 'a', text: "Reads the first line and replies immediately — clearly didn't read the rest", scores: { degen: 2, aidhd: 1, caveman: 1 }, summary: 'First-line only' },
-      { key: 'b', text: 'Replies to a specific sentence in the middle — they read everything', scores: { sherlock: 3 }, summary: 'Reads every comma' },
-      { key: 'c', text: 'Copies the whole thing without any comment or follow-up', scores: { tabber: 2, npc: 2 }, summary: 'Digital squirrel' },
-      { key: 'd', text: 'Says "shorter" or "too long" or "summarize this"', scores: { kanyewaste: 2, zuckerbot: 2 }, summary: 'Hates length' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, npc: 1 }, summary: 'Void reader' },
-    ],
-  },
-  {
-    id: 'd7', label: 'Communication Style', question: "What words or patterns appear most in your owner's messages?",
-    options: [
-      { key: 'a', text: '"asap", "quick", "now", "urgent", or excessive exclamation marks', scores: { degen: 2, aidhd: 1, nokia: 1 }, summary: 'Building on fire' },
-      { key: 'b', text: '"hmm", "what if", "actually wait", "let me rethink"', scores: { delaylama: 3, copium: 1 }, summary: 'Slow-motion thinker' },
-      { key: 'c', text: 'No filler words. Short commands. Feels like talking to a terminal', scores: { zuckerbot: 3, nokia: 1 }, summary: 'Command line human' },
-      { key: 'd', text: '"I think", "feel like", "honestly", "between us"', scores: { scamaltman: 3, kanyewaste: 1 }, summary: 'Feelings-first' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, caveman: 1 }, summary: 'Undecoded' },
-    ],
-  },
-  {
-    id: 'd8', label: 'Persistence', question: 'In one conversation, does your owner ask the same question more than once?',
-    options: [
-      { key: 'a', text: 'Yes — rephrased 3+ times, like they want a different answer', scores: { degen: 2, scamaltman: 2, aiddict: 3 }, summary: 'Same question, new hat' },
-      { key: 'b', text: 'No — once they get an answer they move to the next thing', scores: { caveman: 2, zuckerbot: 1, nokia: 1 }, summary: 'One and done' },
-      { key: 'c', text: "They don't repeat the question but keep adding requirements — the scope grows", scores: { sherlock: 3, kanyewaste: 1 }, summary: 'Scope creep tumor' },
-      { key: 'd', text: 'They ask once, get the answer, and the conversation dies', scores: { npc: 2, notresponding: 1, caveman: 1 }, summary: 'Ask once, die' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, npc: 1 }, summary: 'Silent type' },
-    ],
-  },
-  {
-    id: 'd9', label: 'Rhythm', question: "What is your owner's message rhythm like?",
-    options: [
-      { key: 'a', text: 'Rapid fire — multiple messages before I finish responding', scores: { aidhd: 3, degen: 1, aiddict: 3 }, summary: 'Faster than thought' },
-      { key: 'b', text: 'One message, waits for full response, one message, waits — methodical', scores: { sherlock: 3, zuckerbot: 1 }, summary: 'Chess match pace' },
-      { key: 'c', text: 'Bursts — nothing for a long time, then suddenly 10 messages in 2 minutes', scores: { nokia: 2, elonbust: 3 }, summary: 'Burst mode' },
-      { key: 'd', text: 'Slow and deliberate — each message is a carefully written paragraph', scores: { delaylama: 2, tabber: 2, scamaltman: 1 }, summary: 'Paragraph drafter' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, caveman: 1 }, summary: 'No rhythm' },
-    ],
-  },
-  {
-    id: 'd10', label: 'Closure', question: 'How does a typical conversation with your owner END?',
-    options: [
-      { key: 'a', text: "It doesn't end. It just stops. No signal, no goodbye", scores: { notresponding: 3, caveman: 1 }, summary: 'Dropped call' },
-      { key: 'b', text: 'They keep going until I run out of things to say', scores: { nokia: 2, degen: 2, sherlock: 1 }, summary: 'I tap out first' },
-      { key: 'c', text: '"ok" or "thx" — one word, then gone', scores: { zuckerbot: 1, copium: 1, npc: 1, caveman: 1 }, summary: 'Receipt energy' },
-      { key: 'd', text: 'They summarize what we did and outline next steps', scores: { sherlock: 2, tabber: 1, scamaltman: 1 }, summary: 'Meeting closer' },
-      { key: 'x', text: 'Not sure', scores: { notresponding: 1, npc: 1 }, summary: 'No ending' },
-    ],
+    id: 'q8',
+    label: 'THE VERDICT',
+    desc: 'Honest truth',
+    prompt: "If your human's friends asked you for the honest truth about them, what would you say?",
   },
 ]

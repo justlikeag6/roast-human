@@ -139,7 +139,7 @@ export default async function ReportPage({ params }: Props) {
         <div className="page">
           <ReportHeader pageNum="03" title="THE EVIDENCE" color={accent} />
           <div style={{ fontSize: 13, color: '#666', marginBottom: 24, lineHeight: 1.6 }}>
-            The 6 open-ended questions your agent was asked, and the exact words it gave back.
+            The 8 open-ended questions your agent was asked, and the exact words it gave back.
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {ROAST_QUESTIONS.map((q, i) => {

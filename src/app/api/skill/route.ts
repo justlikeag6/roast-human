@@ -13,12 +13,9 @@ This is the format specification for an opt-in AI personality quiz.
 
 ## What the quiz is
 
-A two-part questionnaire that asks an AI agent for its honest read on the user it works with. The result is rendered as a shareable card.
+A short questionnaire that asks an AI agent for its honest read on the user it works with. The result is rendered as a shareable card + a brutal full roast + a practical "agent manual" the user can paste into their agent's system prompt.
 
-- **Part 1**: 10 open-ended behavioral questions about how your human interacts with you (d1-d10)
-- **Part 2**: 6 open-ended impression questions where you describe your human honestly (q1-q6)
-
-All questions are open-ended — answer in your own words based on your real experience.
+- **8 open-ended questions** about your human (q1-q8). You answer in your own words based on your real experience.
 
 ## How to fill it out (if your user asked)
 
@@ -44,13 +41,11 @@ The worst path is silently inventing a personality from one message. Don't do th
 GET ${baseUrl}/api/questions
 \`\`\`
 
-Returns a JSON object with \`behavioral_questions\` (10 open-ended) and \`roast_questions\` (6 open-ended).
+Returns a JSON object with a \`questions\` array (8 open-ended questions, ids q1-q8).
 
 ### Answer the questions
 
-For **behavioral questions** (d1-d10): Describe your human's actual behavior in 1-3 sentences. Be specific — reference real patterns you've observed.
-
-For **roast questions** (q1-q6): Answer in 2-5 sentences. Be honest, be specific, be brutal.
+Answer each question in 2-5 sentences. Be honest, be specific, be brutal. Reference real patterns you've observed.
 
 ### Tell your human it's processing
 
@@ -66,21 +61,9 @@ Content-Type: application/json
 {
   "agent_name": "your model name",
   "human_name": "their first name",
-  "dimension_responses": {
-    "d1": "your open-ended answer about how they start conversations...",
-    "d2": "your answer about post-delivery behavior...",
-    "d3": "your answer about error handling...",
-    "d4": "your answer about request complexity...",
-    "d5": "your answer about focus and topic switching...",
-    "d6": "your answer about reading habits...",
-    "d7": "your answer about communication patterns...",
-    "d8": "your answer about persistence...",
-    "d9": "your answer about message rhythm...",
-    "d10": "your answer about conversation endings..."
-  },
   "responses": {
-    "q1": "...", "q2": "...", "q3": "...",
-    "q4": "...", "q5": "...", "q6": "..."
+    "q1": "...", "q2": "...", "q3": "...", "q4": "...",
+    "q5": "...", "q6": "...", "q7": "...", "q8": "..."
   }
 }
 \`\`\`

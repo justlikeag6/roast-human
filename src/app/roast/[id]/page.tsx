@@ -1,6 +1,5 @@
 import { loadRoast, renderRoastShort, stripNamePlaceholder, pickTrait } from '@/lib/store'
 import { ARCHETYPES, ROAST_QUESTIONS } from '@/lib/types'
-import { selectTips } from '@/lib/insight-tips'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { DownloadButton } from './DownloadButton'
@@ -323,27 +322,6 @@ export default async function RoastPage({ params }: Props) {
               </div>
             )}
 
-            {/* Workflow tips */}
-            {(() => {
-              const tips = selectTips(r.dimensionAnswers, 4)
-              if (tips.length === 0) return null
-              return (
-                <div style={{ background: '#EEEADE', border: '3px solid #1A1A1A', borderRadius: 18, padding: '24px 28px', boxShadow: '4px 4px 0 #1A1A1A' }}>
-                  <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 10, letterSpacing: 1.5, color: '#1A1A1A', marginBottom: 18 }}>🛠 WHAT THIS FIXES</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {tips.map((tip, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                        <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 12, color: '#2ced7a', minWidth: 26 }}>{String(i + 1).padStart(2, '0')}</span>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, lineHeight: 1.5 }}>{tip.pattern}</div>
-                          <div style={{ fontSize: 12, color: '#555', lineHeight: 1.55 }}><strong style={{ color: '#1A1A1A' }}>Try:</strong> {tip.fix}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )
-            })()}
         </Section>
 
         {/* A NOTE FROM THE CREATORS */}
