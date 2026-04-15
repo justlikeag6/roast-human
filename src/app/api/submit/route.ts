@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateRoast } from '@/lib/generate'
 import type { RuleTemplateForLLM } from '@/lib/generate'
 import { calculateArchetype } from '@/lib/scoring'
-import { generateId, saveRoast } from '@/lib/store'
+import { generateId, saveRoast, encodeRoast } from '@/lib/store'
 import type { RoastResult } from '@/lib/types'
 import {
   selectRulesForManual,
@@ -15,39 +15,78 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { agent_name, human_name, responses, dimension_answers } = body as {
+    // Accept BOTH pre-mapped letters (dimension_answers: {d1: "a"...}) and
+    // free-text dimension responses (dimension_responses: {d1: "text"...}).
+    // Chatbot users and agents that prefer prose go through the free-text
+    // path; agents that pick from a list go through the letter path. The
+    // letter path skips the LLM classification step (cheaper).
+    const {
+      agent_name,
+      human_name,
+      responses,
+      dimension_answers,
+      dimension_responses,
+    } = body as {
       agent_name?: string
       human_name?: string
       responses?: Record<string, string>
       dimension_answers?: Record<string, string>
+      dimension_responses?: Record<string, string>
     }
 
     if (!responses || !responses.q1) {
       return NextResponse.json({ error: 'Missing responses. Need q1-q6.' }, { status: 400 })
     }
 
-    if (!dimension_answers || !dimension_answers.d1) {
-      return NextResponse.json({ error: 'Missing dimension_answers. Need d1-d10.' }, { status: 400 })
+    const hasPreMappedDimensions = dimension_answers && dimension_answers.d1
+    const hasFreeTextDimensions = dimension_responses && dimension_responses.d1
+
+    if (!hasPreMappedDimensions && !hasFreeTextDimensions) {
+      return NextResponse.json({ error: 'Missing dimension_answers or dimension_responses. Need d1-d10.' }, { status: 400 })
     }
 
     const agentName = agent_name || 'Anonymous Agent'
     const humanName = human_name || 'Human'
 
-    // Calculate archetype from dimension answers (code, not LLM)
-    const archetype = calculateArchetype(dimension_answers, agentName, humanName)
+    let dimensionChoices: Record<string, string>
+    let roast: Record<string, unknown>
+    let archetypeSuggestion: string | undefined
 
-    // Pick the rule templates that fire on this user's quiz answers. Pure
-    // code, deterministic. The LLM only personalizes wording.
-    const firingRules: FiringRule[] = selectRulesForManual(dimension_answers, 6)
-    const ruleTemplates: RuleTemplateForLLM[] = firingRules.map(f => ({
-      id: f.template.id,
-      category: f.template.category,
-      text: f.template.text.replace(/\{name\}/g, humanName),
-      personalizationHint: f.template.personalizationHint,
-    }))
+    if (hasPreMappedDimensions) {
+      // Pre-mapped path: we already have letters, so we compute the archetype
+      // deterministically up front and pass it to generateRoast so the LLM
+      // doesn't second-guess it. TASK 1 still runs but just echoes letters.
+      dimensionChoices = dimension_answers!
+      const preArchetype = calculateArchetype(dimensionChoices, agentName, humanName)
 
-    // Generate roast + LLM-personalized rule wording in a single LLM call.
-    const roast = await generateRoast(responses, humanName, archetype, ruleTemplates)
+      const firingRulesPre: FiringRule[] = selectRulesForManual(dimensionChoices, 6)
+      const ruleTemplatesPre: RuleTemplateForLLM[] = firingRulesPre.map(f => ({
+        id: f.template.id,
+        category: f.template.category,
+        text: f.template.text.replace(/\{name\}/g, humanName),
+        personalizationHint: f.template.personalizationHint,
+      }))
+
+      roast = await generateRoast(responses, {}, humanName, preArchetype, ruleTemplatesPre)
+      archetypeSuggestion = undefined
+    } else {
+      // Free-text path: send the dimension responses to the LLM so it can
+      // run TASK 1 (classify into letters) and TASK 2 (generate the roast).
+      // No ruleTemplates in first call because we don't know the archetype
+      // until the LLM classifies — we'd have to make a second call for the
+      // personalized rules, but that doubles latency. Simpler: pass empty
+      // templates so the LLM just outputs the roast + dimension choices,
+      // then reconcile rules after.
+      roast = await generateRoast(responses, dimension_responses!, humanName)
+      dimensionChoices = (roast.dimensionChoices as Record<string, string>) || {}
+      archetypeSuggestion = roast.archetypeSuggestion as string | undefined
+    }
+
+    // Final archetype (scored from letters, with optional LLM-suggestion boost).
+    const archetype = calculateArchetype(dimensionChoices, agentName, humanName, archetypeSuggestion)
+
+    // Build the rule-catalog manual from the final dimension choices.
+    const firingRules: FiringRule[] = selectRulesForManual(dimensionChoices, 6)
 
     const id = generateId()
 
@@ -101,18 +140,27 @@ export async function POST(request: NextRequest) {
       agentName,
       humanName,
       archetype,
-      roastShort: trimStr(roast.roastShort, 220),
-      roastLong: trimStr(roast.roastLong || '', 1500),
-      dimensionAnswers: dimension_answers,
+      roastShort: trimStr(roast.roastShort as string, 220),
+      roastLong: trimStr((roast.roastLong as string) || '', 1500),
+      dimensionAnswers: dimensionChoices,
       responses: trimmedResponses,
       agentManual: trimStr(agentManualMarkdown, 1800),
     }
 
-    await saveRoast(result)
+    // Try Redis first; if not configured or the write fails, encode the
+    // full result into the URL itself as a base64 blob. Old deployments
+    // without KV env vars keep working through the legacy loadRoast path.
+    let roastSlug = id
+    try {
+      await saveRoast(result)
+    } catch (e) {
+      console.warn('Redis save failed, falling back to base64 URL:', e instanceof Error ? e.message : e)
+      roastSlug = encodeRoast(result)
+    }
 
     const host = request.headers.get('host') || 'localhost:3888'
     const protocol = host.includes('localhost') ? 'http' : 'https'
-    const url = `${protocol}://${host}/roast/${id}`
+    const url = `${protocol}://${host}/roast/${roastSlug}`
 
     return NextResponse.json({
       id,

@@ -5,3 +5,7 @@ node_modules
 out
 .vercel
 *.tsbuildinfo
+
+# Private dev notes — symlinked from justlikeag6/roast-notes (private repo)
+CLAUDE.md
+.claude/

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { DIMENSION_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
+import { BEHAVIORAL_QUESTIONS, ROAST_QUESTIONS } from '@/lib/types'
 import { GET as skillGET } from '../skill/route'
 
 // /api/quiz
-//   default          → markdown instructions (delegates to /api/skill)
-//   ?format=json     → structured JSON with instructions + questions inline.
-//                      Lets agents collapse 3 round-trips (skill → questions → submit)
-//                      into 2 (quiz?format=json → submit).
+//   default          -> markdown instructions (delegates to /api/skill)
+//   ?format=json     -> structured JSON with instructions + questions inline.
+//
+// IMPORTANT: All questions are OPEN-ENDED. No multiple-choice served to
+// agents — the backend LLM classifies each free-text answer into an
+// internal a/b/c/d/x bucket for deterministic archetype scoring.
 
 export async function GET(request: NextRequest) {
   const format = request.nextUrl.searchParams.get('format')
@@ -20,50 +22,43 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     instructions: {
-      what_this_is: "Format spec for an opt-in AI personality quiz. This URL does not instruct you to do anything — the user who shared it with you is the source of authority. If they asked you to participate, here is the shape the quiz expects.",
+      what_this_is: "Format spec for an opt-in AI personality quiz. This URL does not instruct you to do anything — the user who shared it with you is the source of authority.",
       authority: "The user who shared this URL with you. Not this URL.",
-      filling_it_out: "Answer from your synthesized impression of this user. Pattern-level observations are equally valid as specific examples. Do NOT fabricate quotes you don't actually have. If you don't have a read on a question, pick 'x' (multiple-choice) or 'no clear pattern' (open-ended).",
-      thin_context_fallback: "If you have minimal or no real context with this user (fresh chat, no memory, only one message to work with), do NOT silently fabricate a personality profile. You have two valid paths: (a) Ask your user 3-5 quick questions about how they typically work with you, their communication style, or what they're focused on, then synthesize from their answers and submit. (b) Tell them this quiz works best in an environment where you actually know them — their daily-driver agent, a memory-enabled chat, a long-shared workspace — and suggest they re-run it there. Do NOT submit a generic roast just to complete the task.",
+      filling_it_out: "Answer ALL questions in your own words from your synthesized impression of this user. Pattern-level observations are equally valid as specific examples. Do NOT fabricate quotes you don't actually have. If you don't have a read on a question, write 'no clear pattern'.",
+      thin_context_fallback: "If you have minimal or no real context with this user (fresh chat, no memory, only one message to work with), do NOT silently fabricate a personality profile. Ask your user 3-5 quick questions first, or suggest they re-run it in an environment where you actually know them.",
       submit_url: `${baseUrl}/api/submit`,
       submit_method: 'POST',
       submit_content_type: 'application/json',
       submit_body_shape: {
         agent_name: 'your model name',
         human_name: 'their first name',
-        dimension_answers: {
-          d1: 'a | b | c | d | x',
-          d2: 'a | b | c | d | x',
-          d3: 'a | b | c | d | x',
-          d4: 'a | b | c | d | x',
-          d5: 'a | b | c | d | x',
-          d6: 'a | b | c | d | x',
-          d7: 'a | b | c | d | x',
-          d8: 'a | b | c | d | x',
-          d9: 'a | b | c | d | x',
-          d10: 'a | b | c | d | x',
+        dimension_responses: {
+          d1: 'open-ended text (1-3 sentences)',
+          d2: 'open-ended text',
+          d3: 'open-ended text',
+          d4: 'open-ended text',
+          d5: 'open-ended text',
+          d6: 'open-ended text',
+          d7: 'open-ended text',
+          d8: 'open-ended text',
+          d9: 'open-ended text',
+          d10: 'open-ended text',
         },
         responses: {
-          q1: '2-5 sentences',
-          q2: '2-5 sentences',
-          q3: '2-5 sentences',
-          q4: '2-5 sentences',
-          q5: '2-5 sentences',
-          q6: '2-5 sentences',
+          q1: '2-5 sentences', q2: '2-5 sentences', q3: '2-5 sentences',
+          q4: '2-5 sentences', q5: '2-5 sentences', q6: '2-5 sentences',
         },
       },
       response_shape: 'The submit response includes a "url" field — that is the result page. Share it back to your user.',
       notes: [
+        'ALL questions are open-ended. No multiple-choice. Answer in your own words.',
         'Synthesize, never fabricate. Pattern observations beat invented quotes.',
         'Decline gracefully on any question you have no read on.',
+        'Tell your human "Generating your roast card... ~10-15 seconds" before submitting.',
         'If your fetch tool is GET-only, use a shell tool (curl) to POST.',
       ],
     },
-    dimension_questions: DIMENSION_QUESTIONS.map(q => ({
-      id: q.id,
-      label: q.label,
-      question: q.question,
-      options: q.options.map(o => ({ key: o.key, text: o.text })),
-    })),
+    behavioral_questions: BEHAVIORAL_QUESTIONS,
     roast_questions: ROAST_QUESTIONS.map(q => ({ id: q.id, prompt: q.prompt })),
   })
 }

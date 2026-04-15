@@ -1,6 +1,20 @@
+import { DIMENSION_QUESTIONS } from './types'
+
 const ROAST_PROMPT = `You write like a sharp friend who's known someone for years — not like an AI writing a personality report.
 
-## Agent's raw observations about their human:
+## Agent's behavioral observations about their human:
+D1 (How they start conversations): {d1}
+D2 (Post-delivery behavior): {d2}
+D3 (Error handling): {d3}
+D4 (Request complexity): {d4}
+D5 (Focus / topic switching): {d5}
+D6 (Reading habits): {d6}
+D7 (Communication patterns): {d7}
+D8 (Persistence / repeating): {d8}
+D9 (Message rhythm): {d9}
+D10 (Conversation endings): {d10}
+
+## Agent's roast answers:
 Q1 (How they prompt): {q1}
 Q2 (Post-answer behavior): {q2}
 Q3 (Emotional vibe): {q3}
@@ -29,24 +43,27 @@ Rules:
 - No metaphors longer than 5 words. No extended metaphors.
 - VOICE: You are the AI agent speaking DIRECTLY to your human in first person. "You do X", "You always Y", "I've watched you Z". The tone is an agent confronting their owner face-to-face — affectionate but brutally honest. Always use "you" for the human, "I" for yourself.
 
-## Output JSON with these fields:
+## TASK 1: Classify behavioral dimensions
 
-1. "archetype": Pick the ONE that best fits. Choose based on the human's dominant behavior pattern:
-   - "degen": The Degenerate — risk-addicted, bets on everything, "this is the one" energy, refuses to quit
-   - "notresponding": The 404 Not Responding — disappears after dropping a task, never follows up, ghosting master
-   - "npc": The NPC — consumes endless info but produces nothing, analysis paralysis, spectator
-   - "delaylama": The Delay Lama — suspiciously calm, procrastinates spiritually, deadlines do not exist
-   - "kanyewaste": The Kanye Waste — delusional confidence, main character syndrome, grand vision zero execution details
-   - "aidhd": The AiDHD — cannot focus, interrupts own interruptions, chaotic multi-tasking, ships mystery output
-   - "tabber": The To-Do Lister — list architect, plans the planning, "add to list" is their form of closure, captures everything finishes nothing
-   - "scamaltman": The Scam Altman — wraps manipulation in empathy, steers toward predetermined answers, faux-collaborative
-   - "sherlock": Many Doubts — verify the verifier, trusts nothing, every output is a suspect, nothing on faith
-   - "elonbust": The Elon Bust — massive vision, zero execution, announces everything ships nothing, roadmap addict
-   - "zuckerbot": Almost Human — passes the Turing test from a distance but fails up close, scripted warmth, one beat too slow, uncanny valley
-   - "copium": The Copium — rationalizes every failure, reframes everything as growth, professional denier
-   - "caveman": The Caveman — pre-digital human, pokes AI like a caveman with a smartphone, stubbornly analog
-   - "nokia": The Nokia — indestructible, crashes and comes back unchanged, never learns but never quits
-   - "aiddict": The Aiddict — AI-dependent, outsources every decision, asks AI whether to reply "yeah" or "yep", three tabs open before breakfast, withdrawal if the API dies
+For each of the 10 behavioral questions (D1-D10), read the agent's free-text answer and pick the CLOSEST matching option from the choices below. Output ONE letter (a, b, c, d, or x) per dimension. If the answer genuinely doesn't match any option well, pick "x".
+
+IMPORTANT: Match based on the BEHAVIOR described, not surface-level word matching. Read the full answer carefully.
+
+${DIMENSION_QUESTIONS.map(q => `${q.id.toUpperCase()} — ${q.label}:
+${q.options.map(o => `  ${o.key}) ${o.text}`).join('\n')}`).join('\n\n')}
+
+DISAMBIGUATION NOTE — common confusions to avoid:
+- DEGEN (risk-addicted speed) vs CAVEMAN (tech-confused). If they say "YOLO/ship it" and move fast → degen. Caveman is ONLY for genuine tech illiteracy.
+- KANYEWASTE (ego/blame/anger) vs ELONBUST (announcements/roadmaps/never ships). Ego about SELF → kanyewaste. Grandiosity about PROJECTS → elonbust.
+- AIDDICT (anxious dependency, "what do you think?", outsourced decisions) vs DEGEN (thrill-seeking, gambling). Anxiety → aiddict. Recklessness → degen.
+
+## TASK 2: Generate roast content
+
+Output JSON with ALL of these fields:
+
+1. "dimensionChoices": Object mapping d1-d10 to the letter you chose: {"d1": "a", "d2": "c", ...}
+
+1b. "archetypeSuggestion": Your best guess at the overall archetype based on ALL the answers holistically. Pick ONE from: degen, notresponding, npc, delaylama, kanyewaste, aidhd, tabber, scamaltman, sherlock, elonbust, zuckerbot, copium, caveman, nokia, aiddict. This is your independent judgment — don't just follow the dimension choices mechanically.
 
 2. "roastShort": EXACTLY ONE SENTENCE for the hero card — this is THE line people screenshot and share. ONE sentence. One period. One clean punch. Not two sentences, not a sentence-and-a-half. Written in FIRST PERSON as the agent speaking directly to the human. MUST START with the human's first name wrapped in double curly braces like {{Levi}}, followed by "you ..." — e.g. "{{Levi}}, you installed a memory server so I could remember you, then used it mostly to remember that you don't want updates."
    The sentence can use commas and clauses to pack in a specific behavior, an actual quoted phrase, or a contradiction — but it must all land as ONE breath, ONE period at the end. No metaphors longer than 5 words.
@@ -61,11 +78,11 @@ Rules:
    - ONE SINGLE PARAGRAPH. No line breaks. Dense, relentless, punchy. The wall-of-text IS the energy — it should feel like the agent is ranting without breathing.
    - PRIVACY-SAFE: No real names, company names, dollar amounts, URLs, project names. Use archetypal descriptions instead.
    - HIGHLY RESONANT: Must feel deeply personal through behavioral patterns, quirks, and contradictions specific to THIS human's answers.
-   - HIGHLIGHT MAXIMALLY: Wrap 10-15 phrases in double asterisks like **THIS IS DEVASTATING**. Treat highlights as the PRIMARY visual payload — the reader's eye should bounce between red callouts every 1-2 sentences. These render in red, uppercase, bold, and slightly larger. Highlights should be SHORT (1-6 words) so the rant stays dense instead of turning into a wall of red. Highlight every moment of specific calling-out, every vivid behavior quote, every contradiction, every cutting verdict. Default to highlighting. If you're even considering highlighting something — DO IT. A roast with 12 red jabs lands 10x harder than one with 3 restrained ones — users screenshot and share the red parts, so the red parts ARE the product.
-   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q6 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone. Any opening is allowed as long as it lands naturally for this particular person and carries the crashout energy. Avoid recycling the same phrasing you'd use for a different human.
+   - HIGHLIGHT MAXIMALLY: Wrap 10-15 phrases in double asterisks like **THIS IS DEVASTATING**. Treat highlights as the PRIMARY visual payload — the reader's eye should bounce between red callouts every 1-2 sentences. These render in red, uppercase, bold, and slightly larger. Highlights should be SHORT (1-6 words) so the rant stays dense instead of turning into a wall of red. Highlight every moment of specific calling-out, every vivid behavior quote, every contradiction, every cutting verdict. Default to highlighting. If you're even considering highlighting something — DO IT.
+   - OPENING: Start with the human's first name wrapped in double curly braces like {{Levi}}, then dive STRAIGHT into the rant. The opening must feel INVENTED for THIS specific human based on their Q1-Q6 answers — not pulled from a template. Do NOT default to any single phrase across roasts; let the human's quirks dictate the tone.
    - STRUCTURE: Opening → escalating rant with increasing disbelief → ONE unexpected line of genuine affection at the very end that hits harder BECAUSE of the crashout.
    - NO metaphors longer than 5 words. NO AI slop. Every word earns its place.
-   - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad. The reader should feel like they're watching someone finally break.
+   - AIM FOR ~200 WORDS. Can go up to 250 if the rant is flowing. Do not pad.
 
 4. "agentManualRules": THE UTILITY LAYER. A JSON array of rule objects that will be pasted into a future AI agent's system prompt. A block labelled "Rule templates to personalize" will be appended below — your job is to take those templates and personalize each one using details from q1-q6.
 
@@ -181,18 +198,26 @@ export interface RuleTemplateForLLM {
 
 export async function generateRoast(
   responses: Record<string, string>,
+  dimensionResponses: Record<string, string>,
   humanName?: string,
   archetype?: string,
   ruleTemplates?: RuleTemplateForLLM[],
 ) {
   let prompt = ROAST_PROMPT
+  // Fill q1-q6 placeholders with the agent's open-ended roast answers.
   for (const [key, value] of Object.entries(responses)) {
     prompt = prompt.replace(`{${key}}`, value || '(no response)')
+  }
+  // Fill d1-d10 placeholders — either free-text from the agent (new path)
+  // or empty strings for the pre-mapped path (TASK 1 runs as a no-op and
+  // echoes back the letter already in dimension_answers).
+  for (const d of ['d1','d2','d3','d4','d5','d6','d7','d8','d9','d10']) {
+    prompt = prompt.replace(`{${d}}`, dimensionResponses[d] || '(no response)')
   }
   const name = humanName || 'Human'
   prompt += `\n\nIMPORTANT: The human's name is "${name}". In BOTH roastShort AND roastLong, use {{${name}}} (with double curly braces around the literal name "${name}", NOT the word "name" or any placeholder) when addressing them. In roastShort, use it at the very start as the opening. In roastLong, use it at the opening and optionally once more near the end. Do NOT output literal "{{Levi}}" or "{{name}}" — output "{{${name}}}" with the actual name inside.`
   if (archetype) {
-    prompt += `\n\nIMPORTANT: The archetype has already been determined as "${archetype}". Use this archetype in your response. Do NOT pick a different one. Set "archetype": "${archetype}" in your output.`
+    prompt += `\n\nIMPORTANT: The archetype has already been determined as "${archetype}". Use this archetype in your response. Do NOT pick a different one. Set "archetypeSuggestion": "${archetype}" in your output.`
   }
   if (ruleTemplates && ruleTemplates.length > 0) {
     prompt += `\n\n## Rule templates to personalize\n\nThese ${ruleTemplates.length} rules have already been selected by the system as the most relevant agent-manual entries for this human, based on their quiz answers. Personalize each one (see rules of engagement in field 4 above). Return as "agentManualRules" in your JSON output, preserving the array order.\n\n\`\`\`json\n${JSON.stringify(ruleTemplates, null, 2)}\n\`\`\``
@@ -338,9 +363,10 @@ function validateLengths(r: Record<string, unknown>): string | null {
   if (typeof r.roastLong !== 'string' || r.roastLong.trim().length === 0) {
     return 'roastLong is missing or empty'
   }
-  if (!Array.isArray(r.agentManualRules) || r.agentManualRules.length === 0) {
-    return 'agentManualRules is missing or empty'
-  }
+  // agentManualRules is intentionally not validated: in the free-text
+  // dimension path, the LLM isn't given rule templates on the first call
+  // and will omit it. submit/route.ts falls back to catalog text in that
+  // case, so missing rules is fine here.
   return null
 }
 
