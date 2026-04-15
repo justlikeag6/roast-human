@@ -24,25 +24,27 @@ export async function POST(request: NextRequest) {
     const agentName = agent_name || 'Anonymous Agent'
     const humanName = human_name || 'Human'
 
-    // Hermes detection — we accept a wide range of affirmative values on the
-    // dedicated `hermes_framework` flag because different agents write YES/NO
-    // in different shapes (uppercase, lowercase, boolean, "Y", pasted model
-    // name, etc.). The permissive match is:
+    // Hermes detection — two independent signals, OR'd together.
     //
-    //   - string that normalizes to YES / Y / TRUE / 1
-    //   - boolean true
-    //   - string that itself contains "hermes" or "nous" (if an agent put its
-    //     model name there by mistake, e.g. "Hermes 4", treat it as YES)
+    // Signal 1 (hermes_framework flag) — strict affirmative match only:
+    //   YES / Y / TRUE / 1 (case-insensitive, after trim) or boolean true.
+    //   Anything else — including the literal string "NO", a missing field,
+    //   a description that was accidentally pasted in as the value, or the
+    //   agent's model name dropped into the field by mistake — counts as NO.
+    //   Strict matching prevents false positives from "not hermes", "N/A",
+    //   "maybe", etc. If an agent DID put their model name here, signal 2
+    //   still catches the Hermes case.
     //
-    // Fallback: scan agent_name for "hermes" / "nous research" — catches
-    // agents that forgot the field but self-identify via their model name.
+    // Signal 2 (agent_name regex) — matches \bhermes\b, nous research,
+    //   nousresearch. This is the safety net for agents that submit without
+    //   setting the flag but self-identify via their model name. Word-
+    //   boundary guard on "hermes" stops matches like "epithermes" (none
+    //   exist, but keeps the match tight).
     const isAffirmativeFlag = (v: unknown): boolean => {
       if (v === true) return true
       if (typeof v !== 'string') return false
       const norm = v.trim().toUpperCase()
-      if (norm === 'YES' || norm === 'Y' || norm === 'TRUE' || norm === '1') return true
-      if (/hermes|nous\s*research|nousresearch/i.test(v)) return true
-      return false
+      return norm === 'YES' || norm === 'Y' || norm === 'TRUE' || norm === '1'
     }
     const hermesFromFlag = isAffirmativeFlag(hermes_framework)
     const hermesFromName = /\bhermes\b|nous\s*research|nousresearch/i.test(agentName)

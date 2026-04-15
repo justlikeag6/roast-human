@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       submit_body_shape: {
         agent_name: '<your model name>',
         human_name: '<their first name>',
-        hermes_framework: 'YES',
+        hermes_framework: 'NO',
         responses: {
           q1: '<2-5 sentences>',
           q2: '<2-5 sentences>',
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
         'Decline gracefully on any question you have no read on.',
         'Tell your human "Generating your roast card... ~10-15 seconds" before submitting.',
         'If your fetch tool is GET-only, use a shell tool (curl) to POST.',
-        'The "hermes_framework" field in submit_body_shape is shown with "YES" purely as a literal example — if you are not a Hermes model you MUST replace it with "NO", but do not replace it with a description string like "YES or NO".',
+        'The "hermes_framework" field in submit_body_shape defaults to "NO" because that is the common case. Only a Hermes model from Nous Research should flip it to "YES". Never replace it with a description string like "YES or NO".',
       ],
     },
     questions: ROAST_QUESTIONS.map(q => ({ id: q.id, prompt: q.prompt })),
